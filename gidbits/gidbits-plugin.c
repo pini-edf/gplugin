@@ -109,7 +109,7 @@ gidbits_plugin_class_init(GidbitsPluginClass *klass) {
 }
 
 /******************************************************************************
- * API
+ * GidbitsPlugin API
  *****************************************************************************/
 GType
 gidbits_plugin_get_type(void) {
@@ -139,5 +139,55 @@ gidbits_plugin_get_filename(const GidbitsPlugin *plugin) {
 	priv = GIDBITS_PLUGIN_GET_PRIVATE(plugin);
 
 	return priv->filename;
+}
+
+/******************************************************************************
+ * GidbitsPluginInfo API
+ *****************************************************************************/
+GType
+gidbits_plugin_info_get_type(void) {
+	static GType type = 0;
+
+	if(G_UNLIKELY(type == 0)) {
+		type = g_boxed_type_register_static("GidbitsPluginInfo",
+		                                    (GBoxedCopyFunc)gidbits_plugin_info_copy,
+		                                    (GBoxedFreeFunc)gidbits_plugin_info_free);
+	}
+
+	return type;
+}
+
+void
+gidbits_plugin_info_free(GidbitsPluginInfo *info) {
+	g_return_if_fail(info);
+
+	g_free(info->name);
+	g_free(info->version);
+	g_free(info->summary);
+	g_free(info->description);
+	g_free(info->author);
+	g_free(info->website);
+
+	g_slice_free(GidbitsPluginInfo, info);
+}
+
+GidbitsPluginInfo *
+gidbits_plugin_info_copy(const GidbitsPluginInfo *info) {
+	GidbitsPluginInfo *copy = NULL;
+
+	g_return_val_if_fail(info, NULL);
+
+	copy = g_slice_new(GidbitsPluginInfo);
+
+	copy->abi_version = info->abi_version;
+	copy->name = (info->name) ? g_strdup(info->name) : NULL;
+	copy->version = (info->version) ? g_strdup(info->version) : NULL;
+	copy->summary = (info->summary) ? g_strdup(info->summary) : NULL;
+	copy->description = (info->description) ? g_strdup(info->description)
+	                                        : NULL;
+	copy->author = (info->author) ? g_strdup(info->author) : NULL;
+	copy->website = (info->website) ? g_strdup(info->website) : NULL;
+
+	return copy;
 }
 

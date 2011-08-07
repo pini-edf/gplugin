@@ -31,6 +31,10 @@
 typedef struct _GidbitsPlugin          GidbitsPlugin;
 typedef struct _GidbitsPluginClass     GidbitsPluginClass;
 
+#define GIDBITS_TYPE_PLUGIN_INFO       (gidbits_plugin_info_get_type())
+
+typedef struct _GidbitsPluginInfo      GidbitsPluginInfo;
+
 typedef enum {
 	GIDBITS_PLUGIN_STATE_UNKNOWN = -1,
 	GIDBITS_PLUGIN_STATE_ERROR = 0,
@@ -56,11 +60,26 @@ struct _GidbitsPluginClass {
 	void (*_gidbits_reserved_4)(void);
 };
 
+struct _GidbitsPluginInfo {
+	guint32 abi_version;
+	gchar *name;
+	gchar *version;
+	gchar *summary;
+	gchar *description;
+	gchar *author;
+	gchar *website;
+};
+
 G_BEGIN_DECLS
 
 GType gidbits_plugin_get_type(void);
 
 const gchar *gidbits_plugin_get_filename(const GidbitsPlugin *plugin);
+
+GType gidbits_plugin_info_get_type(void);
+
+GidbitsPluginInfo *gidbits_plugin_info_copy(const GidbitsPluginInfo *info);
+void gidbits_plugin_info_free(GidbitsPluginInfo *info);
 
 G_END_DECLS
 
