@@ -31,6 +31,15 @@
 typedef struct _GidbitsPlugin          GidbitsPlugin;
 typedef struct _GidbitsPluginClass     GidbitsPluginClass;
 
+typedef enum {
+	GIDBITS_PLUGIN_STATE_UNKNOWN = -1,
+	GIDBITS_PLUGIN_STATE_ERROR = 0,
+	GIDBITS_PLUGIN_STATE_LOADED,
+	GIDBITS_PLUGIN_STATE_LOAD_FAILED,
+	GIDBITS_PLUGIN_STATE_NOT_LOADED,
+	GIDBITS_PLUGIN_STATES,
+} GidbitsPluginState;
+
 #include <glib.h>
 #include <glib-object.h>
 
