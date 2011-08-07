@@ -16,6 +16,7 @@
  */
 
 #include <glib.h>
+#include <glib-object.h>
 
 #include <gidbits/gidbits-core.h>
 #include <gidbits/gidbits-private.h>
