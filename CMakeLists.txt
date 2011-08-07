@@ -43,7 +43,8 @@ add_definitions(
 
 include_directories(
 	${CMAKE_SOURCE_DIR}
-	${CMAKE_BINARY_DIR}
+	${CMAKE_BINARY_DIR}                # for gidbits-version.h
+	${CMAKE_BINARY_DIR}/gidbits        # for gidbits.h
 	${GLIB_INCLUDE_DIRS}
 	${GMODULE_INCLUDE_DIRS}
 )
@@ -62,4 +63,5 @@ configure_file(gidbits.pc.in ${CMAKE_BINARY_DIR}/gidbits.pc @ONLY)
 # Subdirectories
 ###############################################################################
 add_subdirectory(gidbits)
+add_subdirectory(tests)
 

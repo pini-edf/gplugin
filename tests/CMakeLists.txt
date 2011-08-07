@@ -1,0 +1,23 @@
+macro(add_gtest target)
+	add_executable(${target} ${target}.c)
+	target_link_libraries(${target} ${GLIB_LIBRARIES} gidbits)
+
+	get_target_property(_output_name ${target} RUNTIME_OUTPUT_NAME)
+	if(${_output_name})
+	else(${_output_name})
+		get_target_property(_output_name ${target} LOCATION)
+	endif(${_output_name})
+
+	list(APPEND TESTS ${_output_name})
+endmacro(add_gtest)
+
+add_gtest(test-paths)
+
+set(GTESTER_TESTS "${TESTS}")
+set(GTESTER_LOG "testgidbits.log")
+
+add_custom_target(tests ALL
+	COMMAND ${GTESTER} -k --verbose -o ${GTESTER_LOG} ${GTESTER_TESTS}
+	DEPENDS ${GTESTER_TESTS}
+)
+
