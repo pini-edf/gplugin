@@ -34,3 +34,70 @@ gidbits_plugin_loader_get_type(void) {
 	return type;
 }
 
+GList *
+gidbits_plugin_loader_get_supported_extensions(GidbitsPluginLoader *loader) {
+	GidbitsPluginLoaderIface *iface = NULL;
+
+	g_return_val_if_fail(GIDBITS_IS_PLUGIN_LOADER(loader), NULL);
+
+	iface = GIDBITS_PLUGIN_LOADER_GET_IFACE(loader);
+
+	if(iface && iface->supported_extensions)
+		return iface->supported_extensions(loader);
+
+	return NULL;
+}
+
+GidbitsPluginInfo *
+gidbits_plugin_loader_query_plugin(GidbitsPluginLoader *loader,
+                                   const gchar *filename, GError **error)
+{
+	GidbitsPluginLoaderIface *iface = NULL;
+
+	g_return_val_if_fail(GIDBITS_IS_PLUGIN_LOADER(loader), NULL);
+	g_return_val_if_fail(filename, NULL);
+	g_return_val_if_fail(error != NULL, NULL);
+
+	iface = GIDBITS_PLUGIN_LOADER_GET_IFACE(loader);
+
+	if(iface && iface->query)
+		return iface->query(loader, filename, error);
+
+	return NULL;
+}
+
+GidbitsPlugin *
+gidbits_plugin_loader_load_plugin(GidbitsPluginLoader *loader,
+                                  const gchar *filename, GError **error)
+{
+	GidbitsPluginLoaderIface *iface = NULL;
+
+	g_return_val_if_fail(GIDBITS_IS_PLUGIN_LOADER(loader), NULL);
+	g_return_val_if_fail(filename, NULL);
+	g_return_val_if_fail(error != NULL, NULL);
+
+	iface = GIDBITS_PLUGIN_LOADER_GET_IFACE(loader);
+
+	if(iface && iface->load)
+		return iface->load(loader, filename, error);
+
+	return NULL;
+}
+
+gboolean
+gidbits_plugin_loader_unload_plugin(GidbitsPluginLoader *loader,
+                                    GidbitsPlugin *plugin, GError **error)
+{
+	GidbitsPluginLoaderIface *iface = NULL;
+
+	g_return_val_if_fail(GIDBITS_IS_PLUGIN_LOADER(loader), FALSE);
+	g_return_val_if_fail(GIDBITS_IS_PLUGIN(plugin), FALSE);
+
+	iface = GIDBITS_PLUGIN_LOADER_GET_IFACE(loader);
+
+	if(iface && iface->unload)
+		return iface->unload(loader, plugin, error);
+
+	return FALSE;
+}
+

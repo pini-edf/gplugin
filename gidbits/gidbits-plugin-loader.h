@@ -32,8 +32,17 @@ typedef struct _GidbitsPluginLoaderIface     GidbitsPluginLoaderIface;
 #include <glib.h>
 #include <glib-object.h>
 
+#include <gidbits/gidbits-plugin.h>
+
 struct _GidbitsPluginLoaderIface {
 	GTypeInterface gparent;
+
+	GList *(*supported_extensions)(GidbitsPluginLoader *loader);
+
+	GidbitsPluginInfo *(*query)(GidbitsPluginLoader *loader, const gchar *filename, GError **error);
+
+	GidbitsPlugin *(*load)(GidbitsPluginLoader *loader, const gchar *filename, GError **error);
+	gboolean (*unload)(GidbitsPluginLoader *loader, GidbitsPlugin *plugin, GError **error);
 
 	void (*_gidbits_reserved_1)(void);
 	void (*_gidbits_reserved_2)(void);
@@ -44,6 +53,13 @@ struct _GidbitsPluginLoaderIface {
 G_BEGIN_DECLS
 
 GType gidbits_plugin_loader_get_type(void);
+
+GList *gidbits_plugin_loader_get_supported_extensions(GidbitsPluginLoader *loader);
+
+GidbitsPluginInfo *gidbits_plugin_loader_query_plugin(GidbitsPluginLoader *loader, const gchar *filename, GError **error);
+
+GidbitsPlugin *gidbits_plugin_loader_load_plugin(GidbitsPluginLoader *loader, const gchar *filename, GError **error);
+gboolean gidbits_plugin_loader_unload_plugin(GidbitsPluginLoader *loader, GidbitsPlugin *plugin, GError **error);
 
 G_END_DECLS
 
