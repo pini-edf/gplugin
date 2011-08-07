@@ -86,6 +86,8 @@ main(gint argc, gchar **argv) {
 
 	g_test_init(&argc, &argv, NULL);
 
+	gidbits_init();
+
 	g_test_add_func("/plugins/paths/add_remove_single",
 	                test_gidbits_plugins_paths_single);
 

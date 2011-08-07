@@ -20,8 +20,24 @@
 /******************************************************************************
  * Globals
  *****************************************************************************/
-static GList *paths = NULL;
+static GHashTable *paths = NULL;
 static GHashTable *plugins = NULL;
+
+/******************************************************************************
+ * Private API
+ *****************************************************************************/
+void
+gidbits_plugins_init(void) {
+	paths = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
+
+	plugins = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
+}
+
+void
+gidbits_plugins_uninit(void) {
+	g_hash_table_destroy(paths);
+	g_hash_table_destroy(plugins);
+}
 
 /******************************************************************************
  * API
@@ -31,30 +47,16 @@ gidbits_plugins_add_path(const gchar *path_str) {
 	if(!path_str)
 		return;
 
-	if(g_list_find(paths, path_str))
-		return;
-
-	paths = g_list_append(paths, g_strdup(path_str));
+	g_hash_table_insert(paths, g_strdup(path_str), NULL);
 }
 
 void
 gidbits_plugins_remove_path(const gchar *path_str) {
-	GList *l = NULL;
-	gchar *path = NULL;
-
-	if(!path_str)
-		return;
-
-	if(!(l = g_list_find(paths, path_str)))
-		return;
-
-	path = (gchar *)l->data;
-	paths = g_list_remove(paths, path);
-	g_free(path);
+	g_hash_table_remove(paths, path_str);
 }
 
 GList *
 gidbits_plugins_get_paths(void) {
-	return paths;
+	return g_hash_table_get_keys(paths);
 }
 

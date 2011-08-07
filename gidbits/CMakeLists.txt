@@ -6,10 +6,12 @@ add_definitions(
 )
 
 set(GIDBITS_HEADERS
+	gidbits-core.h
 	gidbits-plugins.h
 )
 
 set(GIDBITS_SOURCES
+	gidbits-core.c
 	gidbits-plugins.c
 )
 
@@ -22,6 +24,7 @@ add_library(gidbits SHARED
 	${GIDBITS_HEADERS}
 	${GIDBITS_BUILT_HEADERS}
 	gidbits.h
+	gidbits-private.h
 )
 
 target_link_libraries(gidbits
