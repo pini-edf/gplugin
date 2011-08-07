@@ -20,20 +20,12 @@ set(GIDBITS_SOURCES
 )
 
 set(GIDBITS_BUILT_HEADERS
+	gidbits-enums.h
 	gidbits-version.h
 )
 
-add_library(gidbits SHARED
-	${GIDBITS_SOURCES}
-	${GIDBITS_HEADERS}
-	${GIDBITS_BUILT_HEADERS}
-	gidbits.h
-	gidbits-private.h
-)
-
-target_link_libraries(gidbits
-	${GLIB_LIBRARIES}
-	${GMODULE_LIBRARIES}
+set(GIDBITS_BUILT_SOURCES
+	gidbits-enums.c
 )
 
 ###############################################################################
@@ -49,4 +41,44 @@ foreach(HEADER ${GIDBITS_HEADERS} ${GIDBITS_BUILT_HEADERS})
 endforeach(HEADER)
 
 configure_file(gidbits.h.in gidbits.h @ONLY)
+
+###############################################################################
+# gidbits-enum.[ch] generation
+###############################################################################
+set(ENUM_HEADERS
+	gidbits-plugin.h
+)
+
+add_custom_command(
+	OUTPUT gidbits-enums.h
+	DEPENDS ${ENUM_HEADERS} gidbits-enums.h.template
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	COMMAND ${GLIB_MKENUMS} --template gidbits-enums.h.template ${ENUM_HEADERS} >
+		${CMAKE_CURRENT_BINARY_DIR}/gidbits-enums.h
+)
+
+add_custom_command(
+	OUTPUT gidbits-enums.c
+	DEPENDS ${ENUM_HEADERS} gidbits-enums.c.template gidbits-enums.h
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	COMMAND ${GLIB_MKENUMS} --template gidbits-enums.c.template ${ENUM_HEADERS} >
+		${CMAKE_CURRENT_BINARY_DIR}/gidbits-enums.c
+)
+
+###############################################################################
+# Library target
+###############################################################################
+add_library(gidbits SHARED
+	${GIDBITS_SOURCES}
+	${GIDBITS_BUILT_SOURCES}
+	${GIDBITS_HEADERS}
+	${GIDBITS_BUILT_HEADERS}
+	gidbits.h
+	gidbits-private.h
+)
+
+target_link_libraries(gidbits
+	${GLIB_LIBRARIES}
+	${GMODULE_LIBRARIES}
+)
 
