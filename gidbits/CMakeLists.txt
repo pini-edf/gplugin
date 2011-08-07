@@ -7,12 +7,12 @@ add_definitions(
 
 set(GIDBITS_HEADERS
 	gidbits-core.h
-	gidbits-plugins.h
+	gidbits-plugin-manager.h
 )
 
 set(GIDBITS_SOURCES
 	gidbits-core.c
-	gidbits-plugins.c
+	gidbits-plugin-manager.c
 )
 
 set(GIDBITS_BUILT_HEADERS

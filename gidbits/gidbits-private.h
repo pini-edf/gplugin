@@ -25,8 +25,8 @@
 
 G_BEGIN_DECLS
 
-void gidbits_plugins_init(void);
-void gidbits_plugins_uninit(void);
+void gidbits_plugin_manager_init(void);
+void gidbits_plugin_manager_uninit(void);
 
 G_END_DECLS
 

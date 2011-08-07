@@ -18,18 +18,18 @@
 #error "only <gidbits.h> may be included directly"
 #endif
 
-#ifndef GIDBITS_PLUGINS_H
-#define GIDBITS_PLUGINS_H
+#ifndef GIDBITS_PLUGIN_MANAGER_H
+#define GIDBITS_PLUGIN_MANAGER_H
 
 #include <glib.h>
 
 G_BEGIN_DECLS
 
-void gidbits_plugins_add_path(const gchar *path_str);
-void gidbits_plugins_remove_path(const gchar *path_str);
-GList *gidbits_plugins_get_paths(void);
+void gidbits_plugin_manager_add_path(const gchar *path_str);
+void gidbits_plugin_manager_remove_path(const gchar *path_str);
+GList *gidbits_plugin_manager_get_paths(void);
 
 G_END_DECLS
 
-#endif /* GIDBITS_PLUGINS_H */
+#endif /* GIDBITS_PLUGIN_MANAGER_H */
 

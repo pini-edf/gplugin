@@ -20,7 +20,7 @@
 #include <glib.h>
 
 #define test_path_count(e) G_STMT_START { \
-	GList *paths = gidbits_plugins_get_paths(); \
+	GList *paths = gidbits_plugin_manager_get_paths(); \
 	g_assert_cmpint(g_list_length(paths), ==, (e)); \
 } G_STMT_END
 
@@ -28,56 +28,56 @@
  * Tests
  *****************************************************************************/
 static void
-test_gidbits_plugins_paths_single(void) {
-	gidbits_plugins_add_path("foo");
+test_gidbits_plugin_manager_paths_single(void) {
+	gidbits_plugin_manager_add_path("foo");
 	test_path_count(1);
 
-	gidbits_plugins_remove_path("foo");
+	gidbits_plugin_manager_remove_path("foo");
 	test_path_count(0);
 }
 
 static void
-test_gidbits_plugins_paths_duplicate(void) {
-	gidbits_plugins_add_path("foo");
-	gidbits_plugins_add_path("foo");
+test_gidbits_plugin_manager_paths_duplicate(void) {
+	gidbits_plugin_manager_add_path("foo");
+	gidbits_plugin_manager_add_path("foo");
 
 	test_path_count(1);
 
-	gidbits_plugins_remove_path("foo");
+	gidbits_plugin_manager_remove_path("foo");
 	test_path_count(0);
 }
 
 static void
-test_gidbits_plugins_paths_multiple_fifo(void) {
+test_gidbits_plugin_manager_paths_multiple_fifo(void) {
 	/* add */
-	gidbits_plugins_add_path("foo");
+	gidbits_plugin_manager_add_path("foo");
 	test_path_count(1);
 
-	gidbits_plugins_add_path("bar");
+	gidbits_plugin_manager_add_path("bar");
 	test_path_count(2);
 
 	/* remove */
-	gidbits_plugins_remove_path("foo");
+	gidbits_plugin_manager_remove_path("foo");
 	test_path_count(1);
 
-	gidbits_plugins_remove_path("bar");
+	gidbits_plugin_manager_remove_path("bar");
 	test_path_count(0);
 }
 
 static void
-test_gidbits_plugins_paths_multiple_filo(void) {
+test_gidbits_plugin_manager_paths_multiple_filo(void) {
 	/* add */
-	gidbits_plugins_add_path("foo");
+	gidbits_plugin_manager_add_path("foo");
 	test_path_count(1);
 
-	gidbits_plugins_add_path("bar");
+	gidbits_plugin_manager_add_path("bar");
 	test_path_count(2);
 
 	/* remove */
-	gidbits_plugins_remove_path("bar");
+	gidbits_plugin_manager_remove_path("bar");
 	test_path_count(1);
 
-	gidbits_plugins_remove_path("foo");
+	gidbits_plugin_manager_remove_path("foo");
 	test_path_count(0);
 }
 
@@ -89,16 +89,16 @@ main(gint argc, gchar **argv) {
 	gidbits_init();
 
 	g_test_add_func("/plugins/paths/add_remove_single",
-	                test_gidbits_plugins_paths_single);
+	                test_gidbits_plugin_manager_paths_single);
 
 	g_test_add_func("/plugins/paths/add_remove_duplicate",
-	                test_gidbits_plugins_paths_duplicate);
+	                test_gidbits_plugin_manager_paths_duplicate);
 
 	g_test_add_func("/plugins/paths/add_remove_multiple_fifo",
-	                test_gidbits_plugins_paths_multiple_fifo);
+	                test_gidbits_plugin_manager_paths_multiple_fifo);
 
 	g_test_add_func("/plugins/paths/add_remove_multiple_filo",
-	                test_gidbits_plugins_paths_multiple_filo);
+	                test_gidbits_plugin_manager_paths_multiple_filo);
 
 	return g_test_run();
 }

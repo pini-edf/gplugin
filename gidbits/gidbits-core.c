@@ -22,12 +22,12 @@
 
 void
 gidbits_uninit(void) {
-	gidbits_plugins_uninit();
+	gidbits_plugin_manager_uninit();
 }
 
 void
 gidbits_init(void) {
-	gidbits_plugins_init();
+	gidbits_plugin_manager_init();
 
 	g_atexit(gidbits_uninit);
 }
