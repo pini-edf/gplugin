@@ -1,0 +1,10 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+libdir=${prefix}/lib
+includedir=${prefix}/include/gidbits
+
+Name: libgidbits
+Description: A fully featured GModule based plugin library
+Version: @GIDBITS_VERSION@
+Libs: -L${libdir} -lgidbits
+Cflags: -I${includedir}
+
