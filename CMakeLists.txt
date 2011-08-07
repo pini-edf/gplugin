@@ -29,10 +29,23 @@ pkg_check_modules(GMODULE REQUIRED
 	gmodule-2.0>=${REQ_GLIB_VER}
 )
 
+find_program(GLIB_GENMARSHAL
+	NAMES glib-genmarshal
+	DOC "glib-genmarshal executable"
+)
+mark_as_advanced(GLIB_GENMARSHAL)
+
+find_program(GLIB_MKENUMS
+	NAMES glib-mkenums
+	DOC "glib-mkenums executable"
+)
+mark_as_advanced(GLIB_MKENUMS)
+
 find_program(GTESTER
 	NAMES gtester
 	DOC "gtester executable"
 )
+mark_as_advanced(GTESTER)
 
 ###############################################################################
 # Build Info
