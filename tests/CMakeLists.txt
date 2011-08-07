@@ -11,7 +11,7 @@ macro(add_gtest target)
 	list(APPEND TESTS ${_output_name})
 endmacro(add_gtest)
 
-add_gtest(test-paths)
+add_gtest(test-plugin-manager-paths)
 
 set(GTESTER_TESTS "${TESTS}")
 set(GTESTER_LOG "testgidbits.log")
