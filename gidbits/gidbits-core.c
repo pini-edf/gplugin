@@ -27,6 +27,8 @@ gidbits_uninit(void) {
 
 void
 gidbits_init(void) {
+	g_type_init();
+
 	gidbits_plugin_manager_init();
 
 	g_atexit(gidbits_uninit);
