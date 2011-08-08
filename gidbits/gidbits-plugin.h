@@ -75,6 +75,7 @@ G_BEGIN_DECLS
 GType gidbits_plugin_get_type(void);
 
 const gchar *gidbits_plugin_get_filename(const GidbitsPlugin *plugin);
+GidbitsPluginInfo *gidbits_plugin_get_info(const GidbitsPlugin *plugin);
 
 GType gidbits_plugin_info_get_type(void);
 

@@ -25,6 +25,8 @@
  *****************************************************************************/
 typedef struct {
 	gchar *filename;
+
+	GidbitsPluginInfo *info;
 } GidbitsPluginPrivate;
 
 /******************************************************************************
@@ -33,6 +35,7 @@ typedef struct {
 enum {
 	PROP_ZERO,
 	PROP_FILENAME,
+	PROP_INFO,
 	PROP_LAST,
 };
 
@@ -55,6 +58,19 @@ gidbits_plugin_set_filename(GidbitsPlugin *plugin, const gchar *filename) {
 	g_object_notify(G_OBJECT(plugin), "filename");
 }
 
+static void
+gidbits_plugin_set_info(GidbitsPlugin *plugin, GidbitsPluginInfo *info) {
+	GidbitsPluginPrivate *priv = GIDBITS_PLUGIN_GET_PRIVATE(plugin);
+
+	if(priv->info)
+		gidbits_plugin_info_free(priv->info);
+
+	if(info)
+		priv->info = gidbits_plugin_info_copy(info);
+	else
+		priv->info = NULL;
+}
+
 /******************************************************************************
  * Object Stuff
  *****************************************************************************/
@@ -67,6 +83,9 @@ gidbits_plugin_get_property(GObject *obj, guint param_id, GValue *value,
 	switch(param_id) {
 		case PROP_FILENAME:
 			g_value_set_string(value, gidbits_plugin_get_filename(plugin));
+			break;
+		case PROP_INFO:
+			g_value_set_boxed(value, gidbits_plugin_get_info(plugin));
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, param_id, pspec);
@@ -83,6 +102,9 @@ gidbits_plugin_set_property(GObject *obj, guint param_id, const GValue *value,
 	switch(param_id) {
 		case PROP_FILENAME:
 			gidbits_plugin_set_filename(plugin, g_value_get_string(value));
+			break;
+		case PROP_INFO:
+			gidbits_plugin_set_info(plugin, g_value_get_boxed(value));
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, param_id, pspec);
@@ -139,6 +161,17 @@ gidbits_plugin_get_filename(const GidbitsPlugin *plugin) {
 	priv = GIDBITS_PLUGIN_GET_PRIVATE(plugin);
 
 	return priv->filename;
+}
+
+GidbitsPluginInfo *
+gidbits_plugin_get_info(const GidbitsPlugin *plugin) {
+	GidbitsPluginPrivate *priv = NULL;
+
+	g_return_val_if_fail(GIDBITS_IS_PLUGIN(plugin), NULL);
+
+	priv = GIDBITS_PLUGIN_GET_PRIVATE(plugin);
+
+	return priv->info;
 }
 
 /******************************************************************************

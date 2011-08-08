@@ -3,10 +3,13 @@
 ###############################################################################
 add_definitions(
 	-DGIDBITS_COMPILATION
+	-DG_LOG_DOMAIN="Gidbits"
 )
 
 set(GIDBITS_HEADERS
 	gidbits-core.h
+	gidbits-native-plugin.h
+	gidbits-native-plugin-loader.h
 	gidbits-plugin.h
 	gidbits-plugin-loader.h
 	gidbits-plugin-manager.h
@@ -14,6 +17,8 @@ set(GIDBITS_HEADERS
 
 set(GIDBITS_SOURCES
 	gidbits-core.c
+	gidbits-native-plugin.c
+	gidbits-native-plugin-loader.c
 	gidbits-plugin.c
 	gidbits-plugin-loader.c
 	gidbits-plugin-manager.c
