@@ -23,6 +23,8 @@
 
 #include <glib.h>
 
+#define GIDBITS_DOMAIN    (g_quark_from_static_string("gidbits"))
+
 G_BEGIN_DECLS
 
 void gidbits_init(void);
