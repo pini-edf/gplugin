@@ -22,12 +22,18 @@
 #define GPLUGIN_PLUGIN_MANAGER_H
 
 #include <glib.h>
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
 void gplugin_plugin_manager_add_path(const gchar *path_str);
 void gplugin_plugin_manager_remove_path(const gchar *path_str);
 GList *gplugin_plugin_manager_get_paths(void);
+
+void gplugin_plugin_manager_register_loader(GType type);
+void gplugin_plugin_manager_unregister_loader(GType type);
+
+void gplugin_plugin_manager_refresh(void);
 
 G_END_DECLS
 
