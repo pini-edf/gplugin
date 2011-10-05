@@ -13,6 +13,9 @@ endmacro(add_gtest)
 
 add_gtest(test-plugin-manager-paths)
 
+add_library(test-plugin test-plugin.c)
+set_target_properties(test-plugin PROPERTIES PREFIX "")
+
 set(GTESTER_TESTS "${TESTS}")
 set(GTESTER_LOG "testgidbits.log")
 
