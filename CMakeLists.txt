@@ -3,14 +3,14 @@ cmake_minimum_required(VERSION 2.8)
 ###############################################################################
 # Project Info
 ###############################################################################
-project(gidbits C)
+project(gplugin C)
 
-set(GIDBITS_MAJOR_VERSION 0)
-set(GIDBITS_MICRO_VERSION 0)
-set(GIDBITS_MINOR_VERSION 1)
-set(GIDBITS_EXTRA_VERSION dev)
+set(GPLUGIN_MAJOR_VERSION 0)
+set(GPLUGIN_MICRO_VERSION 0)
+set(GPLUGIN_MINOR_VERSION 1)
+set(GPLUGIN_EXTRA_VERSION dev)
 
-set(GIDBITS_VERSION ${GIDBITS_MAJOR_VERSION}.${GIDBITS_MINOR_VERSION}.${GIDBITS_MINOR_VERSION}${GIDBITS_EXTRA_VERSION})
+set(GPLUGIN_VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.${GPLUGIN_MINOR_VERSION}${GPLUGIN_EXTRA_VERSION})
 
 ###############################################################################
 # Dependencies
@@ -56,8 +56,8 @@ add_definitions(
 
 include_directories(
 	${CMAKE_SOURCE_DIR}
-	${CMAKE_BINARY_DIR}                # for gidbits-version.h
-	${CMAKE_BINARY_DIR}/gidbits        # for gidbits.h
+	${CMAKE_BINARY_DIR}                # for gplugin-version.h
+	${CMAKE_BINARY_DIR}/gplugin        # for gplugin.h
 	${GLIB_INCLUDE_DIRS}
 	${GMODULE_INCLUDE_DIRS}
 )
@@ -70,11 +70,11 @@ link_directories(
 ###############################################################################
 # Config Files
 ###############################################################################
-configure_file(gidbits.pc.in ${CMAKE_BINARY_DIR}/gidbits.pc @ONLY)
+configure_file(gplugin.pc.in ${CMAKE_BINARY_DIR}/gplugin.pc @ONLY)
 
 ###############################################################################
 # Subdirectories
 ###############################################################################
-add_subdirectory(gidbits)
+add_subdirectory(gplugin)
 add_subdirectory(tests)
 

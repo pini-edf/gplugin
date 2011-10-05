@@ -14,22 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#if !defined(GIDBITS_H_INSIDE) && !defined(GIDBITS_COMPILATION)
-#error "only <gidbits.h> may be included directly"
+#if !defined(GPLUGIN_H_INSIDE) && !defined(GPLUGIN_COMPILATION)
+#error "only <gplugin.h> may be included directly"
 #endif
 
-#ifndef GIDBITS_PLUGIN_MANAGER_H
-#define GIDBITS_PLUGIN_MANAGER_H
+#ifndef GPLUGIN_VERSION_H
+#define GPLUGIN_VERSION_H
 
-#include <glib.h>
+#define GPLUGIN_MAJOR_VERSION (@GPLUGIN_MAJOR_VERSION@)
+#define GPLUGIN_MINOR_VERSION (@GPLUGIN_MINOR_VERSION@)
+#define GPLUGIN_MICRO_VERSION (@GPLUGIN_MICRO_VERSION@)
+#define GPLUGIN_EXTRA_VERSION "@GPLUGIN_EXTRA_VERSION@"
 
-G_BEGIN_DECLS
+#define GPLUGIN_VERSION       "@GPLUGIN_VERSION@"
 
-void gidbits_plugin_manager_add_path(const gchar *path_str);
-void gidbits_plugin_manager_remove_path(const gchar *path_str);
-GList *gidbits_plugin_manager_get_paths(void);
+#define GPLUGIN_VERSION_CHECK(x,y,z) \
+	((x) == GPLUGIN_MAJOR_VERSION && \
+	 ((y) < GPLUGIN_MINOR_VERSION || \
+	  ((y) == GPLUGIN_MINOR_VERSION && (z) <= GPLUGIN_MICRO_VERSION)))
 
-G_END_DECLS
-
-#endif /* GIDBITS_PLUGIN_MANAGER_H */
+#endif /* GPLUGIN_VERSION_H */
 

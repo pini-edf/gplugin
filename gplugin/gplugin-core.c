@@ -14,21 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#if !defined(GIDBITS_H_INSIDE) && !defined(GIDBITS_COMPILATION)
-#error "only <gidbits.h> may be included directly"
-#endif
-
-#ifndef GIDBITS_PRIVATE_H
-#define GIDBITS_PRIVATE_H
 
 #include <glib.h>
+#include <glib-object.h>
 
-G_BEGIN_DECLS
+#include <gplugin/gplugin-core.h>
+#include <gplugin/gplugin-private.h>
 
-void gidbits_plugin_manager_init(void);
-void gidbits_plugin_manager_uninit(void);
+void
+gplugin_uninit(void) {
+	gplugin_plugin_manager_uninit();
+}
 
-G_END_DECLS
+void
+gplugin_init(void) {
+	g_type_init();
 
-#endif /* GIDBITS_PRIVATE_H */
+	gplugin_plugin_manager_init();
+
+	g_atexit(gplugin_uninit);
+}
 

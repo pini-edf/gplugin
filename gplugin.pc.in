@@ -1,10 +1,10 @@
 prefix=@CMAKE_INSTALL_PREFIX@
 libdir=${prefix}/lib
-includedir=${prefix}/include/gidbits
+includedir=${prefix}/include/gplugin
 
-Name: libgidbits
+Name: libgplugin
 Description: A fully featured GModule based plugin library
 Version: @GIDBITS_VERSION@
-Libs: -L${libdir} -lgidbits
+Libs: -L${libdir} -lgplugin
 Cflags: -I${includedir}
 

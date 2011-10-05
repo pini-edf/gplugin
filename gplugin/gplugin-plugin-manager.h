@@ -14,22 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#if !defined(GIDBITS_H_INSIDE) && !defined(GIDBITS_COMPILATION)
-#error "only <gidbits.h> may be included directly"
+#if !defined(GPLUGIN_H_INSIDE) && !defined(GPLUGIN_COMPILATION)
+#error "only <gplugin.h> may be included directly"
 #endif
 
-#ifndef GIDBITS_CORE_H
-#define GIDBITS_CORE_H
+#ifndef GPLUGIN_PLUGIN_MANAGER_H
+#define GPLUGIN_PLUGIN_MANAGER_H
 
 #include <glib.h>
 
-#define GIDBITS_DOMAIN    (g_quark_from_static_string("gidbits"))
-
 G_BEGIN_DECLS
 
-void gidbits_init(void);
+void gplugin_plugin_manager_add_path(const gchar *path_str);
+void gplugin_plugin_manager_remove_path(const gchar *path_str);
+GList *gplugin_plugin_manager_get_paths(void);
 
 G_END_DECLS
 
-#endif /* GIDBITS_CORE_H */
+#endif /* GPLUGIN_PLUGIN_MANAGER_H */
 

@@ -1,6 +1,6 @@
 macro(add_gtest target)
 	add_executable(${target} ${target}.c)
-	target_link_libraries(${target} ${GLIB_LIBRARIES} gidbits)
+	target_link_libraries(${target} ${GLIB_LIBRARIES} gplugin)
 
 	get_target_property(_output_name ${target} RUNTIME_OUTPUT_NAME)
 	if(${_output_name})
@@ -17,7 +17,7 @@ add_library(test-plugin test-plugin.c)
 set_target_properties(test-plugin PROPERTIES PREFIX "")
 
 set(GTESTER_TESTS "${TESTS}")
-set(GTESTER_LOG "testgidbits.log")
+set(GTESTER_LOG "testgplugin.log")
 
 add_custom_target(tests ALL
 	COMMAND ${GTESTER} -k --verbose -o ${GTESTER_LOG} ${GTESTER_TESTS}

@@ -14,24 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#if !defined(GIDBITS_H_INSIDE) && !defined(GIDBITS_COMPILATION)
-#error "only <gidbits.h> may be included directly"
-#endif
+#ifndef GPLUGIN_H
+#define GPLUGIN_H
 
-#ifndef GIDBITS_VERSION_H
-#define GIDBITS_VERSION_H
+#define GPLUGIN_H_INSIDE
+@GPLUGIN_H_INCLUDES@
 
-#define GIDBITS_MAJOR_VERSION (@GIDBITS_MAJOR_VERSION@)
-#define GIDBITS_MINOR_VERSION (@GIDBITS_MINOR_VERSION@)
-#define GIDBITS_MICRO_VERSION (@GIDBITS_MICRO_VERSION@)
-#define GIDBITS_EXTRA_VERSION "@GIDBITS_EXTRA_VERSION@"
+#undef GPLUGIN_H_INSIDE
 
-#define GIDBITS_VERSION       "@GIDBITS_VERSION@"
+#endif /* GPLUGIN_H */
 
-#define GIDBITS_VERSION_CHECK(x,y,z) \
-	((x) == GIDBITS_MAJOR_VERSION && \
-	 ((y) < GIDBITS_MINOR_VERSION || \
-	  ((y) == GIDBITS_MINOR_VERSION && (z) <= GIDBITS_MICRO_VERSION)))
-
-#endif /* GIDBITS_VERSION_H */
 

@@ -27,14 +27,14 @@ static GHashTable *plugins = NULL;
  * Private API
  *****************************************************************************/
 void
-gidbits_plugin_manager_init(void) {
+gplugin_plugin_manager_init(void) {
 	paths = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 
 	plugins = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 }
 
 void
-gidbits_plugin_manager_uninit(void) {
+gplugin_plugin_manager_uninit(void) {
 	g_hash_table_destroy(paths);
 	g_hash_table_destroy(plugins);
 }
@@ -43,7 +43,7 @@ gidbits_plugin_manager_uninit(void) {
  * API
  *****************************************************************************/
 void
-gidbits_plugin_manager_add_path(const gchar *path_str) {
+gplugin_plugin_manager_add_path(const gchar *path_str) {
 	if(!path_str)
 		return;
 
@@ -51,12 +51,12 @@ gidbits_plugin_manager_add_path(const gchar *path_str) {
 }
 
 void
-gidbits_plugin_manager_remove_path(const gchar *path_str) {
+gplugin_plugin_manager_remove_path(const gchar *path_str) {
 	g_hash_table_remove(paths, path_str);
 }
 
 GList *
-gidbits_plugin_manager_get_paths(void) {
+gplugin_plugin_manager_get_paths(void) {
 	return g_hash_table_get_keys(paths);
 }
 

@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <gidbits/gidbits-plugin.h>
+#include <gplugin/gplugin-plugin.h>
 
-#define GIDBITS_PLUGIN_GET_PRIVATE(obj) \
-	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GIDBITS_TYPE_PLUGIN, GidbitsPluginPrivate))
+#define GPLUGIN_PLUGIN_GET_PRIVATE(obj) \
+	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_PLUGIN, GPluginPluginPrivate))
 
 /******************************************************************************
  * Structs
@@ -26,8 +26,8 @@
 typedef struct {
 	gchar *filename;
 
-	GidbitsPluginInfo *info;
-} GidbitsPluginPrivate;
+	GPluginPluginInfo *info;
+} GPluginPluginPrivate;
 
 /******************************************************************************
  * Enums
@@ -48,8 +48,8 @@ static GObjectClass *parent_class = NULL;
  * Private API
  *****************************************************************************/
 static void
-gidbits_plugin_set_filename(GidbitsPlugin *plugin, const gchar *filename) {
-	GidbitsPluginPrivate *priv = GIDBITS_PLUGIN_GET_PRIVATE(plugin);
+gplugin_plugin_set_filename(GPluginPlugin *plugin, const gchar *filename) {
+	GPluginPluginPrivate *priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
 
 	g_free(priv->filename);
 
@@ -59,14 +59,14 @@ gidbits_plugin_set_filename(GidbitsPlugin *plugin, const gchar *filename) {
 }
 
 static void
-gidbits_plugin_set_info(GidbitsPlugin *plugin, GidbitsPluginInfo *info) {
-	GidbitsPluginPrivate *priv = GIDBITS_PLUGIN_GET_PRIVATE(plugin);
+gplugin_plugin_set_info(GPluginPlugin *plugin, GPluginPluginInfo *info) {
+	GPluginPluginPrivate *priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
 
 	if(priv->info)
-		gidbits_plugin_info_free(priv->info);
+		gplugin_plugin_info_free(priv->info);
 
 	if(info)
-		priv->info = gidbits_plugin_info_copy(info);
+		priv->info = gplugin_plugin_info_copy(info);
 	else
 		priv->info = NULL;
 }
@@ -75,17 +75,17 @@ gidbits_plugin_set_info(GidbitsPlugin *plugin, GidbitsPluginInfo *info) {
  * Object Stuff
  *****************************************************************************/
 static void
-gidbits_plugin_get_property(GObject *obj, guint param_id, GValue *value,
+gplugin_plugin_get_property(GObject *obj, guint param_id, GValue *value,
                             GParamSpec *pspec)
 {
-	GidbitsPlugin *plugin = GIDBITS_PLUGIN(obj);
+	GPluginPlugin *plugin = GPLUGIN_PLUGIN(obj);
 
 	switch(param_id) {
 		case PROP_FILENAME:
-			g_value_set_string(value, gidbits_plugin_get_filename(plugin));
+			g_value_set_string(value, gplugin_plugin_get_filename(plugin));
 			break;
 		case PROP_INFO:
-			g_value_set_boxed(value, gidbits_plugin_get_info(plugin));
+			g_value_set_boxed(value, gplugin_plugin_get_info(plugin));
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, param_id, pspec);
@@ -94,17 +94,17 @@ gidbits_plugin_get_property(GObject *obj, guint param_id, GValue *value,
 }
 
 static void
-gidbits_plugin_set_property(GObject *obj, guint param_id, const GValue *value,
+gplugin_plugin_set_property(GObject *obj, guint param_id, const GValue *value,
                             GParamSpec *pspec)
 {
-	GidbitsPlugin *plugin = GIDBITS_PLUGIN(obj);
+	GPluginPlugin *plugin = GPLUGIN_PLUGIN(obj);
 
 	switch(param_id) {
 		case PROP_FILENAME:
-			gidbits_plugin_set_filename(plugin, g_value_get_string(value));
+			gplugin_plugin_set_filename(plugin, g_value_get_string(value));
 			break;
 		case PROP_INFO:
-			gidbits_plugin_set_info(plugin, g_value_get_boxed(value));
+			gplugin_plugin_set_info(plugin, g_value_get_boxed(value));
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, param_id, pspec);
@@ -113,15 +113,15 @@ gidbits_plugin_set_property(GObject *obj, guint param_id, const GValue *value,
 }
 
 static void
-gidbits_plugin_class_init(GidbitsPluginClass *klass) {
+gplugin_plugin_class_init(GPluginPluginClass *klass) {
 	GObjectClass *obj_class = G_OBJECT_CLASS(klass);
 
 	parent_class = g_type_class_peek_parent(klass);
 
-	g_type_class_add_private(klass, sizeof(GidbitsPluginPrivate));
+	g_type_class_add_private(klass, sizeof(GPluginPluginPrivate));
 
-	obj_class->get_property = gidbits_plugin_get_property;
-	obj_class->set_property = gidbits_plugin_set_property;
+	obj_class->get_property = gplugin_plugin_get_property;
+	obj_class->set_property = gplugin_plugin_set_property;
 
 	g_object_class_install_property(obj_class, PROP_FILENAME,
 		g_param_spec_string("filename", "filename",
@@ -131,21 +131,21 @@ gidbits_plugin_class_init(GidbitsPluginClass *klass) {
 }
 
 /******************************************************************************
- * GidbitsPlugin API
+ * GPluginPlugin API
  *****************************************************************************/
 GType
-gidbits_plugin_get_type(void) {
+gplugin_plugin_get_type(void) {
 	static GType type = 0;
 
 	if(G_UNLIKELY(type == 0)) {
 		static const GTypeInfo info = {
-			.class_size = sizeof(GidbitsPluginClass),
-			.class_init = (GClassInitFunc)gidbits_plugin_class_init,
-			.instance_size = sizeof(GidbitsPlugin),
+			.class_size = sizeof(GPluginPluginClass),
+			.class_init = (GClassInitFunc)gplugin_plugin_class_init,
+			.instance_size = sizeof(GPluginPlugin),
 		};
 
 		type = g_type_register_static(G_TYPE_OBJECT,
-		                              "GidbitsPlugin",
+		                              "GPluginPlugin",
 		                              &info, G_TYPE_FLAG_ABSTRACT);
 	}
 
@@ -153,45 +153,45 @@ gidbits_plugin_get_type(void) {
 }
 
 const gchar *
-gidbits_plugin_get_filename(const GidbitsPlugin *plugin) {
-	GidbitsPluginPrivate *priv = NULL;
+gplugin_plugin_get_filename(const GPluginPlugin *plugin) {
+	GPluginPluginPrivate *priv = NULL;
 
-	g_return_val_if_fail(GIDBITS_IS_PLUGIN(plugin), NULL);
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), NULL);
 
-	priv = GIDBITS_PLUGIN_GET_PRIVATE(plugin);
+	priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
 
 	return priv->filename;
 }
 
-GidbitsPluginInfo *
-gidbits_plugin_get_info(const GidbitsPlugin *plugin) {
-	GidbitsPluginPrivate *priv = NULL;
+GPluginPluginInfo *
+gplugin_plugin_get_info(const GPluginPlugin *plugin) {
+	GPluginPluginPrivate *priv = NULL;
 
-	g_return_val_if_fail(GIDBITS_IS_PLUGIN(plugin), NULL);
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), NULL);
 
-	priv = GIDBITS_PLUGIN_GET_PRIVATE(plugin);
+	priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
 
 	return priv->info;
 }
 
 /******************************************************************************
- * GidbitsPluginInfo API
+ * GPluginPluginInfo API
  *****************************************************************************/
 GType
-gidbits_plugin_info_get_type(void) {
+gplugin_plugin_info_get_type(void) {
 	static GType type = 0;
 
 	if(G_UNLIKELY(type == 0)) {
-		type = g_boxed_type_register_static("GidbitsPluginInfo",
-		                                    (GBoxedCopyFunc)gidbits_plugin_info_copy,
-		                                    (GBoxedFreeFunc)gidbits_plugin_info_free);
+		type = g_boxed_type_register_static("GPluginPluginInfo",
+		                                    (GBoxedCopyFunc)gplugin_plugin_info_copy,
+		                                    (GBoxedFreeFunc)gplugin_plugin_info_free);
 	}
 
 	return type;
 }
 
 void
-gidbits_plugin_info_free(GidbitsPluginInfo *info) {
+gplugin_plugin_info_free(GPluginPluginInfo *info) {
 	g_return_if_fail(info);
 
 	g_free(info->name);
@@ -201,16 +201,16 @@ gidbits_plugin_info_free(GidbitsPluginInfo *info) {
 	g_free(info->author);
 	g_free(info->website);
 
-	g_slice_free(GidbitsPluginInfo, info);
+	g_slice_free(GPluginPluginInfo, info);
 }
 
-GidbitsPluginInfo *
-gidbits_plugin_info_copy(const GidbitsPluginInfo *info) {
-	GidbitsPluginInfo *copy = NULL;
+GPluginPluginInfo *
+gplugin_plugin_info_copy(const GPluginPluginInfo *info) {
+	GPluginPluginInfo *copy = NULL;
 
 	g_return_val_if_fail(info, NULL);
 
-	copy = g_slice_new(GidbitsPluginInfo);
+	copy = g_slice_new(GPluginPluginInfo);
 
 	copy->abi_version = info->abi_version;
 	copy->name = (info->name) ? g_strdup(info->name) : NULL;

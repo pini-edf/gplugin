@@ -15,24 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <gidbits/gidbits-core.h>
-#include <gidbits/gidbits-native-plugin-loader.h>
-#include <gidbits/gidbits-native-plugin.h>
+#include <gplugin/gplugin-core.h>
+#include <gplugin/gplugin-native-plugin-loader.h>
+#include <gplugin/gplugin-native-plugin.h>
 
 #include <gmodule.h>
 
-#define GIDBITS_QUERY_SYMBOL "gidbits_plugin_query"
+#define GPLUGIN_QUERY_SYMBOL "gplugin_plugin_query"
 
 /******************************************************************************
  * Typedefs
  *****************************************************************************/
-typedef const GidbitsPluginInfo *(*GidbitsNativePluginQueryFunc)(void);
+typedef const GPluginPluginInfo *(*GPluginNativePluginQueryFunc)(void);
 
 /******************************************************************************
  * Implementations
  *****************************************************************************/
 static GModule *
-gidbits_native_plugin_loader_open(const gchar *filename, GError **error) {
+gplugin_native_plugin_loader_open(const gchar *filename, GError **error) {
 	GModule *module = NULL;
 
 	module = g_module_open(filename, 0);
@@ -42,7 +42,7 @@ gidbits_native_plugin_loader_open(const gchar *filename, GError **error) {
 	if(error) {
 		const gchar *msg = g_module_error();
 
-		*error = g_error_new(GIDBITS_DOMAIN, 0,
+		*error = g_error_new(GPLUGIN_DOMAIN, 0,
 		                     "Failed to open plugin '%s': %s\n",
 		                     filename, (msg) ? msg : "Unknown error");
 	}
@@ -50,76 +50,76 @@ gidbits_native_plugin_loader_open(const gchar *filename, GError **error) {
 	return NULL;
 }
 
-static GidbitsPluginInfo *
-gidbits_native_plugin_loader_query(GModule *module, GError **error) {
-	const GidbitsPluginInfo *info = NULL;
-	GidbitsNativePluginQueryFunc query = NULL;
+static GPluginPluginInfo *
+gplugin_native_plugin_loader_query(GModule *module, GError **error) {
+	const GPluginPluginInfo *info = NULL;
+	GPluginNativePluginQueryFunc query = NULL;
 	gpointer func = NULL;
 
-	if(!g_module_symbol(module, GIDBITS_QUERY_SYMBOL, &func)) {
+	if(!g_module_symbol(module, GPLUGIN_QUERY_SYMBOL, &func)) {
 		if(error) {
-			*error = g_error_new(GIDBITS_DOMAIN, 0,
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     "Query symbol was not found");
 		}
 
 		return NULL;
 	}
 
-	query = (GidbitsNativePluginQueryFunc)func;
+	query = (GPluginNativePluginQueryFunc)func;
 	info = query();
 
 	if(!info) {
 		if(error) {
-			*error = g_error_new(GIDBITS_DOMAIN, 0,
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     "Query symbol did not return a valid value");
 		}
 
 		return NULL;
 	}
 
-	if(info->abi_version != GIDBITS_NATIVE_PLUGIN_ABI_VERSION) {
+	if(info->abi_version != GPLUGIN_NATIVE_PLUGIN_ABI_VERSION) {
 		if(error) {
-			*error = g_error_new(GIDBITS_DOMAIN, 0,
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     "ABI version mismatch.  Wanted %x, got %x",
-			                     GIDBITS_NATIVE_PLUGIN_ABI_VERSION,
+			                     GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
 			                     info->abi_version);
 		}
 
 		return NULL;
 	}
 
-	return gidbits_plugin_info_copy(info);
+	return gplugin_plugin_info_copy(info);
 }
 
 /******************************************************************************
- * GidbitsPluginLoaderInterface API
+ * GPluginPluginLoaderInterface API
  *****************************************************************************/
 static GList *
-gidbits_native_plugin_loader_supported_extensions(GidbitsPluginLoader *loader) {
+gplugin_native_plugin_loader_supported_extensions(GPluginPluginLoader *loader) {
 	return g_list_append(NULL, G_MODULE_SUFFIX);
 }
 
-static GidbitsPluginInfo *
-gidbits_native_plugin_loader_query_filename(GidbitsPluginLoader *loader,
+static GPluginPluginInfo *
+gplugin_native_plugin_loader_query_filename(GPluginPluginLoader *loader,
                                             const gchar *filename,
                                             GError **error)
 {
-	GidbitsPluginInfo *info = NULL;
+	GPluginPluginInfo *info = NULL;
 	GModule *module = NULL;
 
-	module = gidbits_native_plugin_loader_open(filename, error);
+	module = gplugin_native_plugin_loader_open(filename, error);
 	if(!module)
 		return NULL;
 
-	info = gidbits_native_plugin_loader_query(module, error);
+	info = gplugin_native_plugin_loader_query(module, error);
 
 	g_module_close(module);
 
 	return info;
 }
 
-static GidbitsPlugin *
-gidbits_native_plugin_loader_load(GidbitsPluginLoader *loader,
+static GPluginPlugin *
+gplugin_native_plugin_loader_load(GPluginPluginLoader *loader,
                                   const gchar *filename,
                                   GError **error)
 {
@@ -127,42 +127,42 @@ gidbits_native_plugin_loader_load(GidbitsPluginLoader *loader,
 }
 
 static gboolean
-gidbits_native_plugin_loader_unload(GidbitsPluginLoader *loader,
-                                    GidbitsPlugin *plugin,
+gplugin_native_plugin_loader_unload(GPluginPluginLoader *loader,
+                                    GPluginPlugin *plugin,
                                     GError **error)
 {
 	return FALSE;
 }
 
 static void
-gidbits_native_loader_loader_loader_init(GidbitsPluginLoaderIface *iface) {
-	iface->supported_extensions = gidbits_native_plugin_loader_supported_extensions;
-	iface->query = gidbits_native_plugin_loader_query_filename;
-	iface->load = gidbits_native_plugin_loader_load;
-	iface->unload = gidbits_native_plugin_loader_unload;
+gplugin_native_loader_loader_loader_init(GPluginPluginLoaderIface *iface) {
+	iface->supported_extensions = gplugin_native_plugin_loader_supported_extensions;
+	iface->query = gplugin_native_plugin_loader_query_filename;
+	iface->load = gplugin_native_plugin_loader_load;
+	iface->unload = gplugin_native_plugin_loader_unload;
 }
 
 /******************************************************************************
  * API
  *****************************************************************************/
 GType
-gidbits_native_plugin_loader_get_type(void) {
+gplugin_native_plugin_loader_get_type(void) {
 	static GType type = 0;
 
 	if(G_UNLIKELY(type == 0)) {
 		static const GTypeInfo info = {
-			.class_size = sizeof(GidbitsNativePluginLoaderClass),
-			.instance_size = sizeof(GidbitsNativePluginLoader),
+			.class_size = sizeof(GPluginNativePluginLoaderClass),
+			.instance_size = sizeof(GPluginNativePluginLoader),
 		};
 
 		static const GInterfaceInfo loader_info = {
-			.interface_init = (GInterfaceInitFunc)gidbits_native_loader_loader_loader_init,
+			.interface_init = (GInterfaceInitFunc)gplugin_native_loader_loader_loader_init,
 		};
 
 		type = g_type_register_static(G_TYPE_OBJECT,
-		                              "GidbitsNativePluginLoader",
+		                              "GPluginNativePluginLoader",
 		                              &info, 0);
-		g_type_add_interface_static(type, GIDBITS_TYPE_PLUGIN_LOADER, &loader_info);
+		g_type_add_interface_static(type, GPLUGIN_TYPE_PLUGIN_LOADER, &loader_info);
 	}
 
 	return type;

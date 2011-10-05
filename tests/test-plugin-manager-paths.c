@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <gidbits.h>
+#include <gplugin.h>
 
 #include <glib.h>
 
 #define test_path_count(e) G_STMT_START { \
-	GList *paths = gidbits_plugin_manager_get_paths(); \
+	GList *paths = gplugin_plugin_manager_get_paths(); \
 	g_assert_cmpint(g_list_length(paths), ==, (e)); \
 } G_STMT_END
 
@@ -28,56 +28,56 @@
  * Tests
  *****************************************************************************/
 static void
-test_gidbits_plugin_manager_paths_single(void) {
-	gidbits_plugin_manager_add_path("foo");
+test_gplugin_plugin_manager_paths_single(void) {
+	gplugin_plugin_manager_add_path("foo");
 	test_path_count(1);
 
-	gidbits_plugin_manager_remove_path("foo");
+	gplugin_plugin_manager_remove_path("foo");
 	test_path_count(0);
 }
 
 static void
-test_gidbits_plugin_manager_paths_duplicate(void) {
-	gidbits_plugin_manager_add_path("foo");
-	gidbits_plugin_manager_add_path("foo");
+test_gplugin_plugin_manager_paths_duplicate(void) {
+	gplugin_plugin_manager_add_path("foo");
+	gplugin_plugin_manager_add_path("foo");
 
 	test_path_count(1);
 
-	gidbits_plugin_manager_remove_path("foo");
+	gplugin_plugin_manager_remove_path("foo");
 	test_path_count(0);
 }
 
 static void
-test_gidbits_plugin_manager_paths_multiple_fifo(void) {
+test_gplugin_plugin_manager_paths_multiple_fifo(void) {
 	/* add */
-	gidbits_plugin_manager_add_path("foo");
+	gplugin_plugin_manager_add_path("foo");
 	test_path_count(1);
 
-	gidbits_plugin_manager_add_path("bar");
+	gplugin_plugin_manager_add_path("bar");
 	test_path_count(2);
 
 	/* remove */
-	gidbits_plugin_manager_remove_path("foo");
+	gplugin_plugin_manager_remove_path("foo");
 	test_path_count(1);
 
-	gidbits_plugin_manager_remove_path("bar");
+	gplugin_plugin_manager_remove_path("bar");
 	test_path_count(0);
 }
 
 static void
-test_gidbits_plugin_manager_paths_multiple_filo(void) {
+test_gplugin_plugin_manager_paths_multiple_filo(void) {
 	/* add */
-	gidbits_plugin_manager_add_path("foo");
+	gplugin_plugin_manager_add_path("foo");
 	test_path_count(1);
 
-	gidbits_plugin_manager_add_path("bar");
+	gplugin_plugin_manager_add_path("bar");
 	test_path_count(2);
 
 	/* remove */
-	gidbits_plugin_manager_remove_path("bar");
+	gplugin_plugin_manager_remove_path("bar");
 	test_path_count(1);
 
-	gidbits_plugin_manager_remove_path("foo");
+	gplugin_plugin_manager_remove_path("foo");
 	test_path_count(0);
 }
 
@@ -86,19 +86,19 @@ main(gint argc, gchar **argv) {
 
 	g_test_init(&argc, &argv, NULL);
 
-	gidbits_init();
+	gplugin_init();
 
 	g_test_add_func("/plugins/paths/add_remove_single",
-	                test_gidbits_plugin_manager_paths_single);
+	                test_gplugin_plugin_manager_paths_single);
 
 	g_test_add_func("/plugins/paths/add_remove_duplicate",
-	                test_gidbits_plugin_manager_paths_duplicate);
+	                test_gplugin_plugin_manager_paths_duplicate);
 
 	g_test_add_func("/plugins/paths/add_remove_multiple_fifo",
-	                test_gidbits_plugin_manager_paths_multiple_fifo);
+	                test_gplugin_plugin_manager_paths_multiple_fifo);
 
 	g_test_add_func("/plugins/paths/add_remove_multiple_filo",
-	                test_gidbits_plugin_manager_paths_multiple_filo);
+	                test_gplugin_plugin_manager_paths_multiple_filo);
 
 	return g_test_run();
 }

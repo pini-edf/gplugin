@@ -1,7 +1,4 @@
-/*** BEGIN file-header ***/
 /*
- * vi:syntax=c
- *
  * Copyright (C) 2011 Gary Kramlich <grim@reaperworld.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,28 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef GIDBITS_ENUM_H
-#define GIDBITS_ENUM_H
+#if !defined(GPLUGIN_H_INSIDE) && !defined(GPLUGIN_COMPILATION)
+#error "only <gplugin.h> may be included directly"
+#endif
 
-#include <glib-object.h>
+#ifndef GPLUGIN_CORE_H
+#define GPLUGIN_CORE_H
+
+#include <glib.h>
+
+#define GPLUGIN_DOMAIN    (g_quark_from_static_string("gplugin"))
 
 G_BEGIN_DECLS
-/*** END file-header ***/
 
-/*** BEGIN file-production ***/
-
-/* enumerations from "@filename@" */
-/*** END file-production ***/
-
-/*** BEGIN value-header ***/
-GType @enum_name@_get_type(void) G_GNUC_CONST;
-#define @ENUMPREFIX@_TYPE_@ENUMSHORT@ (@enum_name@_get_type())
-/*** END value-header ***/
-
-/*** BEGIN file-tail ***/
+void gplugin_init(void);
 
 G_END_DECLS
 
-#endif /* GIDBITS_ENUM_H */
-/*** END file-tail ***/
+#endif /* GPLUGIN_CORE_H */
 
