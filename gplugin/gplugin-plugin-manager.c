@@ -30,6 +30,20 @@ static GHashTable *plugins = NULL;
 static GHashTable *loaders = NULL;
 
 /******************************************************************************
+ * Helpers
+ *****************************************************************************/
+static void
+gplugin_plugin_manager_remove_loader_value(gpointer data) {
+	GSList *loaders = (GSList *)data;
+	GSList *l = NULL;
+
+	for(l = loaders; l; l = l->next)
+		g_object_unref(G_OBJECT(l->data));
+
+	g_slist_free(loaders);
+}
+
+/******************************************************************************
  * Private API
  *****************************************************************************/
 void
@@ -49,8 +63,8 @@ gplugin_plugin_manager_init(void) {
 	 * to use by the filename and helps us to avoid iterating the loaders table
 	 * again and again.
 	 */
-	loaders = g_hash_table_new_full(g_str_hash, g_str_equal,
-	                                g_free, NULL);
+	loaders = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
+	                                gplugin_plugin_manager_remove_loader_value);
 
 	gplugin_plugin_manager_register_loader(GPLUGIN_TYPE_NATIVE_PLUGIN_LOADER);
 }
