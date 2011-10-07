@@ -38,8 +38,19 @@ gplugin_plugin_manager_init(void) {
 
 	plugins = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 
-	loaders = g_hash_table_new_full(g_direct_hash, g_direct_equal,
-	                                NULL, g_object_unref);
+	/* The loaders hash table is keyed on the supported extensions of the
+	 * loader.  Which means that a loader that supports multiple extensions
+	 * will be in the table multiple times.
+	 *
+	 * We deal with collisions by using a GSList for the value which will hold
+	 * references to instances of the actual loaders.
+	 *
+	 * Storing this in this method allows up to quickly figure out which loader
+	 * to use by the filename and helps us to avoid iterating the loaders table
+	 * again and again.
+	 */
+	loaders = g_hash_table_new_full(g_str_hash, g_str_equal,
+	                                g_free, NULL);
 
 	gplugin_plugin_manager_register_loader(GPLUGIN_TYPE_NATIVE_PLUGIN_LOADER);
 }
@@ -75,19 +86,90 @@ gplugin_plugin_manager_get_paths(void) {
 void
 gplugin_plugin_manager_register_loader(GType type) {
 	GPluginPluginLoader *lo = NULL;
+	GPluginPluginLoaderIface *iface = NULL;
+	GSList *l = NULL;
 
-	g_return_if_fail(type != G_TYPE_INVALID);
+	g_return_if_fail(g_type_is_a(type, GPLUGIN_TYPE_PLUGIN_LOADER));
 
+	/* Create the loader instance first.  If we can't create it, we bail */
 	lo = g_object_new(type, NULL);
-	if(!lo)
+	if(!GPLUGIN_IS_PLUGIN_LOADER(lo))
 		return;
 
-	g_hash_table_insert(loaders, GINT_TO_POINTER(type), lo);
+	/* grab the loader class and make sure it's valid */
+	iface = GPLUGIN_PLUGIN_LOADER_GET_IFACE(lo);
+	if(!iface) {
+		g_object_unref(G_OBJECT(lo));
+
+		return;
+	}
+
+	for(l = iface->supported_extensions; l; l = l->next) {
+		GSList *existing = NULL;
+		const gchar *ext = (const gchar *)l->data;
+
+		/* grab any existing loaders that are registered for this type so that
+		 * we can prepend our loader.
+		 */
+		existing = g_hash_table_lookup(loaders, ext);
+		existing = g_slist_prepend(existing, g_object_ref(G_OBJECT(lo)));
+
+		/* Now insert the updated slist back into the hash table */
+		g_hash_table_insert(loaders, g_strdup(ext), existing);
+	}
+
+	/* we remove our initial reference from the loader now to avoid a leak */
+	g_object_unref(G_OBJECT(lo));
 }
 
 void
 gplugin_plugin_manager_unregister_loader(GType type) {
-	g_hash_table_remove(loaders, GINT_TO_POINTER(type));
+	GPluginPluginLoaderIface *iface = NULL;
+	GSList *exts = NULL;
+
+	g_return_if_fail(g_type_is_a(type, GPLUGIN_TYPE_PLUGIN_LOADER));
+
+	iface = g_type_class_ref(type);
+	if(!iface)
+		return;
+
+	for(exts = iface->supported_extensions; exts; exts = exts->next) {
+		GSList *los = NULL;
+		GSList *l = NULL;
+		const gchar *ext = NULL;
+
+		ext = (const gchar *)exts->data;
+		los = g_hash_table_lookup(loaders, ext);
+
+		for(l = los; l; l = l->next) {
+			GPluginPluginLoader *lo = GPLUGIN_PLUGIN_LOADER(l->data);
+
+			if(!GPLUGIN_IS_PLUGIN_LOADER(lo))
+				continue;
+
+			if(G_OBJECT_TYPE(lo) != type)
+				continue;
+
+			/* at this point, the loader we're at is of the type we're
+			 * removing.  So we'll remove it from the los SList.  Then if the
+			 * SList is empty, we remove it from the hash table, otherwise we
+			 * just update it.
+			 */
+			los = g_slist_remove(los, lo);
+			if(los)
+				g_hash_table_insert(loaders, g_strdup(ext), los);
+			else
+				g_hash_table_remove(loaders, ext);
+
+			/* kill our ref to the loader */
+			g_object_unref(G_OBJECT(lo));
+
+			/* now move to the next extension to check */
+			break;
+		}
+	}
+
+	g_type_class_unref(iface);
 }
 
 void
