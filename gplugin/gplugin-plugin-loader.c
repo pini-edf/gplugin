@@ -34,7 +34,7 @@ gplugin_plugin_loader_get_type(void) {
 	return type;
 }
 
-GList *
+GSList *
 gplugin_plugin_loader_get_supported_extensions(GPluginPluginLoader *loader) {
 	GPluginPluginLoaderIface *iface = NULL;
 

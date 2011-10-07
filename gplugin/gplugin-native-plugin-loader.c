@@ -94,9 +94,9 @@ gplugin_native_plugin_loader_query(GModule *module, GError **error) {
 /******************************************************************************
  * GPluginPluginLoaderInterface API
  *****************************************************************************/
-static GList *
+static GSList *
 gplugin_native_plugin_loader_supported_extensions(GPluginPluginLoader *loader) {
-	return g_list_append(NULL, G_MODULE_SUFFIX);
+	return g_slist_append(NULL, G_MODULE_SUFFIX);
 }
 
 static GPluginPluginInfo *

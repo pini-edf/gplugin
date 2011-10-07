@@ -37,7 +37,7 @@ typedef struct _GPluginPluginLoaderIface     GPluginPluginLoaderIface;
 struct _GPluginPluginLoaderIface {
 	GTypeInterface gparent;
 
-	GList *(*supported_extensions)(GPluginPluginLoader *loader);
+	GSList *(*supported_extensions)(GPluginPluginLoader *loader);
 
 	GPluginPluginInfo *(*query)(GPluginPluginLoader *loader, const gchar *filename, GError **error);
 
@@ -54,7 +54,7 @@ G_BEGIN_DECLS
 
 GType gplugin_plugin_loader_get_type(void);
 
-GList *gplugin_plugin_loader_get_supported_extensions(GPluginPluginLoader *loader);
+GSList *gplugin_plugin_loader_get_supported_extensions(GPluginPluginLoader *loader);
 
 GPluginPluginInfo *gplugin_plugin_loader_query_plugin(GPluginPluginLoader *loader, const gchar *filename, GError **error);
 
