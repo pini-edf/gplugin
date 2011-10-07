@@ -34,20 +34,6 @@ gplugin_plugin_loader_get_type(void) {
 	return type;
 }
 
-GSList *
-gplugin_plugin_loader_get_supported_extensions(GPluginPluginLoader *loader) {
-	GPluginPluginLoaderIface *iface = NULL;
-
-	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_LOADER(loader), NULL);
-
-	iface = GPLUGIN_PLUGIN_LOADER_GET_IFACE(loader);
-
-	if(iface && iface->supported_extensions)
-		return iface->supported_extensions(loader);
-
-	return NULL;
-}
-
 GPluginPluginInfo *
 gplugin_plugin_loader_query_plugin(GPluginPluginLoader *loader,
                                    const gchar *filename, GError **error)

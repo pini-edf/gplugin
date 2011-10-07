@@ -94,11 +94,6 @@ gplugin_native_plugin_loader_query(GModule *module, GError **error) {
 /******************************************************************************
  * GPluginPluginLoaderInterface API
  *****************************************************************************/
-static GSList *
-gplugin_native_plugin_loader_supported_extensions(GPluginPluginLoader *loader) {
-	return g_slist_append(NULL, G_MODULE_SUFFIX);
-}
-
 static GPluginPluginInfo *
 gplugin_native_plugin_loader_query_filename(GPluginPluginLoader *loader,
                                             const gchar *filename,
@@ -136,7 +131,7 @@ gplugin_native_plugin_loader_unload(GPluginPluginLoader *loader,
 
 static void
 gplugin_native_loader_loader_loader_init(GPluginPluginLoaderIface *iface) {
-	iface->supported_extensions = gplugin_native_plugin_loader_supported_extensions;
+	iface->supported_extensions = g_slist_append(NULL, G_MODULE_SUFFIX);
 	iface->query = gplugin_native_plugin_loader_query_filename;
 	iface->load = gplugin_native_plugin_loader_load;
 	iface->unload = gplugin_native_plugin_loader_unload;
