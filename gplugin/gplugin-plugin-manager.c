@@ -119,13 +119,26 @@ gplugin_plugin_manager_register_loader(GType type) {
 	}
 
 	for(l = iface->supported_extensions; l; l = l->next) {
-		GSList *existing = NULL;
+		GSList *existing = NULL, *ll = NULL;
 		const gchar *ext = (const gchar *)l->data;
 
 		/* grab any existing loaders that are registered for this type so that
-		 * we can prepend our loader.
+		 * we can prepend our loader.  But before we add our, we remove any old
+		 * copies we might have our ours.
 		 */
 		existing = g_hash_table_lookup(loaders, ext);
+		for(ll = existing; ll; ll = ll->next) {
+			if(G_OBJECT_TYPE(ll->data) == type) {
+				GPluginPluginLoader *old = GPLUGIN_PLUGIN_LOADER(ll->data);
+
+				existing = g_slist_remove(existing, old);
+
+				g_object_unref(G_OBJECT(old));
+
+				break;
+			}
+		}
+
 		existing = g_slist_prepend(existing, g_object_ref(G_OBJECT(lo)));
 
 		/* Now insert the updated slist back into the hash table */
