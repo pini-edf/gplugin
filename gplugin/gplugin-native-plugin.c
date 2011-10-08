@@ -16,6 +16,9 @@
  */
 #include <gplugin/gplugin-native-plugin.h>
 
+#include <gplugin/gplugin-plugin-loader.h>
+#include <gplugin/gplugin-plugin-manager.h>
+
 #define GPLUGIN_NATIVE_PLUGIN_GET_PRIVATE(obj) \
 	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_NATIVE_PLUGIN, GPluginNativePluginPrivate))
 
@@ -420,6 +423,12 @@ gplugin_native_plugin_register_type(GPluginNativePlugin *plugin, GType parent,
 	if(info->value_table) {
 		type_info->info.value_table = g_memdup(info->value_table,
 		                                       sizeof(GTypeValueTable));
+	}
+
+	if(g_type_is_a(type_info->type, GPLUGIN_TYPE_PLUGIN_LOADER) &&
+	   !G_TYPE_IS_ABSTRACT(type_info->type))
+	{
+		gplugin_plugin_manager_register_loader(type_info->type);
 	}
 
 	return type_info->type;
