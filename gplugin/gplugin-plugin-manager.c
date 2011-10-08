@@ -29,6 +29,8 @@ static GHashTable *paths = NULL;
 static GHashTable *plugins = NULL;
 static GHashTable *loaders = NULL;
 
+static gboolean refresh_needed = FALSE;
+
 /******************************************************************************
  * Helpers
  *****************************************************************************/
@@ -145,6 +147,9 @@ gplugin_plugin_manager_register_loader(GType type) {
 		g_hash_table_insert(loaders, g_strdup(ext), existing);
 	}
 
+	/* make a note that we need to refresh */
+	refresh_needed = TRUE;
+
 	/* we remove our initial reference from the loader now to avoid a leak */
 	g_object_unref(G_OBJECT(lo));
 }
@@ -201,27 +206,34 @@ gplugin_plugin_manager_unregister_loader(GType type) {
 
 void
 gplugin_plugin_manager_refresh(void) {
-	GHashTableIter piter;
-	gpointer key;
+	refresh_needed = TRUE;
 
-	g_hash_table_iter_init(&piter, paths);
-	while(g_hash_table_iter_next(&piter, &key, NULL)) {
-		GDir *dir = NULL;
-		GError *error = NULL;
+	while(refresh_needed) {
+		GHashTableIter piter;
+		gpointer key;
 
-		dir = g_dir_open((const gchar *)key, 0, &error);
-		if(error) {
-			g_warning("Failed to open %s: %s\n",
-			          (const gchar *)key,
-			          (error->message) ? error->message : "unknown failure");
+		refresh_needed = FALSE;
 
-			g_error_free(error);
-			error = NULL;
+		g_hash_table_iter_init(&piter, paths);
+		while(g_hash_table_iter_next(&piter, &key, NULL)) {
+			GDir *dir = NULL;
+			GError *error = NULL;
 
-			continue;
+			dir = g_dir_open((const gchar *)key, 0, &error);
+			if(error) {
+				g_warning("Failed to open %s: %s\n",
+				          (const gchar *)key,
+					      (error->message) ? error->message :
+				                             "unknown failure");
+
+				g_error_free(error);
+				error = NULL;
+
+				continue;
+			}
+
+			g_dir_close(dir);
 		}
-
-		g_dir_close(dir);
 	}
 }
 
