@@ -22,6 +22,14 @@
 #include <gplugin/gplugin-native-plugin-loader.h>
 
 /******************************************************************************
+ * Structs
+ *****************************************************************************/
+typedef struct {
+	gchar *filename;
+	gchar *extension;
+} GPluginPluginManagerTreeEntry;
+
+/******************************************************************************
  * Globals
  *****************************************************************************/
 static GHashTable *paths = NULL;
@@ -34,6 +42,100 @@ static gboolean refresh_needed = FALSE;
 /******************************************************************************
  * Helpers
  *****************************************************************************/
+static GPluginPluginManagerTreeEntry *
+gplugin_plugin_manager_tree_entry_new(const gchar *filename) {
+	GPluginPluginManagerTreeEntry *e = NULL;
+
+	e = g_slice_new(GPluginPluginManagerTreeEntry);
+
+	e->filename = g_strdup(filename);
+
+	/* we have to use e->filename, because g_utf8_strrchr returns a pointer
+	 * in the string given too it, and not a new copy.
+	 */
+	e->extension = g_utf8_strrchr(e->filename, -1, g_utf8_get_char("."));
+
+	return e;
+}
+
+static void
+gplugin_plugin_manager_tree_entry_free(GPluginPluginManagerTreeEntry *e) {
+	if(!e)
+		return;
+
+	g_free(e->filename);
+
+	g_slice_free(GPluginPluginManagerTreeEntry, e);
+
+	e = NULL;
+}
+
+static GNode *
+gplugin_plugin_manager_file_tree_new(void) {
+	GHashTableIter iter;
+	GNode *root = NULL;
+	gpointer key = NULL;
+
+	/* read all of the files from all of our paths and store then in a tree */
+	root = g_node_new(NULL);
+
+	g_hash_table_iter_init(&iter, paths);
+	while(g_hash_table_iter_next(&iter, &key, NULL)) {
+		GDir *d = NULL;
+		GError *error = NULL;
+		GNode *dir = NULL;
+		const gchar *path = (const gchar *)key;
+		const gchar *filename = NULL;
+
+		d = g_dir_open(path, 0, &error);
+		if(error) {
+				g_warning("Failed to open %s: %s\n",
+				          (const gchar *)key,
+					      (error->message) ? error->message :
+				                             "unknown failure");
+
+				g_error_free(error);
+				error = NULL;
+
+				continue;
+		}
+
+		/* insert the directory into the tree since we know it exists */
+		dir = g_node_new(g_strdup(path));
+		g_node_prepend(root, dir);
+
+		/* now run through all of the files and add them to the tree */
+		while((filename = g_dir_read_name(d)) != NULL) {
+			GNode *file = NULL;
+
+			file = g_node_new(gplugin_plugin_manager_tree_entry_new(filename));
+			g_node_prepend(dir, file);
+		}
+
+		/* close the directory */
+		g_dir_close(d);
+	}
+
+	return root;
+}
+
+static gboolean
+gplugin_plugin_manager_file_tree_free_helper(GNode *n, gpointer d) {
+	GPluginPluginManagerTreeEntry *e = n->data;
+
+	gplugin_plugin_manager_tree_entry_free(e);
+
+	return FALSE;
+}
+
+static void
+gplugin_plugin_manager_file_tree_free(GNode *root) {
+	g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_ALL, -1,
+	                gplugin_plugin_manager_file_tree_free_helper, NULL);
+
+	g_node_destroy(root);
+}
+
 static void
 gplugin_plugin_manager_remove_loader_value(gpointer data) {
 	GSList *loaders = (GSList *)data;
@@ -206,34 +308,18 @@ gplugin_plugin_manager_unregister_loader(GType type) {
 
 void
 gplugin_plugin_manager_refresh(void) {
+	GNode *root = NULL;
+
+	/* build a list of all possible plugins */
+	root = gplugin_plugin_manager_file_tree_new();
+
 	refresh_needed = TRUE;
 
 	while(refresh_needed) {
-		GHashTableIter piter;
-		gpointer key;
-
 		refresh_needed = FALSE;
 
-		g_hash_table_iter_init(&piter, paths);
-		while(g_hash_table_iter_next(&piter, &key, NULL)) {
-			GDir *dir = NULL;
-			GError *error = NULL;
-
-			dir = g_dir_open((const gchar *)key, 0, &error);
-			if(error) {
-				g_warning("Failed to open %s: %s\n",
-				          (const gchar *)key,
-					      (error->message) ? error->message :
-				                             "unknown failure");
-
-				g_error_free(error);
-				error = NULL;
-
-				continue;
-			}
-
-			g_dir_close(dir);
-		}
 	}
+
+	gplugin_plugin_manager_file_tree_free(root);
 }
 
