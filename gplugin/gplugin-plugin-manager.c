@@ -316,10 +316,40 @@ gplugin_plugin_manager_refresh(void) {
 	refresh_needed = TRUE;
 
 	while(refresh_needed) {
+		GNode *dir = NULL;
+
 		refresh_needed = FALSE;
 
+		for(dir = root->children; dir; dir = dir->next) {
+			GNode *file = NULL;
+			const gchar *path = (const gchar *)dir->data;
+
+			for(file = dir->children; file; file = file->next) {
+				GPluginPluginInfo *info = NULL;
+				GPluginPluginLoader *loader = NULL;
+				GPluginPluginManagerTreeEntry *e = NULL;
+				GError *error = NULL;
+				gchar *filename = NULL;
+
+				e = (GPluginPluginManagerTreeEntry *)file->data;
+
+				/* try to find a load for this plugin, if we don't have one yet
+				 * move on to the next plugin.
+				 */
+				loader = g_hash_table_lookup(loaders, e->extension);
+				if(!GPLUGIN_IS_PLUGIN_LOADER(loader))
+					continue;
+
+				/* yay we have a LOADER!  So build it's path and query it! */
+				filename = g_build_path(path, e->filename, NULL);
+				info = gplugin_plugin_loader_query_plugin(loader, filename,
+				                                          &error);
+				g_free(filename);
+			}
+		}
 	}
 
+	/* free the file tree */
 	gplugin_plugin_manager_file_tree_free(root);
 }
 
