@@ -44,6 +44,10 @@ typedef enum {
 	GPLUGIN_PLUGIN_STATES,
 } GPluginPluginState;
 
+typedef enum {
+	GPLUGIN_PLUGIN_FLAGS_LOAD_ON_QUERY = 1 << 1,
+} GPluginPluginFlags;
+
 #include <glib.h>
 #include <glib-object.h>
 
@@ -62,6 +66,7 @@ struct _GPluginPluginClass {
 
 struct _GPluginPluginInfo {
 	guint32 abi_version;
+	GPluginPluginFlags flags;
 	gchar *name;
 	gchar *version;
 	gchar *summary;

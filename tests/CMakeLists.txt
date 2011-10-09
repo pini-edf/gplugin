@@ -15,6 +15,7 @@ add_library(test-plugin test-plugin.c)
 set_target_properties(test-plugin PROPERTIES PREFIX "")
 
 add_gtest(test-plugin-manager-paths)
+add_gtest(test-boxed-types)
 
 add_gtest(test-native-loader)
 add_dependencies(test-native-loader test-plugin)

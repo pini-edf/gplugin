@@ -213,6 +213,7 @@ gplugin_plugin_info_copy(const GPluginPluginInfo *info) {
 	copy = g_slice_new(GPluginPluginInfo);
 
 	copy->abi_version = info->abi_version;
+	copy->flags = info->flags;
 	copy->name = (info->name) ? g_strdup(info->name) : NULL;
 	copy->version = (info->version) ? g_strdup(info->version) : NULL;
 	copy->summary = (info->summary) ? g_strdup(info->summary) : NULL;
