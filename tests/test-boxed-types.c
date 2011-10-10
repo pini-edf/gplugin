@@ -24,6 +24,7 @@
  *****************************************************************************/
 static void
 test_gplugin_plugin_info(void) {
+	GSList *o = NULL, *c = NULL;
 	GPluginPluginInfo *copy = NULL;
 	GPluginPluginInfo info = {
 		.id = "test",
@@ -35,8 +36,12 @@ test_gplugin_plugin_info(void) {
 		.description = "description",
 		.author = "author",
 		.website = "website",
-		.dependencies = g_slist_prepend(NULL, "foo"),
 	};
+
+	info.dependencies = g_slist_prepend(NULL, "foo"),
+	info.dependencies = g_slist_prepend(info.dependencies, "bar");
+	info.dependencies = g_slist_prepend(info.dependencies, "baz");
+
 
 	copy = gplugin_plugin_info_copy(&info);
 
@@ -67,10 +72,17 @@ test_gplugin_plugin_info(void) {
 	g_assert_cmpstr(info.website, ==, copy->website);
 	g_assert(info.website != copy->website);
 
-	g_assert_cmpstr(info.dependencies->data, ==, copy->dependencies->data);
-	g_assert(info.dependencies->data != copy->dependencies->data);
+	for(o = info.dependencies, c = copy->dependencies; o;
+	    o = o->next, c = c->next)
+	{
+		g_assert_cmpstr(o->data, ==, c->data);
+		g_assert(o->data != c->data);
+	}
 
 	gplugin_plugin_info_free(copy);
+
+	/* clean up the slist we created so we can valgrind the test */
+	g_slist_free(info.dependencies);
 }
 
 gint
