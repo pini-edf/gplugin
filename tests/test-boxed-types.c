@@ -26,6 +26,7 @@ static void
 test_gplugin_plugin_info(void) {
 	GPluginPluginInfo *copy = NULL;
 	GPluginPluginInfo info = {
+		.id = "test",
 		.abi_version = 1,
 		.flags = GPLUGIN_PLUGIN_FLAGS_LOAD_ON_QUERY,
 		.name = "testplugin",
@@ -34,18 +35,40 @@ test_gplugin_plugin_info(void) {
 		.description = "description",
 		.author = "author",
 		.website = "website",
+		.dependencies = g_slist_prepend(NULL, "foo"),
 	};
 
 	copy = gplugin_plugin_info_copy(&info);
 
+	/* for the string pointers, we make sure the strings match and that they
+	 * are pointing to different memory.
+	 */
+	g_assert_cmpstr(info.id, ==, copy->id);
+	g_assert(info.id != copy->id);
+
 	g_assert(info.abi_version == copy->abi_version);
 	g_assert(info.flags == copy->flags);
+
 	g_assert_cmpstr(info.name, ==, copy->name);
+	g_assert(info.name != copy->name);
+
 	g_assert_cmpstr(info.version, ==, copy->version);
+	g_assert(info.version != copy->version);
+
 	g_assert_cmpstr(info.summary, ==, copy->summary);
+	g_assert(info.summary != copy->summary);
+
 	g_assert_cmpstr(info.description, ==, copy->description);
+	g_assert(info.description != copy->description);
+
 	g_assert_cmpstr(info.author, ==, copy->author);
+	g_assert(info.author != copy->author);
+
 	g_assert_cmpstr(info.website, ==, copy->website);
+	g_assert(info.website != copy->website);
+
+	g_assert_cmpstr(info.dependencies->data, ==, copy->dependencies->data);
+	g_assert(info.dependencies->data != copy->dependencies->data);
 
 	gplugin_plugin_info_free(copy);
 }

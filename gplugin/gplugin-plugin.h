@@ -65,14 +65,19 @@ struct _GPluginPluginClass {
 };
 
 struct _GPluginPluginInfo {
+	gchar *id;
+
 	guint32 abi_version;
 	GPluginPluginFlags flags;
+
 	gchar *name;
 	gchar *version;
 	gchar *summary;
 	gchar *description;
 	gchar *author;
 	gchar *website;
+
+	GSList *dependencies;
 };
 
 G_BEGIN_DECLS

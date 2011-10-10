@@ -192,8 +192,11 @@ gplugin_plugin_info_get_type(void) {
 
 void
 gplugin_plugin_info_free(GPluginPluginInfo *info) {
+	GSList *l = NULL;
+
 	g_return_if_fail(info);
 
+	g_free(info->id);
 	g_free(info->name);
 	g_free(info->version);
 	g_free(info->summary);
@@ -201,17 +204,24 @@ gplugin_plugin_info_free(GPluginPluginInfo *info) {
 	g_free(info->author);
 	g_free(info->website);
 
+	for(l = info->dependencies; l; l = l->next)
+		g_free(l->data);
+
+	g_slist_free(info->dependencies);
+
 	g_slice_free(GPluginPluginInfo, info);
 }
 
 GPluginPluginInfo *
 gplugin_plugin_info_copy(const GPluginPluginInfo *info) {
 	GPluginPluginInfo *copy = NULL;
+	GSList *l = NULL;
 
 	g_return_val_if_fail(info, NULL);
 
 	copy = g_slice_new(GPluginPluginInfo);
 
+	copy->id = (info->id) ? g_strdup(info->id) : NULL;
 	copy->abi_version = info->abi_version;
 	copy->flags = info->flags;
 	copy->name = (info->name) ? g_strdup(info->name) : NULL;
@@ -221,6 +231,11 @@ gplugin_plugin_info_copy(const GPluginPluginInfo *info) {
 	                                        : NULL;
 	copy->author = (info->author) ? g_strdup(info->author) : NULL;
 	copy->website = (info->website) ? g_strdup(info->website) : NULL;
+
+	for(l = info->dependencies; l; l = l->next) {
+		copy->dependencies = g_slist_append(copy->dependencies,
+		                                    g_strdup(l->data));
+	}
 
 	return copy;
 }
