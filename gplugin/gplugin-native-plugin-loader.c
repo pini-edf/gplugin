@@ -162,7 +162,36 @@ gplugin_native_plugin_loader_load(GPluginPluginLoader *loader,
                                   GPluginPlugin *plugin,
                                   GError **error)
 {
-	return FALSE;
+	GPluginNativePluginLoadFunc load = NULL;
+	const GPluginPluginInfo *info = NULL;
+	gpointer func = NULL;
+
+	g_return_val_if_fail(plugin != NULL, FALSE);
+	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), FALSE);
+
+	/* grab the info from the plugin for error reporting */
+	info = gplugin_plugin_get_info(plugin);
+
+	/* grab the load function from the plugin */
+	g_object_get(G_OBJECT(plugin), "load-func", &func, NULL);
+
+	/* if the load function is null, we need to bail */
+	if(func == NULL) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "load function for %s is NULL",
+			                      info->name);
+		}
+
+		return FALSE;
+	}
+
+	/* now call the load function and exit */
+	load = (GPluginNativePluginLoadFunc)func;
+	if(!load(GPLUGIN_NATIVE_PLUGIN(plugin)))
+		return FALSE;
+
+	return TRUE;
 }
 
 static gboolean
@@ -170,7 +199,36 @@ gplugin_native_plugin_loader_unload(GPluginPluginLoader *loader,
                                     GPluginPlugin *plugin,
                                     GError **error)
 {
-	return FALSE;
+	GPluginNativePluginUnloadFunc unload = NULL;
+	const GPluginPluginInfo *info = NULL;
+	gpointer func = NULL;
+
+	g_return_val_if_fail(plugin != NULL, FALSE);
+	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), FALSE);
+
+	/* grab the info from the plugin for error reporting */
+	info = gplugin_plugin_get_info(plugin);
+
+	/* grab the load function from the plugin */
+	g_object_get(G_OBJECT(plugin), "unload-func", &func, NULL);
+
+	/* if the load function is null, we need to bail */
+	if(func == NULL) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "unload function for %s is NULL",
+			                      info->name);
+		}
+
+		return FALSE;
+	}
+
+	/* now call the unload function and exit */
+	unload = (GPluginNativePluginLoadFunc)func;
+	if(!unload(GPLUGIN_NATIVE_PLUGIN(plugin)))
+		return FALSE;
+
+	return TRUE;
 }
 
 static void
