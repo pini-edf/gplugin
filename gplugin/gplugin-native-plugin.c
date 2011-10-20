@@ -22,9 +22,6 @@
 #define GPLUGIN_NATIVE_PLUGIN_GET_PRIVATE(obj) \
 	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_NATIVE_PLUGIN, GPluginNativePluginPrivate))
 
-#define GPLUGIN_LOAD_SYMBOL   "gplugin_plugin_load"
-#define GPLUGIN_UNLOAD_SYMBOL "gplugin_plugin_unload"
-
 /******************************************************************************
  * Structs
  *****************************************************************************/
@@ -34,6 +31,9 @@ typedef struct _GPluginNativePluginInterfaceInfo GPluginNativePluginInterfaceInf
 
 struct _GPluginNativePluginPrivate {
 	GModule *module;
+
+	gpointer load_func;
+	gpointer unload_func;
 
 	guint use_count;
 
@@ -61,6 +61,8 @@ struct _GPluginNativePluginInterfaceInfo {
 enum {
 	PROP_ZERO,
 	PROP_MODULE,
+	PROP_LOAD_FUNC,
+	PROP_UNLOAD_FUNC,
 	PROP_LAST,
 };
 
@@ -181,11 +183,18 @@ gplugin_native_plugin_get_property(GObject *obj, guint param_id, GValue *value,
                                    GParamSpec *pspec)
 {
 	GPluginNativePlugin *plugin = GPLUGIN_NATIVE_PLUGIN(obj);
+	GPluginNativePluginPrivate *priv = GPLUGIN_NATIVE_PLUGIN_GET_PRIVATE(plugin);
 
 	switch(param_id) {
 		case PROP_MODULE:
 			g_value_set_pointer(value,
 			                    gplugin_native_plugin_get_module(plugin));
+			break;
+		case PROP_LOAD_FUNC:
+			g_value_set_pointer(value, priv->load_func);
+			break;
+		case PROP_UNLOAD_FUNC:
+			g_value_set_pointer(value, priv->unload_func);
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, param_id, pspec);
@@ -202,6 +211,12 @@ gplugin_native_plugin_set_property(GObject *obj, guint param_id,
 	switch(param_id) {
 		case PROP_MODULE:
 			priv->module = g_value_get_pointer(value);
+			break;
+		case PROP_LOAD_FUNC:
+			priv->load_func = g_value_get_pointer(value);
+			break;
+		case PROP_UNLOAD_FUNC:
+			priv->unload_func = g_value_get_pointer(value);
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, param_id, pspec);
@@ -234,6 +249,14 @@ gplugin_native_plugin_class_init(GPluginNativePluginClass *klass) {
 	g_object_class_install_property(obj_class, PROP_MODULE,
 		g_param_spec_pointer("module", "module handle",
 		                     "The GModule instance of the plugin",
+		                     G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property(obj_class, PROP_LOAD_FUNC,
+		g_param_spec_pointer("load-func", "load function pointer",
+		                     "address pointer to load function",
+		                     G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property(obj_class, PROP_UNLOAD_FUNC,
+		g_param_spec_pointer("unload-func", "unload function pointer",
+		                     "address pointer to the unload function",
 		                     G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
 }
 
@@ -275,19 +298,14 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
 
 	priv->use_count++;
 	if(priv->use_count == 1) {
-		GPluginNativePluginLoadFunc load = NULL;
+		GPluginPluginLoader *loader = NULL;
 		GSList *l = NULL;
-		gpointer func = NULL;
 
-		if(!g_module_symbol(priv->module, GPLUGIN_LOAD_SYMBOL, &func)) {
-			priv->use_count--;
+		loader = gplugin_plugin_get_loader(GPLUGIN_PLUGIN(plugin));
 
-			return FALSE;
-		}
-
-		load = (GPluginNativePluginLoadFunc)func;
-
-		if(!(load && load(plugin))) {
+		if(!gplugin_plugin_loader_load_plugin(loader, GPLUGIN_PLUGIN(plugin),
+		                                      NULL))
+		{
 			priv->use_count--;
 
 			return FALSE;
@@ -327,19 +345,14 @@ gplugin_native_plugin_unuse(GPluginNativePlugin *plugin) {
 	priv->use_count--;
 
 	if(priv->use_count == 0) {
-		GPluginNativePluginUnloadFunc unload = NULL;
+		GPluginPluginLoader *loader = NULL;
 		GSList *l = NULL;
-		gpointer func = NULL;
 
-		if(!g_module_symbol(priv->module, GPLUGIN_UNLOAD_SYMBOL, &func)) {
-			priv->use_count++;
+		loader = gplugin_plugin_get_loader(GPLUGIN_PLUGIN(plugin));
 
-			return FALSE;
-		}
-
-		unload = (GPluginNativePluginUnloadFunc)func;
-
-		if(!(unload && unload(plugin))) {
+		if(!gplugin_plugin_loader_unload_plugin(loader, GPLUGIN_PLUGIN(plugin),
+		                                        NULL))
+		{
 			priv->use_count++;
 
 			return FALSE;
