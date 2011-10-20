@@ -22,15 +22,39 @@
 #include <gmodule.h>
 
 #define GPLUGIN_QUERY_SYMBOL "gplugin_plugin_query"
+#define GPLUGIN_LOAD_SYMBOL "gplugin_plugin_load"
+#define GPLUGIN_UNLOAD_SYMBOL "gplugin_plugin_unload"
 
 /******************************************************************************
  * Typedefs
  *****************************************************************************/
 typedef const GPluginPluginInfo *(*GPluginNativePluginQueryFunc)(void);
+typedef gboolean (*GPluginNativePluginLoadFunc)(GPluginNativePlugin *plugin);
+typedef gboolean (*GPluginNativePluginUnloadFunc)(GPluginNativePlugin *plugin);
 
 /******************************************************************************
- * Implementations
+ * Helpers
  *****************************************************************************/
+static gpointer
+gplugin_native_plugin_loader_lookup_symbol(GModule *module,
+                                           const gchar *name, GError **error)
+{
+	gpointer symbol = NULL;
+
+	g_return_val_if_fail(module != NULL, NULL);
+
+	if(!g_module_symbol(module, name, &symbol)) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "symbol %s was not found", name);
+
+			return NULL;
+		}
+	}
+
+	return symbol;
+}
+
 static GModule *
 gplugin_native_plugin_loader_open(const gchar *filename, GError **error) {
 	GModule *module = NULL;
@@ -50,75 +74,95 @@ gplugin_native_plugin_loader_open(const gchar *filename, GError **error) {
 	return NULL;
 }
 
-static GPluginPluginInfo *
-gplugin_native_plugin_loader_query(GModule *module, GError **error) {
-	const GPluginPluginInfo *info = NULL;
-	GPluginNativePluginQueryFunc query = NULL;
-	gpointer func = NULL;
-
-	if(!g_module_symbol(module, GPLUGIN_QUERY_SYMBOL, &func)) {
-		if(error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "Query symbol was not found");
-		}
-
-		return NULL;
-	}
-
-	query = (GPluginNativePluginQueryFunc)func;
-	info = query();
-
-	if(!info) {
-		if(error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "Query symbol did not return a valid value");
-		}
-
-		return NULL;
-	}
-
-	if(info->abi_version != GPLUGIN_NATIVE_PLUGIN_ABI_VERSION) {
-		if(error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "ABI version mismatch.  Wanted %x, got %x",
-			                     GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-			                     info->abi_version);
-		}
-
-		return NULL;
-	}
-
-	return gplugin_plugin_info_copy(info);
-}
-
 /******************************************************************************
  * GPluginPluginLoaderInterface API
  *****************************************************************************/
-static GPluginPluginInfo *
-gplugin_native_plugin_loader_query_filename(GPluginPluginLoader *loader,
-                                            const gchar *filename,
-                                            GError **error)
+static GPluginPlugin *
+gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
+                                   const gchar *filename,
+                                   GError **error)
 {
-	GPluginPluginInfo *info = NULL;
+	GPluginPlugin *plugin = NULL;
+	const GPluginPluginInfo *info = NULL;
+	GPluginNativePluginLoadFunc load = NULL;
+	GPluginNativePluginQueryFunc query = NULL;
+	GPluginNativePluginUnloadFunc unload = NULL;
 	GModule *module = NULL;
 
+	/* open the file via gmodule */
 	module = gplugin_native_plugin_loader_open(filename, error);
 	if(!module)
 		return NULL;
 
-	info = gplugin_native_plugin_loader_query(module, error);
+	/* now look for the query symbol */
+	query = gplugin_native_plugin_loader_lookup_symbol(module,
+	                                                   GPLUGIN_QUERY_SYMBOL,
+	                                                   error);
+	if(error) {
+		g_module_close(module);
+		return NULL;
+	}
 
-	g_module_close(module);
+	/* now look for the load symbol */
+	load = gplugin_native_plugin_loader_lookup_symbol(module,
+	                                                  GPLUGIN_LOAD_SYMBOL,
+	                                                  error);
+	if(error) {
+		g_module_close(module);
+		return NULL;
+	}
 
-	return info;
+	/* now look for the unload symbol */
+	unload = gplugin_native_plugin_loader_lookup_symbol(module,
+	                                                    GPLUGIN_UNLOAD_SYMBOL,
+	                                                    error);
+	if(error) {
+		g_module_close(module);
+		return NULL;
+	}
+
+	/* now we have all of our symbols, so let's see if this plugin will return a
+	 * valid GPluginPluginInfo structure
+	 */
+	info = ((GPluginNativePluginQueryFunc)(query))();
+	if(!info) {
+		g_module_close(module);
+
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "the query function did not return a "
+			                     "GPluginPluginInfo structure");
+		}
+
+		return NULL;
+	}
+
+	/* now create the actual plugin instance */
+	plugin = g_object_new(GPLUGIN_TYPE_PLUGIN,
+	                      "module", module,
+	                      "info", info,
+	                      "load-func", load,
+	                      "unload-func", unload,
+	                      NULL);
+
+	if(!GPLUGIN_IS_NATIVE_PLUGIN(plugin)) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "failed to create plugin instance");
+		}
+
+		return NULL;
+	}
+
+	return plugin;
 }
 
-static GPluginPlugin *
+static gboolean
 gplugin_native_plugin_loader_load(GPluginPluginLoader *loader,
-                                  const gchar *filename,
+                                  GPluginPlugin *plugin,
                                   GError **error)
 {
-	return NULL;
+	return FALSE;
 }
 
 static gboolean
@@ -132,7 +176,7 @@ gplugin_native_plugin_loader_unload(GPluginPluginLoader *loader,
 static void
 gplugin_native_loader_loader_loader_init(GPluginPluginLoaderIface *iface) {
 	iface->supported_extensions = g_slist_append(NULL, G_MODULE_SUFFIX);
-	iface->query = gplugin_native_plugin_loader_query_filename;
+	iface->query = gplugin_native_plugin_loader_query;
 	iface->load = gplugin_native_plugin_loader_load;
 	iface->unload = gplugin_native_plugin_loader_unload;
 }

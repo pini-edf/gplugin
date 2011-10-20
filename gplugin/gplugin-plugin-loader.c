@@ -34,7 +34,7 @@ gplugin_plugin_loader_get_type(void) {
 	return type;
 }
 
-GPluginPluginInfo *
+GPluginPlugin *
 gplugin_plugin_loader_query_plugin(GPluginPluginLoader *loader,
                                    const gchar *filename, GError **error)
 {
@@ -52,22 +52,22 @@ gplugin_plugin_loader_query_plugin(GPluginPluginLoader *loader,
 	return NULL;
 }
 
-GPluginPlugin *
+gboolean
 gplugin_plugin_loader_load_plugin(GPluginPluginLoader *loader,
-                                  const gchar *filename, GError **error)
+                                  GPluginPlugin *plugin, GError **error)
 {
 	GPluginPluginLoaderIface *iface = NULL;
 
-	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_LOADER(loader), NULL);
-	g_return_val_if_fail(filename, NULL);
-	g_return_val_if_fail(error != NULL, NULL);
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_LOADER(loader), FALSE);
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
+	g_return_val_if_fail(error != NULL, FALSE);
 
 	iface = GPLUGIN_PLUGIN_LOADER_GET_IFACE(loader);
 
 	if(iface && iface->load)
-		return iface->load(loader, filename, error);
+		return iface->load(loader, plugin, error);
 
-	return NULL;
+	return FALSE;
 }
 
 gboolean

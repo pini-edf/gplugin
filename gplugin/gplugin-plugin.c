@@ -26,6 +26,7 @@
 typedef struct {
 	gchar *filename;
 
+	GPluginPluginLoader *loader;
 	GPluginPluginInfo *info;
 } GPluginPluginPrivate;
 
@@ -35,6 +36,7 @@ typedef struct {
 enum {
 	PROP_ZERO,
 	PROP_FILENAME,
+	PROP_LOADER,
 	PROP_INFO,
 	PROP_LAST,
 };
@@ -56,6 +58,19 @@ gplugin_plugin_set_filename(GPluginPlugin *plugin, const gchar *filename) {
 	priv->filename = (filename) ? g_strdup(filename) : NULL;
 
 	g_object_notify(G_OBJECT(plugin), "filename");
+}
+
+static void
+gplugin_plugin_set_loader(GPluginPlugin *plugin, GPluginPluginLoader *loader) {
+	GPluginPluginPrivate *priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
+
+	if(priv->loader)
+		g_object_unref(G_OBJECT(priv->loader));
+
+	if(GPLUGIN_IS_PLUGIN_LOADER(loader))
+		priv->loader = g_object_ref(G_OBJECT(loader));
+	else
+		priv->loader = NULL;
 }
 
 static void
@@ -84,6 +99,9 @@ gplugin_plugin_get_property(GObject *obj, guint param_id, GValue *value,
 		case PROP_FILENAME:
 			g_value_set_string(value, gplugin_plugin_get_filename(plugin));
 			break;
+		case PROP_LOADER:
+			g_value_set_object(value, gplugin_plugin_get_loader(plugin));
+			break;
 		case PROP_INFO:
 			g_value_set_boxed(value, gplugin_plugin_get_info(plugin));
 			break;
@@ -103,6 +121,9 @@ gplugin_plugin_set_property(GObject *obj, guint param_id, const GValue *value,
 		case PROP_FILENAME:
 			gplugin_plugin_set_filename(plugin, g_value_get_string(value));
 			break;
+		case PROP_LOADER:
+			gplugin_plugin_set_loader(plugin, g_value_get_object(value));
+			break;
 		case PROP_INFO:
 			gplugin_plugin_set_info(plugin, g_value_get_boxed(value));
 			break;
@@ -110,6 +131,17 @@ gplugin_plugin_set_property(GObject *obj, guint param_id, const GValue *value,
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, param_id, pspec);
 			break;
 	}
+}
+
+static void
+gplugin_plugin_finalize(GObject *obj) {
+	GPluginPluginPrivate *priv = GPLUGIN_PLUGIN_GET_PRIVATE(obj);
+
+	g_free(priv->filename);
+	g_object_unref(priv->loader);
+	gplugin_plugin_info_free(priv->info);
+
+	G_OBJECT_CLASS(parent_class)->finalize(obj);
 }
 
 static void
@@ -122,12 +154,25 @@ gplugin_plugin_class_init(GPluginPluginClass *klass) {
 
 	obj_class->get_property = gplugin_plugin_get_property;
 	obj_class->set_property = gplugin_plugin_set_property;
+	obj_class->finalize = gplugin_plugin_finalize;
 
 	g_object_class_install_property(obj_class, PROP_FILENAME,
 		g_param_spec_string("filename", "filename",
 		                    "The filename of the plugin",
 		                    NULL,
 		                    G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
+
+	g_object_class_install_property(obj_class, PROP_LOADER,
+		g_param_spec_object("loader", "loader",
+		                    "The loader for this plugin",
+		                    GPLUGIN_TYPE_PLUGIN_LOADER,
+		                    G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
+
+	g_object_class_install_property(obj_class, PROP_INFO,
+		g_param_spec_boxed("info", "info",
+		                   "The information for the plugin",
+		                   GPLUGIN_TYPE_PLUGIN_INFO,
+		                   G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
 }
 
 /******************************************************************************
@@ -161,6 +206,17 @@ gplugin_plugin_get_filename(const GPluginPlugin *plugin) {
 	priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
 
 	return priv->filename;
+}
+
+GPluginPluginLoader *
+gplugin_plugin_get_loader(const GPluginPlugin *plugin) {
+	GPluginPluginPrivate *priv = NULL;
+
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), NULL);
+
+	priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
+
+	return priv->loader;
 }
 
 GPluginPluginInfo *

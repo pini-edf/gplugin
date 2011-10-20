@@ -39,9 +39,9 @@ struct _GPluginPluginLoaderIface {
 
 	GSList *supported_extensions;
 
-	GPluginPluginInfo *(*query)(GPluginPluginLoader *loader, const gchar *filename, GError **error);
+	GPluginPlugin *(*query)(GPluginPluginLoader *loader, const gchar *filename, GError **error);
 
-	GPluginPlugin *(*load)(GPluginPluginLoader *loader, const gchar *filename, GError **error);
+	gboolean (*load)(GPluginPluginLoader *loader, GPluginPlugin *plugin, GError **error);
 	gboolean (*unload)(GPluginPluginLoader *loader, GPluginPlugin *plugin, GError **error);
 
 	void (*_gplugin_reserved_1)(void);
@@ -54,9 +54,9 @@ G_BEGIN_DECLS
 
 GType gplugin_plugin_loader_get_type(void);
 
-GPluginPluginInfo *gplugin_plugin_loader_query_plugin(GPluginPluginLoader *loader, const gchar *filename, GError **error);
+GPluginPlugin *gplugin_plugin_loader_query_plugin(GPluginPluginLoader *loader, const gchar *filename, GError **error);
 
-GPluginPlugin *gplugin_plugin_loader_load_plugin(GPluginPluginLoader *loader, const gchar *filename, GError **error);
+gboolean gplugin_plugin_loader_load_plugin(GPluginPluginLoader *loader, GPluginPlugin *plugin, GError **error);
 gboolean gplugin_plugin_loader_unload_plugin(GPluginPluginLoader *loader, GPluginPlugin *plugin, GError **error);
 
 G_END_DECLS

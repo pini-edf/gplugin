@@ -67,6 +67,7 @@ enum {
 /******************************************************************************
  * Functions
  *****************************************************************************/
+typedef GPluginPluginInfo *(*GPluginNativePluginQueryFunc)(void);
 typedef gboolean (*GPluginNativePluginLoadFunc)(GPluginNativePlugin *plugin);
 typedef gboolean (*GPluginNativePluginUnloadFunc)(GPluginNativePlugin *plugin);
 
