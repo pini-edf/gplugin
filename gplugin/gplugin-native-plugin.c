@@ -384,6 +384,8 @@ gplugin_native_plugin_register_type(GPluginNativePlugin *plugin, GType parent,
 	g_return_val_if_fail(name, G_TYPE_INVALID);
 	g_return_val_if_fail(info, G_TYPE_INVALID);
 
+	priv = GPLUGIN_NATIVE_PLUGIN_GET_PRIVATE(plugin);
+
 	type = g_type_from_name(name);
 
 	if(type != G_TYPE_INVALID) {
@@ -458,6 +460,8 @@ gplugin_native_plugin_add_interface(GPluginNativePlugin *plugin,
 
 	g_return_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin));
 	g_return_if_fail(interface_info);
+
+	priv = GPLUGIN_NATIVE_PLUGIN_GET_PRIVATE(plugin);
 
 	if(g_type_is_a(instance_type, interface_type)) {
 		GTypePlugin *old = g_type_interface_get_plugin(instance_type,

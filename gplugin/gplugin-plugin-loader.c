@@ -40,6 +40,7 @@ gplugin_plugin_loader_query_plugin(GPluginPluginLoader *loader,
 {
 	GPluginPluginLoaderIface *iface = NULL;
 
+	g_return_val_if_fail(loader != NULL, NULL);
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_LOADER(loader), NULL);
 	g_return_val_if_fail(filename, NULL);
 	g_return_val_if_fail(error != NULL, NULL);
@@ -58,6 +59,7 @@ gplugin_plugin_loader_load_plugin(GPluginPluginLoader *loader,
 {
 	GPluginPluginLoaderIface *iface = NULL;
 
+	g_return_val_if_fail(loader != NULL, FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_LOADER(loader), FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
 	g_return_val_if_fail(error != NULL, FALSE);
@@ -76,6 +78,7 @@ gplugin_plugin_loader_unload_plugin(GPluginPluginLoader *loader,
 {
 	GPluginPluginLoaderIface *iface = NULL;
 
+	g_return_val_if_fail(loader != NULL, FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_LOADER(loader), FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
 
