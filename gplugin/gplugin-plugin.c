@@ -219,7 +219,7 @@ gplugin_plugin_get_loader(const GPluginPlugin *plugin) {
 	return priv->loader;
 }
 
-GPluginPluginInfo *
+const GPluginPluginInfo *
 gplugin_plugin_get_info(const GPluginPlugin *plugin) {
 	GPluginPluginPrivate *priv = NULL;
 

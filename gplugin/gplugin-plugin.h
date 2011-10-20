@@ -88,7 +88,7 @@ GType gplugin_plugin_get_type(void);
 
 const gchar *gplugin_plugin_get_filename(const GPluginPlugin *plugin);
 GPluginPluginLoader *gplugin_plugin_get_loader(const GPluginPlugin *plugin);
-GPluginPluginInfo *gplugin_plugin_get_info(const GPluginPlugin *plugin);
+const GPluginPluginInfo *gplugin_plugin_get_info(const GPluginPlugin *plugin);
 
 GType gplugin_plugin_info_get_type(void);
 
