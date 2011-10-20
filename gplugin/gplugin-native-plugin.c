@@ -129,7 +129,7 @@ gplugin_native_plugin_priv_use(GTypePlugin *plugin) {
 	GPluginNativePlugin *native = GPLUGIN_NATIVE_PLUGIN(plugin);
 
 	if(!gplugin_native_plugin_use(native)) {
-		GPluginPluginInfo *info =
+		const GPluginPluginInfo *info =
 			gplugin_plugin_get_info(GPLUGIN_PLUGIN(native));
 		const gchar *name = (info) ? info->name : "(unknown)";
 
@@ -316,7 +316,7 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
 				(GPluginNativePluginTypeInfo *)(l->data);
 
 			if(!info->loaded) {
-				GPluginPluginInfo *plugin_info =
+				const GPluginPluginInfo *plugin_info =
 					gplugin_plugin_get_info(GPLUGIN_PLUGIN(plugin));
 				const gchar *name = (plugin_info) ? plugin_info->name
 				                                  : "(unknown)";
