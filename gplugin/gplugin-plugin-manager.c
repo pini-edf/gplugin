@@ -27,6 +27,7 @@
 typedef struct {
 	gchar *filename;
 	gchar *extension;
+	gboolean loaded;
 } GPluginPluginManagerTreeEntry;
 
 /******************************************************************************
@@ -54,6 +55,8 @@ gplugin_plugin_manager_tree_entry_new(const gchar *filename) {
 	 * in the string given too it, and not a new copy.
 	 */
 	e->extension = g_utf8_strrchr(e->filename, -1, g_utf8_get_char("."));
+
+	e->loaded = FALSE;
 
 	return e;
 }
