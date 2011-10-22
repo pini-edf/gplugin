@@ -34,6 +34,14 @@ set(GPLUGIN_BUILT_SOURCES
 )
 
 ###############################################################################
+# Helper Variables
+###############################################################################
+list(APPEND PUBLIC_HEADERS ${GPLUGIN_HEADERS} ${GPLUGIN_BUILT_HEADERS} gplugin.h)
+list(SORT PUBLIC_HEADERS)
+
+list(APPEND PRIVATE_HEADERS gplugin-private.h)
+
+###############################################################################
 # Configure Files
 ###############################################################################
 configure_file(gplugin-version.h.in gplugin-version.h @ONLY)
@@ -41,8 +49,11 @@ configure_file(gplugin-version.h.in gplugin-version.h @ONLY)
 # build gplugin.h
 set(GPLUGIN_H_INCLUDES "")
 
-foreach(HEADER ${GPLUGIN_HEADERS} ${GPLUGIN_BUILT_HEADERS})
-	set(GPLUGIN_H_INCLUDES "${GPLUGIN_H_INCLUDES}\n#include <gplugin/${HEADER}>")
+foreach(HEADER ${PUBLIC_HEADERS})
+	if(${HEADER} STREQUAL gplugin.h)
+	else(${HEADER} STREQUAL gplugin.h)
+		set(GPLUGIN_H_INCLUDES "${GPLUGIN_H_INCLUDES}\n#include <gplugin/${HEADER}>")
+	endif(${HEADER} STREQUAL gplugin.h)
 endforeach(HEADER)
 
 configure_file(gplugin.h.in gplugin.h @ONLY)
@@ -76,10 +87,13 @@ add_custom_command(
 add_library(gplugin SHARED
 	${GPLUGIN_SOURCES}
 	${GPLUGIN_BUILT_SOURCES}
-	${GPLUGIN_HEADERS}
-	${GPLUGIN_BUILT_HEADERS}
-	gplugin.h
-	gplugin-private.h
+	${PUBLIC_HEADERS}
+	${PRIVATE_HEADERS}
+)
+
+set_target_properties(gplugin PROPERTIES
+	PUBLIC_HEADER "${PUBLIC_HEADERS}"
+	PRIVATE_HEADER "${PRIVATE_HEADERS}"
 )
 
 target_link_libraries(gplugin
