@@ -27,7 +27,7 @@
 typedef struct {
 	gchar *filename;
 	gchar *extension;
-	gboolean loaded;
+	gboolean probed;
 } GPluginPluginManagerTreeEntry;
 
 /******************************************************************************
@@ -73,6 +73,13 @@ gplugin_plugin_manager_tree_entry_free(GPluginPluginManagerTreeEntry *e) {
 	e = NULL;
 }
 
+/**
+ * gplugin_plugin_manager_file_tree_new:
+ *
+ * Builds a GNode tree of consisting of a root node, whose children contain
+ * an allocated string of a plugin directory.  The directory node's children
+ * are GPluginPluginManagerTreeEntry instances for the files in that directory.
+ */
 static GNode *
 gplugin_plugin_manager_file_tree_new(void) {
 	GHashTableIter iter;
@@ -313,7 +320,7 @@ void
 gplugin_plugin_manager_refresh(void) {
 	GNode *root = NULL;
 
-	/* build a list of all possible plugins */
+	/* build a tree of all possible plugins */
 	root = gplugin_plugin_manager_file_tree_new();
 
 	refresh_needed = TRUE;
