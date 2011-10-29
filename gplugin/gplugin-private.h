@@ -23,7 +23,11 @@
 
 #include <glib.h>
 
+#include <gplugin/gplugin-plugin.h>
+
 G_BEGIN_DECLS
+
+gchar *gplugin_plugin_get_internal_filename(GPluginPlugin *plugin);
 
 void gplugin_plugin_manager_init(void);
 void gplugin_plugin_manager_uninit(void);

@@ -21,13 +21,14 @@
 #include <gplugin/gplugin-core.h>
 #include <gplugin/gplugin-native-plugin-loader.h>
 
+#include <gplugin/gplugin-private.h>
+
 /******************************************************************************
  * Structs
  *****************************************************************************/
 typedef struct {
 	gchar *filename;
 	gchar *extension;
-	gboolean probed;
 } GPluginPluginManagerTreeEntry;
 
 /******************************************************************************
@@ -36,6 +37,8 @@ typedef struct {
 static GHashTable *paths = NULL;
 
 static GHashTable *plugins = NULL;
+static GHashTable *plugins_filename_view = NULL;
+
 static GHashTable *loaders = NULL;
 
 static gboolean refresh_needed = FALSE;
@@ -55,8 +58,6 @@ gplugin_plugin_manager_tree_entry_new(const gchar *filename) {
 	 * in the string given too it, and not a new copy.
 	 */
 	e->extension = g_utf8_strrchr(e->filename, -1, g_utf8_get_char("."));
-
-	e->loaded = FALSE;
 
 	return e;
 }
@@ -166,6 +167,9 @@ gplugin_plugin_manager_init(void) {
 
 	plugins = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 
+	plugins_filename_view = g_hash_table_new_full(g_str_hash, g_str_equal,
+	                                              NULL, g_object_unref);
+
 	/* The loaders hash table is keyed on the supported extensions of the
 	 * loader.  Which means that a loader that supports multiple extensions
 	 * will be in the table multiple times.
@@ -187,6 +191,7 @@ void
 gplugin_plugin_manager_uninit(void) {
 	g_hash_table_destroy(paths);
 	g_hash_table_destroy(plugins);
+	g_hash_table_destroy(plugins_filename_view);
 	g_hash_table_destroy(loaders);
 }
 
@@ -335,25 +340,111 @@ gplugin_plugin_manager_refresh(void) {
 			const gchar *path = (const gchar *)dir->data;
 
 			for(file = dir->children; file; file = file->next) {
-				GPluginPluginInfo *info = NULL;
-				GPluginPluginLoader *loader = NULL;
+				GPluginPlugin *plugin = NULL;
 				GPluginPluginManagerTreeEntry *e = NULL;
 				GError *error = NULL;
+				GSList *l = NULL;
 				gchar *filename = NULL;
 
 				e = (GPluginPluginManagerTreeEntry *)file->data;
 
-				/* try to find a load for this plugin, if we don't have one yet
-				 * move on to the next plugin.
-				 */
-				loader = g_hash_table_lookup(loaders, e->extension);
-				if(!GPLUGIN_IS_PLUGIN_LOADER(loader))
-					continue;
-
-				/* yay we have a LOADER!  So build it's path and query it! */
+				/* Build the path and see if we need to probe it! */
 				filename = g_build_path(path, e->filename, NULL);
-				info = gplugin_plugin_loader_query_plugin(loader, filename,
-				                                          &error);
+				plugin = g_hash_table_lookup(plugins_filename_view, filename);
+
+				if(plugin && GPLUGIN_IS_PLUGIN(plugin)) {
+					GPluginPluginState state = GPLUGIN_PLUGIN_STATE_UNKNOWN;
+
+					/* The plugin is in our "view", check it's state.  If it's
+					 * probed or loaded, move on to the next one.
+					 */
+					if(state == GPLUGIN_PLUGIN_STATE_PROBED ||
+					   state == GPLUGIN_PLUGIN_STATE_LOADED)
+					{
+						g_free(filename);
+						continue;
+					}
+				}
+
+				/* grab the list of loaders for this extension */
+				for(l = g_hash_table_lookup(loaders, e->extension); l;
+				    l = l->next)
+				{
+					GPluginPluginLoader *loader = NULL;
+
+					if(!l->data)
+						continue;
+
+					loader = GPLUGIN_PLUGIN_LOADER(l->data);
+					if(!GPLUGIN_IS_PLUGIN_LOADER(loader))
+						continue;
+
+					/* Try to probe the plugin with the current loader */
+					plugin = gplugin_plugin_loader_query_plugin(loader,
+					                                            filename,
+				                                                &error);
+
+					/* Check the GError, if it's set, output it's message and
+					 * try the next loader.
+					 */
+					if(error) {
+						g_warning("failed to probe '%s' with loader '%s': %s",
+					              filename, G_OBJECT_TYPE_NAME(loader),
+						          error->message ? error->message : "Unknown");
+
+						g_error_free(error);
+						error = NULL;
+
+						continue;
+					}
+
+					/* if the plugin instance is good, then break out of this
+					 * loop.
+					 */
+					if(plugin != NULL && GPLUGIN_IS_PLUGIN(plugin))
+						break;
+
+					plugin = NULL;
+				}
+
+				/* check if our plugin instance is good.  If it's not good we
+				 * don't need to do anything but free the filename which we'll
+				 * do later.
+				 */
+				if(plugin != NULL && GPLUGIN_IS_PLUGIN(plugin)) {
+					/* we have a good plugin, huzzah!  We need to add it to our
+					 * "view" as well as the main plugin hash table.
+					 */
+
+					/* we want the internal filename from the plugin to avoid
+					 * duplicate memory, so we need to grab it for the "view".
+					 */
+					gchar *real_filename =
+						gplugin_plugin_get_internal_filename(plugin);
+
+					/* we also need the GPluginPluginInfo to get the plugin's
+					 * ID for the key in our main hash table.
+					 */
+					const GPluginPluginInfo *info =
+						gplugin_plugin_get_info(plugin);
+
+					/* We need a GSList for the plugins hash table since
+					 * multiple plugins could have the same id.
+					 */
+					GSList *l = NULL;
+
+					/* now insert into our view */
+					g_hash_table_insert(plugins_filename_view, real_filename,
+					                    g_object_ref(G_OBJECT(plugin)));
+
+					/* Grab the list of plugins with our id and prepend the new
+					 * plugin to it before updating it.
+					 */
+					l = g_hash_table_lookup(plugins, info->id);
+					l = g_slist_prepend(l, g_object_ref(plugin));
+					g_hash_table_insert(plugins, g_strdup(info->id), l);
+				}
+
 				g_free(filename);
 			}
 		}

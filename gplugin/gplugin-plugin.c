@@ -17,6 +17,8 @@
 
 #include <gplugin/gplugin-plugin.h>
 
+#include <gplugin/gplugin-private.h>
+
 #define GPLUGIN_PLUGIN_GET_PRIVATE(obj) \
 	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_PLUGIN, GPluginPluginPrivate))
 
@@ -84,6 +86,13 @@ gplugin_plugin_set_info(GPluginPlugin *plugin, GPluginPluginInfo *info) {
 		priv->info = gplugin_plugin_info_copy(info);
 	else
 		priv->info = NULL;
+}
+
+gchar *
+gplugin_plugin_get_internal_filename(GPluginPlugin *plugin) {
+	GPluginPluginPrivate *priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
+
+	return priv->filename;
 }
 
 /******************************************************************************
