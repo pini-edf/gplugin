@@ -46,6 +46,14 @@ static gboolean refresh_needed = FALSE;
 /******************************************************************************
  * Helpers
  *****************************************************************************/
+static guint
+gplugin_plugin_manager_str_hash(gconstpointer v) {
+	if(v == NULL)
+		return g_str_hash("");
+
+	return g_str_hash(v);
+}
+
 static GPluginPluginManagerTreeEntry *
 gplugin_plugin_manager_tree_entry_new(const gchar *filename) {
 	GPluginPluginManagerTreeEntry *e = NULL;
@@ -58,6 +66,10 @@ gplugin_plugin_manager_tree_entry_new(const gchar *filename) {
 	 * in the string given too it, and not a new copy.
 	 */
 	e->extension = g_utf8_strrchr(e->filename, -1, g_utf8_get_char("."));
+
+	/* if we have an extension, we need to iterate past the . */
+	if(e->extension)
+		e->extension = g_utf8_next_char(e->extension);
 
 	return e;
 }
@@ -118,8 +130,12 @@ gplugin_plugin_manager_file_tree_new(void) {
 		/* now run through all of the files and add them to the tree */
 		while((filename = g_dir_read_name(d)) != NULL) {
 			GNode *file = NULL;
+			GPluginPluginManagerTreeEntry *entry = NULL;
 
-			file = g_node_new(gplugin_plugin_manager_tree_entry_new(filename));
+			entry = gplugin_plugin_manager_tree_entry_new(filename);
+
+			file = g_node_new(entry);
+
 			g_node_prepend(dir, file);
 		}
 
@@ -131,7 +147,7 @@ gplugin_plugin_manager_file_tree_new(void) {
 }
 
 static gboolean
-gplugin_plugin_manager_file_tree_free_helper(GNode *n, gpointer d) {
+gplugin_plugin_manager_file_tree_free_leaves(GNode *n, gpointer d) {
 	GPluginPluginManagerTreeEntry *e = n->data;
 
 	gplugin_plugin_manager_tree_entry_free(e);
@@ -139,10 +155,20 @@ gplugin_plugin_manager_file_tree_free_helper(GNode *n, gpointer d) {
 	return FALSE;
 }
 
+static gboolean
+gplugin_plugin_manager_file_tree_free_nonleaves(GNode *n, gpointer d) {
+	g_free(n->data);
+
+	return FALSE;
+}
+
 static void
 gplugin_plugin_manager_file_tree_free(GNode *root) {
-	g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_ALL, -1,
-	                gplugin_plugin_manager_file_tree_free_helper, NULL);
+	g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_LEAVES, -1,
+	                gplugin_plugin_manager_file_tree_free_leaves, NULL);
+
+	g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_NON_LEAVES, -1,
+	                gplugin_plugin_manager_file_tree_free_nonleaves, NULL);
 
 	g_node_destroy(root);
 }
@@ -181,7 +207,8 @@ gplugin_plugin_manager_init(void) {
 	 * to use by the filename and helps us to avoid iterating the loaders table
 	 * again and again.
 	 */
-	loaders = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
+	loaders = g_hash_table_new_full(gplugin_plugin_manager_str_hash,
+	                                g_str_equal, g_free,
 	                                gplugin_plugin_manager_remove_list_value);
 
 	gplugin_plugin_manager_register_loader(GPLUGIN_TYPE_NATIVE_PLUGIN_LOADER);
