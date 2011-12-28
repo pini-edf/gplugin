@@ -35,6 +35,9 @@ void gplugin_plugin_manager_unregister_loader(GType type);
 
 void gplugin_plugin_manager_refresh(void);
 
+GSList *gplugin_plugin_manager_find_plugins(const gchar *id);
+void gplugin_plugin_manager_free_plugin_list(GSList *plugins_list);
+
 G_END_DECLS
 
 #endif /* GPLUGIN_PLUGIN_MANAGER_H */

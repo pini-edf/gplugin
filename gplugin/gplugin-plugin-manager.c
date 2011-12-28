@@ -481,3 +481,44 @@ gplugin_plugin_manager_refresh(void) {
 	gplugin_plugin_manager_file_tree_free(root);
 }
 
+GSList *
+gplugin_plugin_manager_find_plugins(const gchar *id) {
+	GSList *plugins_list = NULL, *l;
+
+	g_return_val_if_fail(id != NULL, NULL);
+
+	for(l = g_hash_table_lookup(plugins, id); l; l = l->next) {
+		GPluginPlugin *plugin = NULL;
+
+		if(l->data == NULL)
+			continue;
+
+		plugin = GPLUGIN_PLUGIN(l->data);
+
+		plugins_list = g_slist_prepend(plugins_list,
+		                               g_object_ref(G_OBJECT(plugin)));
+	}
+
+	return plugins_list;
+}
+
+void
+gplugin_plugin_manager_free_plugin_list(GSList *plugins_list) {
+	GSList *l = NULL;
+
+	g_return_if_fail(plugins_list != NULL);
+
+	for(l = plugins_list; l; l = l->next) {
+		GPluginPlugin *plugin = NULL;
+
+		if(l->data == NULL)
+			continue;
+
+		plugin = GPLUGIN_PLUGIN(l->data);
+
+		g_object_unref(G_OBJECT(plugin));
+	}
+
+	g_slist_free(plugins_list);
+}
+
