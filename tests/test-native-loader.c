@@ -31,6 +31,8 @@ main(gint argc, gchar **argv) {
 
 	gplugin_plugin_manager_add_path(TEST_DIR);
 
+	gplugin_plugin_manager_refresh();
+
 	return g_test_run();
 }
 
