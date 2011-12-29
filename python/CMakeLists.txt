@@ -1,6 +1,11 @@
 if(PYTHONLIBS_FOUND)
 	set(GPLUGIN_PYTHON_SOURCES
 		gplugin-python-core.c
+		gplugin-python-plugin-loader.c
+	)
+
+	set(GPLUGIN_PYTHON_HEADERS
+		gplugin-python-plugin-loader.h
 	)
 
 	add_library(gplugin-python MODULE
@@ -9,12 +14,12 @@ if(PYTHONLIBS_FOUND)
 	)
 
 	include_directories(
-		${PYTHONLIBS_INCLUDE_DIRS}
+		${PYTHON_INCLUDE_DIRS}
 		${PYGOBJECT_INCLUDE_DIRS}
 	)
 
 	target_link_libraries(gplugin-python
-		${PYTHONLIBS_LIBS}
+		${PYTHON_LIBS}
 		${PYGOBJECT_LIBS}
 		gplugin
 	)
