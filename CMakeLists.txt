@@ -47,6 +47,15 @@ find_program(GTESTER
 )
 mark_as_advanced(GTESTER)
 
+# Python
+include(FindPythonLibs)
+
+if(PYTHONLIBS_FOUND)
+	pkg_check_modules(PYGOBJECT REQUIRED
+		pygobject-3.0>=3.0.0
+	)
+endif(PYTHONLIBS_FOUND)
+
 ###############################################################################
 # Build Info
 ###############################################################################
@@ -76,5 +85,6 @@ configure_file(gplugin.pc.in ${CMAKE_BINARY_DIR}/gplugin.pc @ONLY)
 # Subdirectories
 ###############################################################################
 add_subdirectory(gplugin)
+add_subdirectory(python)
 add_subdirectory(tests)
 
