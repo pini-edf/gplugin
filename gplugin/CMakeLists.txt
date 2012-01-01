@@ -94,6 +94,7 @@ add_library(gplugin SHARED
 set_target_properties(gplugin PROPERTIES
 	PUBLIC_HEADER "${PUBLIC_HEADERS}"
 	PRIVATE_HEADER "${PRIVATE_HEADERS}"
+	SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
 target_link_libraries(gplugin

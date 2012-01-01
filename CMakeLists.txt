@@ -1,4 +1,9 @@
+###############################################################################
+# CMake Initialization
+###############################################################################
 cmake_minimum_required(VERSION 2.8)
+
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
 
 ###############################################################################
 # Project Info
@@ -87,4 +92,4 @@ configure_file(gplugin.pc.in ${CMAKE_BINARY_DIR}/gplugin.pc @ONLY)
 add_subdirectory(gplugin)
 add_subdirectory(python)
 add_subdirectory(tests)
-
+#add_subdirectory(gir)
