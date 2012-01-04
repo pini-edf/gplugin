@@ -22,6 +22,32 @@
 /******************************************************************************
  * Tests
  *****************************************************************************/
+static void
+test_gplugin_native_plugin_loader(void) {
+	GSList *plugins = NULL, *l = NULL;
+
+	/* add the test directory to the plugin manager's search paths */
+	gplugin_plugin_manager_add_path(TEST_DIR);
+
+	/* refresh the plugin manager */
+	gplugin_plugin_manager_refresh();
+
+	/* now look for the plugin */
+	plugins = gplugin_plugin_manager_find_plugins("test-native-plugin");
+	g_assert(plugins != NULL);
+
+	/* now iterate through the plugins (we really only should have one...) */
+	for(l = plugins; l; l = l->next) {
+		GPluginPlugin *plugin = GPLUGIN_PLUGIN(l->data);
+		GPluginPluginState state = GPLUGIN_PLUGIN_STATE_UNKNOWN;
+
+		state = gplugin_plugin_get_state(plugin);
+	}
+
+	/* make sure the free function works too */
+	gplugin_plugin_manager_free_plugin_list(plugins);
+}
+
 gint
 main(gint argc, gchar **argv) {
 
@@ -29,9 +55,7 @@ main(gint argc, gchar **argv) {
 
 	gplugin_init();
 
-	gplugin_plugin_manager_add_path(TEST_DIR);
-
-	gplugin_plugin_manager_refresh();
+	g_test_add_func("/loaders/native/load", test_gplugin_native_plugin_loader);
 
 	return g_test_run();
 }
