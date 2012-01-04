@@ -26,11 +26,13 @@ set(GPLUGIN_SOURCES
 
 set(GPLUGIN_BUILT_HEADERS
 	gplugin-enums.h
+	gplugin-marshallers.h
 	gplugin-version.h
 )
 
 set(GPLUGIN_BUILT_SOURCES
 	gplugin-enums.c
+	gplugin-marshallers.c
 )
 
 ###############################################################################
@@ -79,6 +81,25 @@ add_custom_command(
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 	COMMAND ${GLIB_MKENUMS} --template gplugin-enums.c.tmpl ${ENUM_HEADERS} >
 		${CMAKE_CURRENT_BINARY_DIR}/gplugin-enums.c
+)
+
+###############################################################################
+# gplugin-marshallers.[ch] generation
+###############################################################################
+add_custom_command(
+	OUTPUT gplugin-marshallers.h
+	DEPENDS gplugin-marshallers.list
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	COMMAND ${GLIB_GENMARSHAL} --header --prefix=gplugin_marshal gplugin-marshallers.list
+		> ${CMAKE_CURRENT_BINARY_DIR}/gplugin-marshallers.h
+)
+
+add_custom_command(
+	OUTPUT gplugin-marshallers.c
+	DEPENDS gplugin-marshallers.list
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	COMMAND ${GLIB_GENMARSHAL} --body --prefix=gplugin_marshal gplugin-marshallers.list
+		> ${CMAKE_CURRENT_BINARY_DIR}/gplugin-marshallers.c
 )
 
 ###############################################################################
