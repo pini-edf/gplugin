@@ -45,7 +45,7 @@ typedef enum /*< prefix=GPLUGIN_PLUGIN_STATE,underscore_name=GPLUGIN_PLUGIN_STAT
 	GPLUGIN_PLUGIN_STATES, /*< skip >*/
 } GPluginPluginState;
 
-typedef enum /*< prefix=GPLUGIN_PLUGIN_FLAGS >*/ {
+typedef enum /*< prefix=GPLUGIN_PLUGIN_FLAGS,underscore_name=GPLUGIN_PLUGIN_FLAGS >*/ {
 	GPLUGIN_PLUGIN_FLAGS_LOAD_ON_QUERY = 1 << 1,
 } GPluginPluginFlags;
 
@@ -60,6 +60,8 @@ struct _GPluginPlugin {
 
 struct _GPluginPluginClass {
 	GObjectClass gparent;
+
+	void (*state_changed)(GPluginPlugin *, GPluginPluginState, GPluginPluginState);
 
 	void (*_gplugin_reserved_1)(void);
 	void (*_gplugin_reserved_2)(void);

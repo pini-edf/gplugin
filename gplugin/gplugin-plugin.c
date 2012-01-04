@@ -18,6 +18,7 @@
 #include <gplugin/gplugin-plugin.h>
 
 #include <gplugin/gplugin-enums.h>
+#include <gplugin/gplugin-marshallers.h>
 #include <gplugin/gplugin-private.h>
 
 #define GPLUGIN_PLUGIN_GET_PRIVATE(obj) \
@@ -47,10 +48,16 @@ enum {
 	PROP_LAST,
 };
 
+enum {
+	SIG_STATE_CHANGED,
+	SIG_LAST,
+};
+
 /******************************************************************************
  * Globals
  *****************************************************************************/
 static GObjectClass *parent_class = NULL;
+static guint signals[SIG_LAST] = {0, };
 
 /******************************************************************************
  * Private API
@@ -95,8 +102,12 @@ gplugin_plugin_set_info(GPluginPlugin *plugin, GPluginPluginInfo *info) {
 static void
 gplugin_plugin_set_state(GPluginPlugin *plugin, GPluginPluginState state) {
 	GPluginPluginPrivate *priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
+	GPluginPluginState oldstate = priv->state;
 
-	
+	priv->state = state;
+
+	g_signal_emit(plugin, signals[SIG_STATE_CHANGED], 0,
+	              oldstate, priv->state);
 }
 
 gchar *
@@ -206,6 +217,17 @@ gplugin_plugin_class_init(GPluginPluginClass *klass) {
 	                      GPLUGIN_TYPE_PLUGIN_STATE,
 		                  GPLUGIN_PLUGIN_STATE_UNKNOWN,
 		                  G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+
+	signals[SIG_STATE_CHANGED] =
+		g_signal_new("state-changed",
+		             G_OBJECT_CLASS_TYPE(klass),
+		             G_SIGNAL_RUN_LAST,
+		             G_STRUCT_OFFSET(GPluginPluginClass, state_changed),
+		             NULL, NULL,
+		             gplugin_marshal_VOID__ENUM_ENUM,
+		             G_TYPE_NONE,
+		             2,
+		             GPLUGIN_TYPE_PLUGIN_STATE, GPLUGIN_TYPE_PLUGIN_STATE);
 }
 
 /******************************************************************************
