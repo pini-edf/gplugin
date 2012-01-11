@@ -11,15 +11,23 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
 project(gplugin C)
 
 set(GPLUGIN_MAJOR_VERSION 0)
-set(GPLUGIN_MICRO_VERSION 0)
-set(GPLUGIN_MINOR_VERSION 1)
+set(GPLUGIN_MINOR_VERSION 0)
+set(GPLUGIN_MICRO_VERSION 1)
 
 find_file(HG_CHECKOUT branch ${CMAKE_SOURCE_DIR}/.hg/)
-message("HG_DIR ${HG_CHECKOUT}")
+if(HG_CHECKOUT)
+	execute_process(
+		COMMAND hg id -i
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		OUTPUT_VARIABLE HG_REVISION
+	)
 
-set(GPLUGIN_EXTRA_VERSION dev)
+	set(GPLUGIN_EXTRA_VERSION "-r${HG_REVISION}")
+elseif(HG_CHECKOUT)
+	set(GPLUGIN_EXTRA_VERSION "")
+endif(HG_CHECKOUT)
 
-set(GPLUGIN_VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.${GPLUGIN_MINOR_VERSION}${GPLUGIN_EXTRA_VERSION})
+set(GPLUGIN_VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.${GPLUGIN_MICRO_VERSION}${GPLUGIN_EXTRA_VERSION})
 
 ###############################################################################
 # Dependencies
@@ -95,10 +103,4 @@ add_subdirectory(gplugin)
 add_subdirectory(python)
 add_subdirectory(tests)
 #add_subdirectory(gir)
-
-###############################################################################
-# Add some output
-###############################################################################
-message("${CMAKE_PROJECT_NAME}
-")
 
