@@ -13,6 +13,10 @@ project(gplugin C)
 set(GPLUGIN_MAJOR_VERSION 0)
 set(GPLUGIN_MICRO_VERSION 0)
 set(GPLUGIN_MINOR_VERSION 1)
+
+find_file(HG_CHECKOUT branch ${CMAKE_SOURCE_DIR}/.hg/)
+message("HG_DIR ${HG_CHECKOUT}")
+
 set(GPLUGIN_EXTRA_VERSION dev)
 
 set(GPLUGIN_VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.${GPLUGIN_MINOR_VERSION}${GPLUGIN_EXTRA_VERSION})
@@ -91,3 +95,10 @@ add_subdirectory(gplugin)
 add_subdirectory(python)
 add_subdirectory(tests)
 #add_subdirectory(gir)
+
+###############################################################################
+# Add some output
+###############################################################################
+message("${CMAKE_PROJECT_NAME}
+")
+

@@ -11,7 +11,7 @@ macro(add_gtest target)
 	list(APPEND TESTS ${_output_name})
 endmacro(add_gtest)
 
-add_library(test-plugin test-plugin.c)
+add_library(test-plugin MODULE test-plugin.c)
 set_target_properties(test-plugin PROPERTIES PREFIX "")
 
 add_gtest(test-plugin-manager-paths)
