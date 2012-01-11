@@ -56,9 +56,7 @@ mark_as_advanced(GTESTER)
 include(FindPythonLibs)
 
 if(PYTHONLIBS_FOUND)
-	pkg_check_modules(PYGOBJECT REQUIRED
-		pygobject-3.0>=3.0.0
-	)
+	pkg_check_modules(PYGOBJECT pygobject-3.0>=3.0.0)
 endif(PYTHONLIBS_FOUND)
 
 ###############################################################################
