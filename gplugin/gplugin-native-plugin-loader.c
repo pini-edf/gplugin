@@ -138,7 +138,7 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	}
 
 	/* now create the actual plugin instance */
-	plugin = g_object_new(GPLUGIN_TYPE_PLUGIN,
+	plugin = g_object_new(GPLUGIN_TYPE_NATIVE_PLUGIN,
 	                      "module", module,
 	                      "info", info,
 	                      "load-func", load,

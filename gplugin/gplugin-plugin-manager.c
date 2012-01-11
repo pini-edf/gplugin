@@ -60,7 +60,7 @@ gplugin_plugin_manager_tree_entry_new(const gchar *filename) {
 
 	e = g_slice_new(GPluginPluginManagerTreeEntry);
 
-	e->filename = g_strdup(filename);
+	e->filename = g_filename_to_utf8(filename, -1, NULL, NULL, NULL);
 
 	/* we have to use e->filename, because g_utf8_strrchr returns a pointer
 	 * in the string given too it, and not a new copy.
@@ -112,15 +112,14 @@ gplugin_plugin_manager_file_tree_new(void) {
 
 		d = g_dir_open(path, 0, &error);
 		if(error) {
-				g_warning("Failed to open %s: %s\n",
-				          (const gchar *)key,
-					      (error->message) ? error->message :
-				                             "unknown failure");
+			g_debug("Failed to open %s: %s\n",
+			        path,
+			        (error->message) ? error->message : "unknown failure");
 
-				g_error_free(error);
-				error = NULL;
+			g_error_free(error);
+			error = NULL;
 
-				continue;
+			continue;
 		}
 
 		/* insert the directory into the tree since we know it exists */
@@ -253,8 +252,12 @@ gplugin_plugin_manager_register_loader(GType type) {
 
 	/* Create the loader instance first.  If we can't create it, we bail */
 	lo = g_object_new(type, NULL);
-	if(!GPLUGIN_IS_PLUGIN_LOADER(lo))
+	if(!GPLUGIN_IS_PLUGIN_LOADER(lo)) {
+		g_warning("failed to create loader instance for %s",
+		          g_type_name(type));
+
 		return;
+	}
 
 	/* grab the loader class and make sure it's valid */
 	iface = GPLUGIN_PLUGIN_LOADER_GET_IFACE(lo);
@@ -380,7 +383,8 @@ gplugin_plugin_manager_refresh(void) {
 				plugin = g_hash_table_lookup(plugins_filename_view, filename);
 
 				if(plugin && GPLUGIN_IS_PLUGIN(plugin)) {
-					GPluginPluginState state = GPLUGIN_PLUGIN_STATE_UNKNOWN;
+					GPluginPluginState state =
+						gplugin_plugin_get_state(plugin);
 
 					/* The plugin is in our "view", check it's state.  If it's
 					 * probed or loaded, move on to the next one.
@@ -430,8 +434,6 @@ gplugin_plugin_manager_refresh(void) {
 					 */
 					if(plugin != NULL && GPLUGIN_IS_PLUGIN(plugin))
 						break;
-
-					plugin = NULL;
 				}
 
 				/* check if our plugin instance is good.  If it's not good we
