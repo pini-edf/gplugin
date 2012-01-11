@@ -379,7 +379,7 @@ gplugin_plugin_manager_refresh(void) {
 				e = (GPluginPluginManagerTreeEntry *)file->data;
 
 				/* Build the path and see if we need to probe it! */
-				filename = g_build_path(path, e->filename, NULL);
+				filename = g_build_filename(path, e->filename, NULL);
 				plugin = g_hash_table_lookup(plugins_filename_view, filename);
 
 				if(plugin && GPLUGIN_IS_PLUGIN(plugin)) {
@@ -419,7 +419,7 @@ gplugin_plugin_manager_refresh(void) {
 					 * try the next loader.
 					 */
 					if(error) {
-						g_warning("failed to probe '%s' with loader '%s': %s",
+						g_warning("failed to query '%s' with loader '%s': %s",
 					              filename, G_OBJECT_TYPE_NAME(loader),
 						          error->message ? error->message : "Unknown");
 
