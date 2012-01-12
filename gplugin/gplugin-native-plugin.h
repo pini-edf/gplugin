@@ -21,7 +21,7 @@
 #ifndef GPLUGIN_NATIVE_PLUGIN_H
 #define GPLUGIN_NATIVE_PLUGIN_H
 
-#define GPLUGIN_TYPE_NATIVE_PLUGIN            (gplugin_plugin_get_type())
+#define GPLUGIN_TYPE_NATIVE_PLUGIN            (gplugin_native_plugin_get_type())
 #define GPLUGIN_NATIVE_PLUGIN(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GPLUGIN_TYPE_NATIVE_PLUGIN, GPluginNativePlugin))
 #define GPLUGIN_NATIVE_PLUGIN_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((obj), GPLUGIN_TYPE_NATIVE_PLUGIN, GPluginNativePluginClass))
 #define GPLUGIN_IS_NATIVE_PLUGIN(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), GPLUGIN_TYPE_NATIVE_PLUGIN))
