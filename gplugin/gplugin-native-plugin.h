@@ -39,6 +39,11 @@ typedef struct _GPluginNativePluginClass      GPluginNativePluginClass;
 
 struct _GPluginNativePlugin {
 	GPluginPlugin parent;
+
+	void (*_gplugin_reserved_1)(void);
+	void (*_gplugin_reserved_2)(void);
+	void (*_gplugin_reserved_3)(void);
+	void (*_gplugin_reserved_4)(void);
 };
 
 struct _GPluginNativePluginClass {
