@@ -41,7 +41,6 @@ struct _GPluginNativePluginLoader {
 };
 
 struct _GPluginNativePluginLoaderClass {
-	GPluginPluginLoader
 	GPluginPluginLoaderClass parent;
 
 	void (*_gplugin_reserved_1)(void);
