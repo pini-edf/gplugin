@@ -48,8 +48,9 @@ gplugin_native_plugin_loader_lookup_symbol(GModule *module,
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     "symbol %s was not found", name);
 
-			return NULL;
 		}
+
+		return NULL;
 	}
 
 	return symbol;
@@ -98,7 +99,7 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	query = gplugin_native_plugin_loader_lookup_symbol(module,
 	                                                   GPLUGIN_QUERY_SYMBOL,
 	                                                   error);
-	if(error) {
+	if(*error) {
 		g_module_close(module);
 		return NULL;
 	}
@@ -107,7 +108,7 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	load = gplugin_native_plugin_loader_lookup_symbol(module,
 	                                                  GPLUGIN_LOAD_SYMBOL,
 	                                                  error);
-	if(error) {
+	if(*error) {
 		g_module_close(module);
 		return NULL;
 	}
@@ -116,7 +117,7 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	unload = gplugin_native_plugin_loader_lookup_symbol(module,
 	                                                    GPLUGIN_UNLOAD_SYMBOL,
 	                                                    error);
-	if(error) {
+	if(*error) {
 		g_module_close(module);
 		return NULL;
 	}
