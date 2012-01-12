@@ -17,3 +17,13 @@ gplugin_plugin_query(void) {
 	return &info;
 }
 
+G_MODULE_EXPORT gboolean
+gplugin_plugin_load(GPluginNativePlugin *plugin) {
+	return TRUE;
+}
+
+G_MODULE_EXPORT gboolean
+gplugin_plugin_unload(GPluginNativePlugin *plugin) {
+	return TRUE;
+}
+
