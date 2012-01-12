@@ -37,11 +37,11 @@ typedef struct _GPluginNativePluginLoaderClass       GPluginNativePluginLoaderCl
 #include <gplugin/gplugin-plugin-loader.h>
 
 struct _GPluginNativePluginLoader {
-	GObject parent;
+	GPluginPluginLoader parent;
 };
 
 struct _GPluginNativePluginLoaderClass {
-	GObjectClass parent;
+	GPluginPluginLoaderClass parent;
 
 	void (*_gplugin_reserved_1)(void);
 	void (*_gplugin_reserved_2)(void);

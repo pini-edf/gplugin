@@ -234,11 +234,14 @@ gplugin_native_plugin_loader_unload(GPluginPluginLoader *loader,
 }
 
 static void
-gplugin_native_loader_loader_loader_init(GPluginPluginLoaderIface *iface) {
-	iface->supported_extensions = g_slist_append(NULL, G_MODULE_SUFFIX);
-	iface->query = gplugin_native_plugin_loader_query;
-	iface->load = gplugin_native_plugin_loader_load;
-	iface->unload = gplugin_native_plugin_loader_unload;
+gplugin_native_plugin_loader_class_init(GPluginNativePluginLoaderClass *klass) {
+	GPluginPluginLoaderClass *loader_class =
+		GPLUGIN_PLUGIN_LOADER_CLASS(klass);
+
+	loader_class->supported_extensions = g_slist_append(NULL, G_MODULE_SUFFIX);
+	loader_class->query = gplugin_native_plugin_loader_query;
+	loader_class->load = gplugin_native_plugin_loader_load;
+	loader_class->unload = gplugin_native_plugin_loader_unload;
 }
 
 /******************************************************************************
@@ -251,17 +254,13 @@ gplugin_native_plugin_loader_get_type(void) {
 	if(G_UNLIKELY(type == 0)) {
 		static const GTypeInfo info = {
 			.class_size = sizeof(GPluginNativePluginLoaderClass),
+			.class_init = (GClassInitFunc)gplugin_native_plugin_loader_class_init,
 			.instance_size = sizeof(GPluginNativePluginLoader),
 		};
 
-		static const GInterfaceInfo loader_info = {
-			.interface_init = (GInterfaceInitFunc)gplugin_native_loader_loader_loader_init,
-		};
-
-		type = g_type_register_static(G_TYPE_OBJECT,
+		type = g_type_register_static(GPLUGIN_TYPE_PLUGIN_LOADER,
 		                              "GPluginNativePluginLoader",
 		                              &info, 0);
-		g_type_add_interface_static(type, GPLUGIN_TYPE_PLUGIN_LOADER, &loader_info);
 	}
 
 	return type;

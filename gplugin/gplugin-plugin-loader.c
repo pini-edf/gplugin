@@ -23,12 +23,13 @@ gplugin_plugin_loader_get_type(void) {
 
 	if(G_UNLIKELY(type == 0)) {
 		static const GTypeInfo info = {
-			.class_size = sizeof(GPluginPluginLoaderIface),
+			.class_size = sizeof(GPluginPluginLoaderClass),
+			.instance_size = sizeof(GPluginPluginLoader),
 		};
 
-		type = g_type_register_static(G_TYPE_INTERFACE,
+		type = g_type_register_static(G_TYPE_OBJECT,
 		                              "GPluginPluginLoader",
-		                              &info, 0);
+		                              &info, G_TYPE_FLAG_ABSTRACT);
 	}
 
 	return type;
@@ -38,17 +39,17 @@ GPluginPlugin *
 gplugin_plugin_loader_query_plugin(GPluginPluginLoader *loader,
                                    const gchar *filename, GError **error)
 {
-	GPluginPluginLoaderIface *iface = NULL;
+	GPluginPluginLoaderClass *klass = NULL;
 
 	g_return_val_if_fail(loader != NULL, NULL);
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_LOADER(loader), NULL);
 	g_return_val_if_fail(filename, NULL);
 	g_return_val_if_fail(error != NULL, NULL);
 
-	iface = GPLUGIN_PLUGIN_LOADER_GET_IFACE(loader);
+	klass = GPLUGIN_PLUGIN_LOADER_GET_CLASS(loader);
 
-	if(iface && iface->query)
-		return iface->query(loader, filename, error);
+	if(klass && klass->query)
+		return klass->query(loader, filename, error);
 
 	return NULL;
 }
@@ -57,17 +58,17 @@ gboolean
 gplugin_plugin_loader_load_plugin(GPluginPluginLoader *loader,
                                   GPluginPlugin *plugin, GError **error)
 {
-	GPluginPluginLoaderIface *iface = NULL;
+	GPluginPluginLoaderClass *klass = NULL;
 
 	g_return_val_if_fail(loader != NULL, FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_LOADER(loader), FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
 	g_return_val_if_fail(error != NULL, FALSE);
 
-	iface = GPLUGIN_PLUGIN_LOADER_GET_IFACE(loader);
+	klass = GPLUGIN_PLUGIN_LOADER_GET_CLASS(loader);
 
-	if(iface && iface->load)
-		return iface->load(loader, plugin, error);
+	if(klass && klass->load)
+		return klass->load(loader, plugin, error);
 
 	return FALSE;
 }
@@ -76,16 +77,16 @@ gboolean
 gplugin_plugin_loader_unload_plugin(GPluginPluginLoader *loader,
                                     GPluginPlugin *plugin, GError **error)
 {
-	GPluginPluginLoaderIface *iface = NULL;
+	GPluginPluginLoaderClass *klass = NULL;
 
 	g_return_val_if_fail(loader != NULL, FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_LOADER(loader), FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
 
-	iface = GPLUGIN_PLUGIN_LOADER_GET_IFACE(loader);
+	klass = GPLUGIN_PLUGIN_LOADER_GET_CLASS(loader);
 
-	if(iface && iface->unload)
-		return iface->unload(loader, plugin, error);
+	if(klass && klass->unload)
+		return klass->unload(loader, plugin, error);
 
 	return FALSE;
 }

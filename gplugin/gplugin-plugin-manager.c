@@ -244,30 +244,30 @@ gplugin_plugin_manager_get_paths(void) {
 
 void
 gplugin_plugin_manager_register_loader(GType type) {
-	GPluginPluginLoader *lo = NULL;
-	GPluginPluginLoaderIface *iface = NULL;
+	GPluginPluginLoader *loader = NULL;
+	GPluginPluginLoaderClass *lo_class = NULL;
 	GSList *l = NULL;
 
 	g_return_if_fail(g_type_is_a(type, GPLUGIN_TYPE_PLUGIN_LOADER));
 
 	/* Create the loader instance first.  If we can't create it, we bail */
-	lo = g_object_new(type, NULL);
-	if(!GPLUGIN_IS_PLUGIN_LOADER(lo)) {
+	loader = g_object_new(type, NULL);
+	if(!GPLUGIN_IS_PLUGIN_LOADER(loader)) {
 		g_warning("failed to create loader instance for %s",
 		          g_type_name(type));
 
 		return;
 	}
 
-	/* grab the loader class and make sure it's valid */
-	iface = GPLUGIN_PLUGIN_LOADER_GET_IFACE(lo);
-	if(!iface) {
-		g_object_unref(G_OBJECT(lo));
+	/* grab the class of the loader */
+	lo_class = GPLUGIN_PLUGIN_LOADER_GET_CLASS(loader);
+	if(!lo_class) {
+		g_object_unref(G_OBJECT(loader));
 
 		return;
 	}
 
-	for(l = iface->supported_extensions; l; l = l->next) {
+	for(l = lo_class->supported_extensions; l; l = l->next) {
 		GSList *existing = NULL, *ll = NULL;
 		const gchar *ext = (const gchar *)l->data;
 
@@ -288,7 +288,7 @@ gplugin_plugin_manager_register_loader(GType type) {
 			}
 		}
 
-		existing = g_slist_prepend(existing, g_object_ref(G_OBJECT(lo)));
+		existing = g_slist_prepend(existing, g_object_ref(G_OBJECT(loader)));
 
 		/* Now insert the updated slist back into the hash table */
 		g_hash_table_insert(loaders, g_strdup(ext), existing);
@@ -298,21 +298,21 @@ gplugin_plugin_manager_register_loader(GType type) {
 	refresh_needed = TRUE;
 
 	/* we remove our initial reference from the loader now to avoid a leak */
-	g_object_unref(G_OBJECT(lo));
+	g_object_unref(G_OBJECT(loader));
 }
 
 void
 gplugin_plugin_manager_unregister_loader(GType type) {
-	GPluginPluginLoaderIface *iface = NULL;
+	GPluginPluginLoaderClass *klass = NULL;
 	GSList *exts = NULL;
 
 	g_return_if_fail(g_type_is_a(type, GPLUGIN_TYPE_PLUGIN_LOADER));
 
-	iface = g_type_class_ref(type);
-	if(!iface)
+	klass = g_type_class_ref(type);
+	if(!klass)
 		return;
 
-	for(exts = iface->supported_extensions; exts; exts = exts->next) {
+	for(exts = klass->supported_extensions; exts; exts = exts->next) {
 		GSList *los = NULL;
 		GSList *l = NULL;
 		const gchar *ext = NULL;
@@ -348,7 +348,7 @@ gplugin_plugin_manager_unregister_loader(GType type) {
 		}
 	}
 
-	g_type_class_unref(iface);
+	g_type_class_unref(klass);
 }
 
 void

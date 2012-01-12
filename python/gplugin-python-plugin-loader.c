@@ -68,17 +68,6 @@ gplugin_python_plugin_loader_unload(GPluginPluginLoader *loader,
 	return FALSE;
 }
 
-static void
-gplugin_python_loader_loader_init(GPluginPluginLoaderIface *iface) {
-	iface->supported_extensions = g_slist_append(NULL, "py");
-	iface->supported_extensions = g_slist_append(iface->supported_extensions,
-	                                             "pyc");
-
-	iface->query = gplugin_python_plugin_loader_query;
-	iface->load = gplugin_python_plugin_loader_load;
-	iface->unload = gplugin_python_plugin_loader_unload;
-}
-
 /******************************************************************************
  * Object Stuff
  *****************************************************************************/
@@ -92,13 +81,23 @@ gplugin_python_plugin_loader_finalize(GObject *obj) {
 
 static void
 gplugin_python_plugin_loader_class_init(GPluginPythonPluginLoaderClass *klass) {
+	GSList *exts = NULL;
 	GObjectClass *obj_class = G_OBJECT_CLASS(klass);
+	GPluginPluginLoaderClass *loader_class =
+		GPLUGIN_PLUGIN_LOADER_CLASS(klass);
 
 	parent_class = g_type_class_peek_parent(klass);
 
 	g_type_class_add_private(klass, sizeof(GPluginPythonPluginLoaderPrivate));
 
 	obj_class->finalize = gplugin_python_plugin_loader_finalize;
+
+	exts = g_slist_append(NULL, "py");
+	exts = g_slist_append(exts, "pyc");
+	loader_class->supported_extensions = exts;
+	loader_class->query = gplugin_python_plugin_loader_query;
+	loader_class->load = gplugin_python_plugin_loader_load;
+	loader_class->unload = gplugin_python_plugin_loader_unload;
 }
 
 /******************************************************************************
@@ -113,19 +112,11 @@ gplugin_python_plugin_loader_register(GPluginNativePlugin *plugin) {
 			.instance_size = sizeof(GPluginPythonPluginLoader),
 		};
 
-		static const GInterfaceInfo loader_info = {
-			.interface_init = (GInterfaceInitFunc)gplugin_python_loader_loader_init,
-		};
-
 		type = gplugin_native_plugin_register_type(plugin,
-		                                           G_TYPE_OBJECT,
+		                                           GPLUGIN_TYPE_PLUGIN_LOADER,
 		                                           "GPluginPythonPluginLoader",
 		                                           &info,
 		                                           0);
-
-		gplugin_native_plugin_add_interface(plugin, type,
-		                                    GPLUGIN_TYPE_PLUGIN_LOADER,
-		                                    &loader_info);
 	}
 }
 

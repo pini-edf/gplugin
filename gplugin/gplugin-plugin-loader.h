@@ -21,21 +21,32 @@
 #ifndef GPLUGIN_PLUGIN_LOADER_H
 #define GPLUGIN_PLUGIN_LOADER_H
 
-#define GPLUGIN_TYPE_PLUGIN_LOADER           (gplugin_plugin_loader_get_type())
-#define GPLUGIN_PLUGIN_LOADER(obj)           (G_TYPE_CHECK_INSTANCE_CAST((obj), GPLUGIN_TYPE_PLUGIN_LOADER, GPluginPluginLoader))
-#define GPLUGIN_IS_PLUGIN_LOADER(obj)        (G_TYPE_CHECK_INSTANCE_TYPE((obj), GPLUGIN_TYPE_PLUGIN_LOADER))
-#define GPLUGIN_PLUGIN_LOADER_GET_IFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE((obj), GPLUGIN_TYPE_PLUGIN_LOADER, GPluginPluginLoaderIface))
+#define GPLUGIN_TYPE_PLUGIN_LOADER            (gplugin_plugin_loader_get_type())
+#define GPLUGIN_PLUGIN_LOADER(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GPLUGIN_TYPE_PLUGIN_LOADER, GPluginPluginLoader))
+#define GPLUGIN_PLUGIN_LOADER_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), GPLUGIN_TYPE_PLUGIN_LOADER, GPluginPluginLoaderClass))
+#define GPLUGIN_IS_PLUGIN_LOADER(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), GPLUGIN_TYPE_PLUGIN_LOADER))
+#define GPLUGIN_IS_PLUGIN_LOADER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST((klass), GPLUGIN_TYPE_PLUGIN_LOADER))
+#define GPLUGIN_PLUGIN_LOADER_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), GPLUGIN_TYPE_PLUGIN_LOADER, GPluginPluginLoaderClass))
 
 typedef struct _GPluginPluginLoader          GPluginPluginLoader;
-typedef struct _GPluginPluginLoaderIface     GPluginPluginLoaderIface;
+typedef struct _GPluginPluginLoaderClass     GPluginPluginLoaderClass;
 
 #include <glib.h>
 #include <glib-object.h>
 
 #include <gplugin/gplugin-plugin.h>
 
-struct _GPluginPluginLoaderIface {
-	GTypeInterface gparent;
+struct _GPluginPluginLoader {
+	GObject gparent;
+
+	void (*_gplugin_reserved_1)(void);
+	void (*_gplugin_reserved_2)(void);
+	void (*_gplugin_reserved_3)(void);
+	void (*_gplugin_reserved_4)(void);
+};
+
+struct _GPluginPluginLoaderClass {
+	GObjectClass gparent;
 
 	GSList *supported_extensions;
 
