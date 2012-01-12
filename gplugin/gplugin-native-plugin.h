@@ -38,11 +38,11 @@ typedef struct _GPluginNativePluginClass      GPluginNativePluginClass;
 #define GPLUGIN_NATIVE_PLUGIN_ABI_VERSION     0x00000001
 
 struct _GPluginNativePlugin {
-	GObject parent;
+	GPluginPlugin parent;
 };
 
 struct _GPluginNativePluginClass {
-	GObjectClass parent;
+	GPluginPluginClass parent;
 
 	void (*_gplugin_reserved_1)(void);
 	void (*_gplugin_reserved_2)(void);
