@@ -36,7 +36,7 @@ typedef struct _GPluginPluginClass     GPluginPluginClass;
 typedef struct _GPluginPluginInfo      GPluginPluginInfo;
 
 typedef enum /*< prefix=GPLUGIN_PLUGIN_STATE,underscore_name=GPLUGIN_PLUGIN_STATE >*/ {
-	GPLUGIN_PLUGIN_STATE_UNKNOWN = -1, /*< skip >*/
+	GPLUGIN_PLUGIN_STATE_UNKNOWN = -1,
 	GPLUGIN_PLUGIN_STATE_ERROR = 0,
 	GPLUGIN_PLUGIN_STATE_PROBED,
 	GPLUGIN_PLUGIN_STATE_REPROBE,
