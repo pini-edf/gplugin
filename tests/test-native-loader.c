@@ -39,10 +39,25 @@ test_gplugin_native_plugin_loader(void) {
 	/* now iterate through the plugins (we really only should have one...) */
 	for(l = plugins; l; l = l->next) {
 		GPluginPlugin *plugin = GPLUGIN_PLUGIN(l->data);
+		GPluginPluginInfo *info = NULL;
 		GPluginPluginState state = GPLUGIN_PLUGIN_STATE_UNKNOWN;
 
 		state = gplugin_plugin_get_state(plugin);
 		g_assert_cmpint(state, ==, GPLUGIN_PLUGIN_STATE_QUERIED);
+
+		info = gplugin_plugin_get_info(plugin);
+		g_assert(info != NULL);
+
+		g_assert_cmpstr(info->id, ==, "test-native-plugin");
+		g_assert_cmpint(info->abi_version, ==,
+		                GPLUGIN_NATIVE_PLUGIN_ABI_VERSION);
+		g_assert_cmpuint(info->flags, ==, 0);
+		g_assert_cmpstr(info->name, ==, "test plugin name");
+		g_assert_cmpstr(info->version, ==, "test plugin version");
+		g_assert_cmpstr(info->summary, ==, "test plugin summary");
+		g_assert_cmpstr(info->description, ==, "test plugin description");
+		g_assert_cmpstr(info->author, ==, "test plugin author");
+		g_assert_cmpstr(info->website, ==, "test plugin website");
 	}
 
 	/* make sure the free function works too */
