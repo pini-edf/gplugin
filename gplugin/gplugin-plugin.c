@@ -99,17 +99,6 @@ gplugin_plugin_set_info(GPluginPlugin *plugin, GPluginPluginInfo *info) {
 		priv->info = NULL;
 }
 
-static void
-gplugin_plugin_set_state(GPluginPlugin *plugin, GPluginPluginState state) {
-	GPluginPluginPrivate *priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
-	GPluginPluginState oldstate = priv->state;
-
-	priv->state = state;
-
-	g_signal_emit(plugin, signals[SIG_STATE_CHANGED], 0,
-	              oldstate, priv->state);
-}
-
 gchar *
 gplugin_plugin_get_internal_filename(GPluginPlugin *plugin) {
 	GPluginPluginPrivate *priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
@@ -361,4 +350,21 @@ gplugin_plugin_get_state(const GPluginPlugin *plugin) {
 
 	return priv->state;
 }
+
+void
+gplugin_plugin_set_state(GPluginPlugin *plugin, GPluginPluginState state) {
+	GPluginPluginPrivate *priv = NULL;
+	GPluginPluginState oldstate = GPLUGIN_PLUGIN_STATE_UNKNOWN;
+
+	g_return_if_fail(GPLUGIN_IS_PLUGIN(plugin));
+
+	priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
+
+	oldstate = priv->state;
+	priv->state = state;
+
+	g_signal_emit(plugin, signals[SIG_STATE_CHANGED], 0,
+	              oldstate, priv->state);
+}
+
 

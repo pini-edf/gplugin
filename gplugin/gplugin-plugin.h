@@ -38,8 +38,8 @@ typedef struct _GPluginPluginInfo      GPluginPluginInfo;
 typedef enum /*< prefix=GPLUGIN_PLUGIN_STATE,underscore_name=GPLUGIN_PLUGIN_STATE >*/ {
 	GPLUGIN_PLUGIN_STATE_UNKNOWN = -1,
 	GPLUGIN_PLUGIN_STATE_ERROR = 0,
-	GPLUGIN_PLUGIN_STATE_PROBED,
-	GPLUGIN_PLUGIN_STATE_REPROBE,
+	GPLUGIN_PLUGIN_STATE_QUERIED,
+	GPLUGIN_PLUGIN_STATE_REQUERY,
 	GPLUGIN_PLUGIN_STATE_LOADED,
 	GPLUGIN_PLUGIN_STATE_LOAD_FAILED,
 	GPLUGIN_PLUGIN_STATES, /*< skip >*/
@@ -99,6 +99,7 @@ GPluginPluginInfo *gplugin_plugin_info_copy(const GPluginPluginInfo *info);
 void gplugin_plugin_info_free(GPluginPluginInfo *info);
 
 GPluginPluginState gplugin_plugin_get_state(const GPluginPlugin *plugin);
+void gplugin_plugin_set_state(GPluginPlugin *plugin, GPluginPluginState state);
 
 G_END_DECLS
 

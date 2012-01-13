@@ -389,7 +389,7 @@ gplugin_plugin_manager_refresh(void) {
 					/* The plugin is in our "view", check it's state.  If it's
 					 * probed or loaded, move on to the next one.
 					 */
-					if(state == GPLUGIN_PLUGIN_STATE_PROBED ||
+					if(state == GPLUGIN_PLUGIN_STATE_QUERIED ||
 					   state == GPLUGIN_PLUGIN_STATE_LOADED)
 					{
 						g_free(filename);
@@ -472,6 +472,9 @@ gplugin_plugin_manager_refresh(void) {
 					l = g_hash_table_lookup(plugins, info->id);
 					l = g_slist_prepend(l, g_object_ref(plugin));
 					g_hash_table_insert(plugins, g_strdup(info->id), l);
+
+					/* finally set the plugin state queried */
+					gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_QUERIED);
 				}
 
 				g_free(filename);
