@@ -42,6 +42,7 @@ test_gplugin_native_plugin_loader(void) {
 		GPluginPluginState state = GPLUGIN_PLUGIN_STATE_UNKNOWN;
 
 		state = gplugin_plugin_get_state(plugin);
+		g_assert_cmpint(state, ==, GPLUGIN_PLUGIN_STATE_QUERIED);
 	}
 
 	/* make sure the free function works too */
