@@ -145,6 +145,7 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	                      "load-func", load,
 	                      "unload-func", unload,
 	                      "loader", loader,
+	                      "filename", filename,
 	                      NULL);
 
 	if(!GPLUGIN_IS_NATIVE_PLUGIN(plugin)) {
