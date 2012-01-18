@@ -18,6 +18,21 @@ set(GPLUGIN_EXTRA_VERSION dev)
 set(GPLUGIN_VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.${GPLUGIN_MICRO_VERSION}${GPLUGIN_EXTRA_VERSION})
 
 ###############################################################################
+# Options
+###############################################################################
+option(
+	BUILD_GIR
+	"Whether or not to build a GObject Introspection type library"
+	"On"
+)
+
+option(
+	BUILD_PYTHON
+	"Whether or not to build the Python plugin loader"
+	"On"
+)
+
+###############################################################################
 # Dependencies
 ###############################################################################
 include(FindPkgConfig)
@@ -53,11 +68,13 @@ find_program(GTESTER
 mark_as_advanced(GTESTER)
 
 # Python
-include(FindPythonLibs)
+if(BUILD_PYTHON)
+	include(FindPythonLibs)
 
-if(PYTHONLIBS_FOUND)
-	pkg_check_modules(PYGOBJECT pygobject-3.0>=3.0.0)
-endif(PYTHONLIBS_FOUND)
+	if(PYTHONLIBS_FOUND)
+		pkg_check_modules(PYGOBJECT REQUIRED pygobject-3.0>=3.0.0)
+	endif(PYTHONLIBS_FOUND)
+endif(BUILD_PYTHON)
 
 ###############################################################################
 # Build Info
@@ -90,5 +107,4 @@ configure_file(gplugin.pc.in ${CMAKE_BINARY_DIR}/gplugin.pc @ONLY)
 add_subdirectory(gplugin)
 add_subdirectory(python)
 add_subdirectory(tests)
-#add_subdirectory(gir)
 

@@ -1,4 +1,4 @@
-if(PYTHONLIBS_FOUND)
+if(BUILD_PYTHON)
 	set(GPLUGIN_PYTHON_SOURCES
 		gplugin-python-core.c
 		gplugin-python-plugin-loader.c
@@ -23,5 +23,5 @@ if(PYTHONLIBS_FOUND)
 		${PYGOBJECT_LIBS}
 		gplugin
 	)
-endif(PYTHONLIBS_FOUND)
+endif(BUILD_PYTHON)
 
