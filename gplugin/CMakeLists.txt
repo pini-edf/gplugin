@@ -123,3 +123,19 @@ target_link_libraries(gplugin
 	${GMODULE_LIBRARIES}
 )
 
+###############################################################################
+# GObject Introspection
+###############################################################################
+if(BUILD_GIR)
+	include(GObjectIntrospection)
+
+	add_gir_introspection(
+		FILENAME gplugin-0.1.gir
+		INCLUDES GObject-2.0
+		LIBS gplugin
+		SCANNER_ARGS "--add-include-path=${CMAKE_CURRENT_SOURCE_DIR}"
+		COMPILER_ARGS "--includedir=${CMAKE_CURRENT_SOURCE_DIR}"
+		SYMBOL_PREFIXES gplugin
+	)
+endif(BUILD_GIR)
+
