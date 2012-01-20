@@ -18,34 +18,95 @@ macro(_gir_list_prefix _newlist _list _prefix)
 endmacro(_gir_list_prefix)
 
 function(add_gir_introspection _FIRST_ARG)
-	set(oneValueArgs FILENAME PROGRAM PROGRAM_ARG)
+	set(options QUIET VERBOSE)
+	set(oneValueArgs
+		FILENAME
+		FORMAT
+		LIBRARY
+		NAMESPACE
+		NSVERSION
+		PROGRAM
+		PROGRAM_ARG
+	)
 	set(multiValueArgs
-		SCANNER_ARGS
-		COMPILER_ARGS
-		SOURCES
-		INCLUDES
 		CFLAGS
-		LIBS
-		FILES
+		COMPILER_ARGS
+		HEADERS
 		IDENTIFIER_PREFIXES
+		INCLUDES
+		FILES
+		PACKAGES
+		SCANNER_ARGS
+		SOURCES
 		SYMBOL_PREFIXES
 	)
 
-	CMAKE_PARSE_ARGUMENTS(GIR "" "${oneValueArgs}" "${multiValueArgs}" ${_FIRST_ARG} ${ARGN})
+	CMAKE_PARSE_ARGUMENTS(GIR "${options}" "${oneValueArgs}" "${multiValueArgs}" ${_FIRST_ARG} ${ARGN})
 
 	if(ADD_GIR_UNPARSED_ARGUMENTS)
 		message(FATAL_ERROR "Unknown keys given to ADD_GIR_INTROSPECTION(): \"${ADD_GIR_UNPARSED_ARGUMENTS}\"")
 	endif(ADD_GIR_UNPARSED_ARGUMENTS)
 
-	# if program has been set, we prepend --program on to it
+	###########################################################################
+	# make sure that the user set some variables...
+	###########################################################################
+	if(NOT GIR_FILENAME)
+		message(FATAL_ERROR "No gir filename given")
+	endif(NOT GIR_FILENAME)
+
+	if(NOT GIR_NAMESPACE)
+		# the caller didn't give us a namespace, try to grab it from the filename
+		string(REGEX REPLACE "([^-]+)-.*" "\\1" GIR_NAMESPACE "${GIR_FILENAME}")
+		if(NOT GIR_NAMESPACE)
+			message(FATAL_ERROR "No namespace given and couldn't find one in FILENAME")
+		endif(NOT GIR_NAMESPACE)
+	endif(NOT GIR_NAMESPACE)
+
+	if(NOT GIR_NSVERSION)
+		# the caller didn't give us a namespace version, try to grab it from the filemenu
+		string(REGEX REPLACE ".*-([^-]+).gir" "\\1" GIR_NSVERSION "${GIR_FILENAME}")
+		if(NOT GIR_NSVERSION)
+			message(FATAL_ERROR "No namespace version given and couldn't find one in FILENAME")
+		endif(NOT GIR_NSVERSION)
+	endif(NOT GIR_NSVERSION)
+
+	if(NOT GIR_CFLAGS)
+		get_directory_property(GIR_CFLAGS INCLUDE_DIRECTORIES)
+		_gir_list_prefix(GIR_REAL_CFLAGS GIR_INCLUDES "-I")
+	endif(NOT GIR_CFLAGS)
+
+	###########################################################################
+	# Fix up some of our arguments
+	###########################################################################
+	if(GIR_VERBOSE)
+		set(GIR_VERBOSE "--verbose")
+	endif(GIR_VERBOSE)
+
+	if(GIR_QUIET)
+		set(GIR_QUIET "--quiet")
+	endif(GIR_QUIET)
+
+	if(GIR_FORMAT)
+		set(GIR_FORMAT "--format=${GIR_FORMAT}")
+	endif(GIR_FORMAT)
+
+	# if library is set, we need to prepend --library= on to it
+	if(GIR_LIBRARY)
+		set(GIR_LIBRARY "--library=${GIR_LIBRARY}")
+	endif(GIR_LIBRARY)
+
+	# if program has been set, we prepend --program= on to it
 	if(GIR_PROGRAM)
 		set(GIR_PROGRAM "--program=${GIR_PROGRAM}")
 	endif(GIR_PROGRAM)
 
-	# if program_arg has been set, we prepend --program-arg on to it
+	# if program_arg has been set, we prepend --program-arg= on to it
 	if(GIR_PROGRAM_ARG)
 		set(GIR_PROGRAM_ARG "--program-arg=${GIR_PROGRAM_ARG}")
 	endif(GIR_PROGRAM_ARG)
+
+	set(GIR_NAMESPACE "--namespace=${GIR_NAMESPACE}")
+	set(GIR_NSVERSION "--nsversion=${GIR_NSVERSION}")
 
 	###########################################################################
 	# Clean up any of the multivalue items that all need to be prefixed
@@ -61,13 +122,28 @@ function(add_gir_introspection _FIRST_ARG)
 		_gir_list_prefix(GIR_REAL_SYMBOL_PREFIXES GIR_SYMBOL_PREFIXES "--symbol-prefix=")
 	endif(GIR_SYMBOL_PREFIXES)
 
+	# if the user specified PACKAGES we need to prefix each with --pkg
+	if(GIR_PACKAGES)
+		_gir_list_prefix(GIR_REAL_PACKAGES GIR_PACKAGES "--pkg=")
+	endif(GIR_PACKAGES)
+
+	message("includes: ${GIR_CFLAGS}")
+
 	###########################################################################
 	# Add the custom commands
 	###########################################################################
 	add_custom_command(
 		COMMAND ${GIR_SCANNER} ${GIR_SCANNER_ARGS}
+			${GIR_REAL_CFLAGS}
+			${GIR_FORMAT}
+			${GIR_HEADERS}
+			${GIR_LIBRARY}
+			${GIR_PROGRAM} ${GIR_PROGRAM_ARGS}
+			${GIR_NAMESPACE} ${GIR_NSVERSION}
+			${GIR_QUIET} ${GIR_VERBOSE}
 			${GIR_REAL_IDENTIFIER_PREFIXES}
 			${GIR_REAL_SYMBOL_PREFIXES}
+			${GIR_REAL_PACKAGES}
 			--no-libtool
 			--output ${CMAKE_CURRENT_BINARY_DIR}/${GIR_FILENAME}
 		OUTPUT ${GIR_FILENAME}
@@ -75,7 +151,18 @@ function(add_gir_introspection _FIRST_ARG)
 		VERBATIM
 	)
 
-	message("filename: ${GIR_FILENAME}")
-	message("symbol prefixes: ${GIR_REAL_SYMBOL_PREFIXES}")
+	# create the name of the typelib
+	string(REPLACE ".gir" ".typelib" GIR_TYPELIB "${GIR_FILENAME}")
+
+	add_custom_command(
+		COMMAND ${GIR_COMPILER} ${GIR_COMPILER_ARGS}
+			${CMAKE_CURRENT_BINARY_DIR}/${GIR_FILENAME}
+			--output=${CMAKE_CURRENT_BINARY_DIR}/${GIR_TYPELIB}
+		DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${GIR_TYPELIB}
+		OUTPUT ${GIR_TYPELIB}
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	)
+
+	add_custom_target(${GIR_TYPELIB} ALL DEPENDS ${GIR_FILENAME})
 endfunction(add_gir_introspection)
 
