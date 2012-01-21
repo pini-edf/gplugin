@@ -17,7 +17,7 @@ macro(_gir_list_prefix _newlist _list _prefix)
 	endforeach(_item)
 endmacro(_gir_list_prefix)
 
-function(add_gir_introspection _FIRST_ARG)
+function(gobject_introspection _FIRST_ARG)
 	set(options QUIET VERBOSE)
 	set(oneValueArgs
 		FILENAME
@@ -180,5 +180,5 @@ function(add_gir_introspection _FIRST_ARG)
 	)
 
 	add_custom_target(${GIR_TYPELIB} ALL DEPENDS ${GIR_LIBRARY} ${GIR_FILENAME} ${GIR_TYPELIB})
-endfunction(add_gir_introspection)
+endfunction(gobject_introspection)
 

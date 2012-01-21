@@ -128,9 +128,9 @@ target_link_libraries(gplugin
 if(BUILD_GIR)
 	include(GObjectIntrospection)
 
-	add_gir_introspection(
+	gobject_introspection(
 		FILENAME GPlugin-0.1.gir
-		INCLUDES GObject-2.0
+		PACKAGES GObject-2.0
 		LIBRARY gplugin
 		SCANNER_ARGS "--add-include-path=${CMAKE_CURRENT_SOURCE_DIR}"
 		COMPILER_ARGS "--includedir=${CMAKE_CURRENT_SOURCE_DIR}"
