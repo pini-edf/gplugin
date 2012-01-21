@@ -95,7 +95,7 @@ function(add_gir_introspection _FIRST_ARG)
 
 	# if library is set, we need to prepend --library= on to it
 	if(GIR_LIBRARY)
-		set(GIR_LIBRARY "--library=${GIR_LIBRARY}")
+		set(GIR_REAL_LIBRARY "--library=${GIR_LIBRARY}")
 	endif(GIR_LIBRARY)
 
 	# if program has been set, we prepend --program= on to it
@@ -148,7 +148,7 @@ function(add_gir_introspection _FIRST_ARG)
 			--nsversion=${GIR_NSVERSION}
 			${GIR_REAL_CFLAGS}
 			${GIR_FORMAT}
-			${GIR_LIBRARY}
+			${GIR_REAL_LIBRARY}
 			${GIR_PROGRAM} ${GIR_PROGRAM_ARGS}
 			${GIR_QUIET} ${GIR_VERBOSE}
 			${GIR_REAL_IDENTIFIER_PREFIXES}
@@ -160,9 +160,12 @@ function(add_gir_introspection _FIRST_ARG)
 			${GIR_SOURCES}
 			${GIR_REAL_BUILT_SOURCES}
 		OUTPUT ${GIR_FILENAME}
+		DEPENDS ${GIR_LIBRARY}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		VERBATIM
 	)
+
+	add_custom_target(${GIR_FILENAME} ALL DEPENDS ${GIR_LIBRARY} ${GIR_FILENAME})
 
 	# create the name of the typelib
 	string(REPLACE ".gir" ".typelib" GIR_TYPELIB "${GIR_FILENAME}")
@@ -171,11 +174,11 @@ function(add_gir_introspection _FIRST_ARG)
 		COMMAND ${GIR_COMPILER} ${GIR_COMPILER_ARGS}
 			${CMAKE_CURRENT_BINARY_DIR}/${GIR_FILENAME}
 			--output=${CMAKE_CURRENT_BINARY_DIR}/${GIR_TYPELIB}
-		DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${GIR_TYPELIB}
 		OUTPUT ${GIR_TYPELIB}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		DEPENDS ${GIR_FILENAME}
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	)
 
-	add_custom_target(${GIR_TYPELIB} ALL DEPENDS ${GIR_FILENAME})
+	add_custom_target(${GIR_TYPELIB} ALL DEPENDS ${GIR_LIBRARY} ${GIR_FILENAME} ${GIR_TYPELIB})
 endfunction(add_gir_introspection)
 
