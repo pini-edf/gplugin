@@ -1,0 +1,32 @@
+Dependencies
+============
+GPlugin depends on the following:
+	glib-2.0 >= 2.16.0
+	cmake >= 2.8
+	a C compiler
+
+All of these packages and their development headers need to be installed
+prior to building GPlugin.
+
+Building
+========
+GPlugin uses CMake (http://www.cmake.org) as it's build system.  As such
+compiling is a little bit different than your typical ./configure, make,
+sudo make install.  But luckily for you, not too much different.
+
+While it is not required, it is highly recommended that you use a separate
+build dir.  As such, these instructions use a separate build directory.
+
+To compile you need to run the following commands:
+
+	mkdir build
+	cd build
+	cmake ..
+	make
+	sudo make install
+
+If you want/need to tweak the build system (to enable/disable certain loaders)
+you can do so at any time by using a CMake user interface.  For example, if you
+have the CMake curses gui installed, you can do this by running "ccmake .."
+from the build directory.
+
