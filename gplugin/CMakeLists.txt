@@ -120,8 +120,7 @@ set_target_properties(gplugin PROPERTIES
 
 target_link_libraries(gplugin
 	${GLIB_LIBRARIES}
-	${GMODULE_LIBRARIES}
-)
+	${GMODULE_LIBRARIES})
 
 ###############################################################################
 # GObject Introspection
@@ -136,7 +135,8 @@ if(BUILD_GIR)
 		SCANNER_ARGS "--add-include-path=${CMAKE_CURRENT_SOURCE_DIR}"
 		COMPILER_ARGS "--includedir=${CMAKE_CURRENT_SOURCE_DIR}"
 		SYMBOL_PREFIXES gplugin
-		CFLAGS ${PUBLIC_HEADERS}
+		SOURCES ${GPLUGIN_SOURCES} ${GPLUGIN_HEADERS}
+		BUILT_SOURCES ${GPLUGIN_BUILT_SOURCES} ${GPLUGIN_BUILT_HEADERS}
 	)
 endif(BUILD_GIR)
 

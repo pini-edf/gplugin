@@ -14,9 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#ifndef __GI_SCANNER__ /* hide this bit from g-ir-scanner */
 #if !defined(GPLUGIN_H_INSIDE) && !defined(GPLUGIN_COMPILATION)
 #error "only <gplugin.h> may be included directly"
 #endif
+#endif /* __GI_SCANNER__ */
 
 #ifndef GPLUGIN_PLUGIN_LOADER_H
 #define GPLUGIN_PLUGIN_LOADER_H

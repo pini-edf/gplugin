@@ -29,12 +29,11 @@ function(add_gir_introspection _FIRST_ARG)
 		PROGRAM_ARG
 	)
 	set(multiValueArgs
+		BUILT_SOURCES
 		CFLAGS
 		COMPILER_ARGS
 		HEADERS
 		IDENTIFIER_PREFIXES
-		INCLUDES
-		FILES
 		PACKAGES
 		SCANNER_ARGS
 		SOURCES
@@ -72,7 +71,7 @@ function(add_gir_introspection _FIRST_ARG)
 
 	if(NOT GIR_CFLAGS)
 		get_directory_property(GIR_CFLAGS INCLUDE_DIRECTORIES)
-		_gir_list_prefix(GIR_REAL_CFLAGS GIR_INCLUDES "-I")
+		_gir_list_prefix(GIR_REAL_CFLAGS GIR_CFLAGS "-I")
 	endif(NOT GIR_CFLAGS)
 
 	###########################################################################
@@ -80,10 +79,14 @@ function(add_gir_introspection _FIRST_ARG)
 	###########################################################################
 	if(GIR_VERBOSE)
 		set(GIR_VERBOSE "--verbose")
+	else(GIR_VERBOSE)
+		set(GIR_VERBOSE "")
 	endif(GIR_VERBOSE)
 
 	if(GIR_QUIET)
 		set(GIR_QUIET "--quiet")
+	else(GIR_QUIET)
+		set(GIR_QUIET "")
 	endif(GIR_QUIET)
 
 	if(GIR_FORMAT)
@@ -105,9 +108,6 @@ function(add_gir_introspection _FIRST_ARG)
 		set(GIR_PROGRAM_ARG "--program-arg=${GIR_PROGRAM_ARG}")
 	endif(GIR_PROGRAM_ARG)
 
-	set(GIR_NAMESPACE "--namespace=${GIR_NAMESPACE}")
-	set(GIR_NSVERSION "--nsversion=${GIR_NSVERSION}")
-
 	###########################################################################
 	# Clean up any of the multivalue items that all need to be prefixed
 	###########################################################################
@@ -127,27 +127,40 @@ function(add_gir_introspection _FIRST_ARG)
 		_gir_list_prefix(GIR_REAL_PACKAGES GIR_PACKAGES "--pkg=")
 	endif(GIR_PACKAGES)
 
-	message("includes: ${GIR_CFLAGS}")
+	# if the user specified BUILT_SOURCES, we need to get their paths since
+	# they could be in CMAKE_CURRENT_BUILD_DIR
+	if(GIR_BUILT_SOURCES)
+		set(GIR_REAL_BUILT_SOURCES)
+
+		foreach(ITEM ${GIR_BUILT_SOURCES})
+			get_source_file_property(LOCATION ${ITEM} LOCATION)
+			list(APPEND GIR_REAL_BUILT_SOURCES "${LOCATION}")
+		endforeach(ITEM)
+	endif(GIR_BUILT_SOURCES)
 
 	###########################################################################
 	# Add the custom commands
 	###########################################################################
+	set(ENV{CFLAGS} ${GIR_REAL_CFLAGS})
 	add_custom_command(
 		COMMAND ${GIR_SCANNER} ${GIR_SCANNER_ARGS}
+			--namespace=${GIR_NAMESPACE}
+			--nsversion=${GIR_NSVERSION}
 			${GIR_REAL_CFLAGS}
 			${GIR_FORMAT}
-			${GIR_HEADERS}
 			${GIR_LIBRARY}
 			${GIR_PROGRAM} ${GIR_PROGRAM_ARGS}
-			${GIR_NAMESPACE} ${GIR_NSVERSION}
 			${GIR_QUIET} ${GIR_VERBOSE}
 			${GIR_REAL_IDENTIFIER_PREFIXES}
 			${GIR_REAL_SYMBOL_PREFIXES}
 			${GIR_REAL_PACKAGES}
 			--no-libtool
-			--output ${CMAKE_CURRENT_BINARY_DIR}/${GIR_FILENAME}
+			-L${CMAKE_CURRENT_BINARY_DIR}
+			--output=${CMAKE_CURRENT_BINARY_DIR}/${GIR_FILENAME}
+			${GIR_SOURCES}
+			${GIR_REAL_BUILT_SOURCES}
 		OUTPUT ${GIR_FILENAME}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		VERBATIM
 	)
 
