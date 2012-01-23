@@ -39,7 +39,7 @@ test_gplugin_native_plugin_loader(void) {
 	/* now iterate through the plugins (we really only should have one...) */
 	for(l = plugins; l; l = l->next) {
 		GPluginPlugin *plugin = GPLUGIN_PLUGIN(l->data);
-		GPluginPluginInfo *info = NULL;
+		const GPluginPluginInfo *info = NULL;
 		GPluginPluginState state = GPLUGIN_PLUGIN_STATE_UNKNOWN;
 
 		state = gplugin_plugin_get_state(plugin);
