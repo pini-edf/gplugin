@@ -332,6 +332,8 @@ gplugin_plugin_info_copy(const GPluginPluginInfo *info) {
 	copy->author = (info->author) ? g_strdup(info->author) : NULL;
 	copy->website = (info->website) ? g_strdup(info->website) : NULL;
 
+	copy->dependencies = NULL;
+
 	for(l = info->dependencies; l; l = l->next) {
 		copy->dependencies = g_slist_append(copy->dependencies,
 		                                    g_strdup(l->data));
