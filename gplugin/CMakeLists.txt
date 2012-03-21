@@ -131,7 +131,7 @@ if(BUILD_GIR)
 
 	gobject_introspection(
 		FILENAME GPlugin-0.1.gir
-		PACKAGES GObject-2.0
+		PACKAGES gobject-2.0
 		LIBRARY gplugin
 		SCANNER_ARGS "--add-include-path=${CMAKE_CURRENT_SOURCE_DIR}"
 		COMPILER_ARGS "--includedir=${CMAKE_CURRENT_SOURCE_DIR}"
