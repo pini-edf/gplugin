@@ -120,7 +120,8 @@ set_target_properties(gplugin PROPERTIES
 
 target_link_libraries(gplugin
 	${GLIB_LIBRARIES}
-	${GMODULE_LIBRARIES})
+	${GMODULE_LIBRARIES}
+)
 
 ###############################################################################
 # GObject Introspection
