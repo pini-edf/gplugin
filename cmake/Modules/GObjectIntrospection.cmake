@@ -143,6 +143,7 @@ function(gobject_introspection _FIRST_ARG)
 	###########################################################################
 	set(ENV{CFLAGS} ${GIR_REAL_CFLAGS})
 	add_custom_command(
+		OUTPUT ${GIR_FILENAME}
 		COMMAND ${GIR_SCANNER} ${GIR_SCANNER_ARGS}
 			--namespace=${GIR_NAMESPACE}
 			--nsversion=${GIR_NSVERSION}
@@ -159,13 +160,12 @@ function(gobject_introspection _FIRST_ARG)
 			--output=${CMAKE_CURRENT_BINARY_DIR}/${GIR_FILENAME}
 			${GIR_SOURCES}
 			${GIR_REAL_BUILT_SOURCES}
-		OUTPUT ${GIR_FILENAME}
 		DEPENDS ${GIR_LIBRARY}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		VERBATIM
 	)
 
-	add_custom_target(${GIR_FILENAME} ALL DEPENDS ${GIR_LIBRARY} ${GIR_FILENAME})
+	add_custom_target("${GIR_LIBRARY} gir" ALL DEPENDS ${GIR_LIBRARY} ${GIR_FILENAME})
 
 	# create the name of the typelib
 	string(REPLACE ".gir" ".typelib" GIR_TYPELIB "${GIR_FILENAME}")
@@ -179,6 +179,6 @@ function(gobject_introspection _FIRST_ARG)
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	)
 
-	add_custom_target(${GIR_TYPELIB} ALL DEPENDS ${GIR_LIBRARY} ${GIR_FILENAME} ${GIR_TYPELIB})
+	add_custom_target("${GIR_LIBRARY} typelib" ALL DEPENDS ${GIR_LIBRARY} ${GIR_FILENAME} ${GIR_TYPELIB})
 endfunction(gobject_introspection)
 
