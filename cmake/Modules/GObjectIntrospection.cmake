@@ -1,15 +1,25 @@
 include(CMakeParseArguments)
 include(FindPkgConfig)
 
-pkg_check_modules(GOBJECT_INTROSPECTION REQUIRED gobject-introspection-1.0)
+set(_PKG_CONFIG_MODULE "gobject-introspection-1.0")
 
-find_program(GIR_SCANNER NAMES g-ir-scanner DOC "g-ir-scanner executable")
-mark_as_advanced(GIR_SCANNER)
-find_program(GIR_COMPILER NAMES g-ir-compiler DOC "g-ir-compiler executable")
-mark_as_advanced(GIR_COMPILER)
-find_program(GIR_GENERATE NAMES g-ir-generate DOC "g-ir-generate executable")
-mark_as_advanced(GIR_GENERATE)
+pkg_check_modules(GOBJECT_INTROSPECTION REQUIRED ${_PKG_CONFIG_MODULE})
 
+###############################################################################
+# Helpers
+###############################################################################
+# this macro will run "pkg-config --variable=VARIABLE ${_PKG_CONFIG_MODULE}"
+# and store the result in OUTPUT_VARIABLE
+macro(_pkg_config_variable VARIABLE OUTPUT_VARIABLE)
+	execute_process(
+		COMMAND ${PKG_CONFIG_EXECUTABLE} --variable=${VARIABLE} ${_PKG_CONFIG_MODULE}
+		OUTPUT_VARIABLE ${OUTPUT_VARIABLE}
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+	)
+endmacro(_pkg_config_variable)
+
+# this macro will prefix every item in _list with _prefix and return it in
+# _newlist.
 macro(_gir_list_prefix _newlist _list _prefix)
 	set(${_newlist})
 	foreach(_item IN LISTS ${_list})
@@ -17,6 +27,18 @@ macro(_gir_list_prefix _newlist _list _prefix)
 	endforeach(_item)
 endmacro(_gir_list_prefix)
 
+###############################################################################
+# use the pkg-config to grab a bunch of variables from the
+# gobject-introspection.pc file
+###############################################################################
+_pkg_config_variable(g_ir_scanner GIR_SCANNER)
+_pkg_config_variable(g_ir_compiler GIR_COMPILER)
+_pkg_config_variable(girdir GIR_GIRDIR)
+_pkg_config_variable(typelibdir GIR_TYPELIBDIR)
+
+###############################################################################
+# The main function
+###############################################################################
 function(gobject_introspection _FIRST_ARG)
 	set(options QUIET VERBOSE)
 	set(oneValueArgs
@@ -147,6 +169,7 @@ function(gobject_introspection _FIRST_ARG)
 		COMMAND ${GIR_SCANNER} ${GIR_SCANNER_ARGS}
 			--namespace=${GIR_NAMESPACE}
 			--nsversion=${GIR_NSVERSION}
+			--warn-all
 			${GIR_REAL_CFLAGS}
 			${GIR_FORMAT}
 			${GIR_REAL_LIBRARY}
@@ -167,6 +190,11 @@ function(gobject_introspection _FIRST_ARG)
 
 	add_custom_target("${GIR_LIBRARY} gir" ALL DEPENDS ${GIR_LIBRARY} ${GIR_FILENAME})
 
+	install(
+		FILES ${CMAKE_CURRENT_BINARY_DIR}/${GIR_FILENAME}
+		DESTINATION ${GIR_GIRDIR}
+	)
+
 	# create the name of the typelib
 	string(REPLACE ".gir" ".typelib" GIR_TYPELIB "${GIR_FILENAME}")
 
@@ -180,5 +208,10 @@ function(gobject_introspection _FIRST_ARG)
 	)
 
 	add_custom_target("${GIR_LIBRARY} typelib" ALL DEPENDS ${GIR_LIBRARY} ${GIR_FILENAME} ${GIR_TYPELIB})
+	install(
+		FILES ${CMAKE_CURRENT_BINARY_DIR}/${GIR_TYPELIB}
+		DESTINATION ${GIR_TYPELIBDIR}
+	)
+
 endfunction(gobject_introspection)
 
