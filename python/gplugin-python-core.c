@@ -16,6 +16,7 @@
  */
 
 #include <gplugin.h>
+#include <gplugin-native.h>
 
 static const GPluginPluginInfo info = {
 	.id = "gplugin-python-loader",

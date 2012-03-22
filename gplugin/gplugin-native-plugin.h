@@ -16,8 +16,8 @@
  */
 
 #ifndef __GI_SCANNER__ /* hide this bit from g-ir-scanner */
-#if !defined(GPLUGIN_NATIVE_H_INSIDE) && !defined(GPLUGIN_COMPILATION)
-#error "only <gplugin-native.h> may be included directly"
+#if !defined(GPLUGIN_GLOBAL_HEADER_INSIDE) && !defined(GPLUGIN_COMPILATION)
+#error "only <gplugin.h> or <gplugin-native.h> may be included directly"
 #endif
 #endif /* __GI_SCANNER__ */
 
