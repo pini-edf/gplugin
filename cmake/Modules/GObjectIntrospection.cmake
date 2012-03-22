@@ -169,7 +169,6 @@ function(gobject_introspection _FIRST_ARG)
 		COMMAND ${GIR_SCANNER} ${GIR_SCANNER_ARGS}
 			--namespace=${GIR_NAMESPACE}
 			--nsversion=${GIR_NSVERSION}
-			--warn-all
 			${GIR_REAL_CFLAGS}
 			${GIR_FORMAT}
 			${GIR_REAL_LIBRARY}
