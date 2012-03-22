@@ -224,6 +224,13 @@ gplugin_plugin_manager_uninit(void) {
 /******************************************************************************
  * API
  *****************************************************************************/
+
+/**
+ * gplugin_plugin_manager_add_path:
+ * @path_str: A path to add to the plugin search paths
+ *
+ * Adds @path_str to the list of paths to search for plugins.
+ */
 void
 gplugin_plugin_manager_add_path(const gchar *path_str) {
 	if(!path_str)
@@ -232,16 +239,37 @@ gplugin_plugin_manager_add_path(const gchar *path_str) {
 	g_hash_table_insert(paths, g_strdup(path_str), NULL);
 }
 
+/**
+ * gplugin_plugin_manager_remove_path:
+ * @path_str: A path to remove from the plugin search paths
+ *
+ * Removes @path_str from the list of paths to search for plugins.
+ */
 void
 gplugin_plugin_manager_remove_path(const gchar *path_str) {
 	g_hash_table_remove(paths, path_str);
 }
 
+/**
+ * gplugin_plugin_manager_get_paths:
+ *
+ * Gets the list of paths which will be search for plugins.
+ *
+ * Return value: (element-type utf8) (transfer full): list of paths which will
+ *               be searched for plugins.  free the list with g_list_free when
+ *               done.
+ */
 GList *
 gplugin_plugin_manager_get_paths(void) {
 	return g_hash_table_get_keys(paths);
 }
 
+/**
+ * gplugin_plugin_manager_register_loader:
+ * @type: #GType of a #GPluginPluginLoader
+ *
+ * Registers @type as an available loader.
+ */
 void
 gplugin_plugin_manager_register_loader(GType type) {
 	GPluginPluginLoader *loader = NULL;
@@ -301,6 +329,12 @@ gplugin_plugin_manager_register_loader(GType type) {
 	g_object_unref(G_OBJECT(loader));
 }
 
+/**
+ * gplugin_plugin_manager_unregister_loader:
+ * @type: #GType of a #GPluginPluginLoader
+ *
+ * Unregisters @type as an available loader.
+ */
 void
 gplugin_plugin_manager_unregister_loader(GType type) {
 	GPluginPluginLoaderClass *klass = NULL;
@@ -351,6 +385,11 @@ gplugin_plugin_manager_unregister_loader(GType type) {
 	g_type_class_unref(klass);
 }
 
+/**
+ * gplugin_plugin_manager_refresh:
+ *
+ * Forces a refresh of all plugins found in the search paths.
+ */
 void
 gplugin_plugin_manager_refresh(void) {
 	GNode *root = NULL;
@@ -486,6 +525,17 @@ gplugin_plugin_manager_refresh(void) {
 	gplugin_plugin_manager_file_tree_free(root);
 }
 
+/**
+ * gplugin_plugin_manager_find_plugins:
+ * @id: id string of the plugin to find
+ *
+ * Finds all plugins matching @id.
+ *
+ * Return value: (element-type GPlugin.Plugin) (transfer full): A #GSList of
+ *               referenced #GPluginPlugin's matching @id.  Call
+ *               #gplugin_plugin_manager_free_plugin_list on the returned value
+ *               when you're done with it.
+ */
 GSList *
 gplugin_plugin_manager_find_plugins(const gchar *id) {
 	GSList *plugins_list = NULL, *l;
@@ -507,6 +557,13 @@ gplugin_plugin_manager_find_plugins(const gchar *id) {
 	return plugins_list;
 }
 
+/**
+ * gplugin_plugin_manager_free_plugin_list:
+ * @plugins_list: (element-type GPlugin.Plugin): Returned value from
+ *                #gplugin_plugin_manager_find_plugins
+ *
+ * Frees the return value of #gplugin_plugin_manager_find_plugins.
+ */
 void
 gplugin_plugin_manager_free_plugin_list(GSList *plugins_list) {
 	GSList *l = NULL;

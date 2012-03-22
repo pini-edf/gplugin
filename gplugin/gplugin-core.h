@@ -31,6 +31,7 @@
 G_BEGIN_DECLS
 
 void gplugin_init(void);
+void gplugin_uninit(void);
 
 G_END_DECLS
 

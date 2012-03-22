@@ -142,6 +142,7 @@ if(BUILD_GIR)
 		FILENAME GPlugin-0.1.gir
 		PACKAGES gobject-2.0
 		LIBRARY gplugin
+		QUIET
 		SCANNER_ARGS --add-include-path=${CMAKE_CURRENT_SOURCE_DIR} --warn-all
 		COMPILER_ARGS --includedir=${CMAKE_CURRENT_SOURCE_DIR}
 		SYMBOL_PREFIXES gplugin

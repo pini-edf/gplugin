@@ -241,6 +241,12 @@ gplugin_plugin_get_type(void) {
 	return type;
 }
 
+/**
+ * gplugin_plugin_get_filename:
+ * @plugin: #GPluginPlugin instance
+ *
+ * Return value: The filename of @plugin
+ */
 const gchar *
 gplugin_plugin_get_filename(const GPluginPlugin *plugin) {
 	GPluginPluginPrivate *priv = NULL;
@@ -252,6 +258,12 @@ gplugin_plugin_get_filename(const GPluginPlugin *plugin) {
 	return priv->filename;
 }
 
+/**
+ * gplugin_plugin_get_loader:
+ * @plugin: #GPluginPlugin instance
+ *
+ * Return Value: (transfer none): The #GPluginPluginLoader that loaded @plugin
+ */
 GPluginPluginLoader *
 gplugin_plugin_get_loader(const GPluginPlugin *plugin) {
 	GPluginPluginPrivate *priv = NULL;
@@ -263,6 +275,12 @@ gplugin_plugin_get_loader(const GPluginPlugin *plugin) {
 	return priv->loader;
 }
 
+/**
+ * gplugin_plugin_get_info:
+ * @plugin: #GPluginPlugin instance
+ *
+ * Return value: (transfer none): The #GPluginPluginInfo instance for @plugin
+ */
 const GPluginPluginInfo *
 gplugin_plugin_get_info(const GPluginPlugin *plugin) {
 	GPluginPluginPrivate *priv = NULL;
@@ -272,6 +290,49 @@ gplugin_plugin_get_info(const GPluginPlugin *plugin) {
 	priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
 
 	return priv->info;
+}
+
+/**
+ * gplugin_plugin_get_state:
+ * @plugin: #GPluginPlugin instance
+ *
+ * Gets the current state of @plugin
+ *
+ * Return value: (transfer full): The current state of @plugin
+ */
+GPluginPluginState
+gplugin_plugin_get_state(const GPluginPlugin *plugin) {
+	GPluginPluginPrivate *priv = NULL;
+
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), GPLUGIN_PLUGIN_STATE_UNKNOWN);
+
+	priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
+
+	return priv->state;
+}
+
+/**
+ * gplugin_plugin_set_state:
+ * @plugin: #GPluginPlugin instance
+ * @state: new #GPluginPluginState for @plugin
+ *
+ * Changes the state of @plugin to @state.  This function should only be called
+ * by loaders.
+ */
+void
+gplugin_plugin_set_state(GPluginPlugin *plugin, GPluginPluginState state) {
+	GPluginPluginPrivate *priv = NULL;
+	GPluginPluginState oldstate = GPLUGIN_PLUGIN_STATE_UNKNOWN;
+
+	g_return_if_fail(GPLUGIN_IS_PLUGIN(plugin));
+
+	priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
+
+	oldstate = priv->state;
+	priv->state = state;
+
+	g_signal_emit(plugin, signals[SIG_STATE_CHANGED], 0,
+	              oldstate, priv->state);
 }
 
 /******************************************************************************
@@ -290,6 +351,12 @@ gplugin_plugin_info_get_type(void) {
 	return type;
 }
 
+/**
+ * gplugin_plugin_info_free:
+ * @info: #GPluginPluginInfo instance to free
+ *
+ * Free's an allocated #GPluginPluginInfo instance
+ */
 void
 gplugin_plugin_info_free(GPluginPluginInfo *info) {
 	GSList *l = NULL;
@@ -312,6 +379,14 @@ gplugin_plugin_info_free(GPluginPluginInfo *info) {
 	g_slice_free(GPluginPluginInfo, info);
 }
 
+/**
+ * gplugin_plugin_info_copy:
+ * @info: #GPluginPluginInfo instance
+ *
+ * Creates an allocated copy of @info
+ *
+ * Return value: (transfer full): A newly allocated #GPluginPluginInfo instance
+ */
 GPluginPluginInfo *
 gplugin_plugin_info_copy(const GPluginPluginInfo *info) {
 	GPluginPluginInfo *copy = NULL;
@@ -341,32 +416,4 @@ gplugin_plugin_info_copy(const GPluginPluginInfo *info) {
 
 	return copy;
 }
-
-GPluginPluginState
-gplugin_plugin_get_state(const GPluginPlugin *plugin) {
-	GPluginPluginPrivate *priv = NULL;
-
-	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), GPLUGIN_PLUGIN_STATE_UNKNOWN);
-
-	priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
-
-	return priv->state;
-}
-
-void
-gplugin_plugin_set_state(GPluginPlugin *plugin, GPluginPluginState state) {
-	GPluginPluginPrivate *priv = NULL;
-	GPluginPluginState oldstate = GPLUGIN_PLUGIN_STATE_UNKNOWN;
-
-	g_return_if_fail(GPLUGIN_IS_PLUGIN(plugin));
-
-	priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
-
-	oldstate = priv->state;
-	priv->state = state;
-
-	g_signal_emit(plugin, signals[SIG_STATE_CHANGED], 0,
-	              oldstate, priv->state);
-}
-
 

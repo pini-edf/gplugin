@@ -21,17 +21,27 @@
 #include <gplugin/gplugin-core.h>
 #include <gplugin/gplugin-private.h>
 
-void
-gplugin_uninit(void) {
-	gplugin_plugin_manager_uninit();
-}
-
+/**
+ * gplugin_init:
+ *
+ * Initializes the GPlugin library.
+ *
+ * This function *MUST* be called before interacting with any other GPlugin API
+ */
 void
 gplugin_init(void) {
 	g_type_init();
 
 	gplugin_plugin_manager_init();
+}
 
-	g_atexit(gplugin_uninit);
+/**
+ * gplugin_uninit:
+ *
+ * Uninitializes the GPlugin library
+ */
+void
+gplugin_uninit(void) {
+	gplugin_plugin_manager_uninit();
 }
 

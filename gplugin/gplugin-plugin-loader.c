@@ -35,6 +35,14 @@ gplugin_plugin_loader_get_type(void) {
 	return type;
 }
 
+/**
+ * gplugin_plugin_loader_query_plugin:
+ * @loader: #GPluginPluginLoader instance performing the query
+ * @filename: filename to query
+ * error: return location for a GError, or NULL
+ *
+ * Return value: (transfer full): A #GPluginPlugin instance or NULL on failure
+ */
 GPluginPlugin *
 gplugin_plugin_loader_query_plugin(GPluginPluginLoader *loader,
                                    const gchar *filename, GError **error)
@@ -54,6 +62,14 @@ gplugin_plugin_loader_query_plugin(GPluginPluginLoader *loader,
 	return NULL;
 }
 
+/**
+ * gplugin_plugin_loader_load_plugin:
+ * @loader: #GPluginPluginLoader instance performing the load
+ * @plugin: #GPluginPlugin instance to load
+ * error: return location for a GError, or NULL
+ *
+ * Return value: TRUE if @plugin was loaded successfully, FALSE otherwise
+ */
 gboolean
 gplugin_plugin_loader_load_plugin(GPluginPluginLoader *loader,
                                   GPluginPlugin *plugin, GError **error)
@@ -73,6 +89,14 @@ gplugin_plugin_loader_load_plugin(GPluginPluginLoader *loader,
 	return FALSE;
 }
 
+/**
+ * gplugin_plugin_loader_unload_plugin:
+ * @loader: #GPluginPluginLoader instance performing the unload
+ * @plugin: #GPluginPlugin instance to unload
+ * error: return location for a GError, or NULL
+ *
+ * Return value: TRUE if @plugin was unloaded successfully, FALSE otherwise
+ */
 gboolean
 gplugin_plugin_loader_unload_plugin(GPluginPluginLoader *loader,
                                     GPluginPlugin *plugin, GError **error)
