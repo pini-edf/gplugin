@@ -28,6 +28,7 @@ typedef struct _GPluginPythonPluginLoader            GPluginPythonPluginLoader;
 typedef struct _GPluginPythonPluginLoaderClass       GPluginPythonPluginLoaderClass;
 
 #include <gplugin.h>
+#include <gplugin-native.h>
 
 struct _GPluginPythonPluginLoader {
 	GObject parent;
