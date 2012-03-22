@@ -16,6 +16,7 @@
  */
 
 #include <gplugin.h>
+#include <gplugin-native.h>
 
 #include <glib.h>
 

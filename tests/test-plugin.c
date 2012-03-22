@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <gplugin.h>
+#include <gplugin-native.h>
 
 static const GPluginPluginInfo info = {
 	.id = "test-native-plugin",
