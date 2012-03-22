@@ -85,7 +85,6 @@ add_definitions(
 
 include_directories(
 	${CMAKE_SOURCE_DIR}
-	${CMAKE_BINARY_DIR}                # for gplugin-version.h
 	${CMAKE_BINARY_DIR}/gplugin        # for gplugin.h
 	${GLIB_INCLUDE_DIRS}
 	${GMODULE_INCLUDE_DIRS}
