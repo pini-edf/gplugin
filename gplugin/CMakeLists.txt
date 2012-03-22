@@ -24,24 +24,32 @@ set(GPLUGIN_SOURCES
 	gplugin-plugin-manager.c
 )
 
-set(GPLUGIN_BUILT_HEADERS
+set(GPLUGIN_PUBLIC_BUILT_HEADERS
 	gplugin-enums.h
-	gplugin-marshallers.h
 	gplugin-version.h
 )
 
-set(GPLUGIN_BUILT_SOURCES
+set(GPLUGIN_PRIVATE_BUILT_HEADERS
+	gplugin-marshallers.h
+)
+
+set(GPLUGIN_PUBLIC_BUILT_SOURCES
 	gplugin-enums.c
+)
+
+set(GPLUGIN_PRIVATE_BUILT_SOURCES
 	gplugin-marshallers.c
 )
 
-###############################################################################
+##############################################################################
 # Helper Variables
 ###############################################################################
-list(APPEND PUBLIC_HEADERS ${GPLUGIN_HEADERS} ${GPLUGIN_BUILT_HEADERS} gplugin.h)
+list(APPEND PUBLIC_HEADERS
+	${GPLUGIN_HEADERS} ${GPLUGIN_PUBLIC_BUILT_HEADERS} gplugin.h
+)
 list(SORT PUBLIC_HEADERS)
 
-list(APPEND PRIVATE_HEADERS gplugin-private.h)
+list(APPEND PRIVATE_HEADERS ${GPLUGIN_PRIVATE_BUILT_HEADERS} gplugin-private.h)
 
 ###############################################################################
 # Configure Files
@@ -107,7 +115,8 @@ add_custom_command(
 ###############################################################################
 add_library(gplugin SHARED
 	${GPLUGIN_SOURCES}
-	${GPLUGIN_BUILT_SOURCES}
+	${GPLUGIN_PUBLIC_BUILT_SOURCES}
+	${GPLUGIN_PRIVATE_BUILT_SOURCES}
 	${PUBLIC_HEADERS}
 	${PRIVATE_HEADERS}
 )
@@ -137,7 +146,8 @@ if(BUILD_GIR)
 		COMPILER_ARGS --includedir=${CMAKE_CURRENT_SOURCE_DIR}
 		SYMBOL_PREFIXES gplugin
 		SOURCES ${GPLUGIN_SOURCES} ${GPLUGIN_HEADERS}
-		BUILT_SOURCES ${GPLUGIN_BUILT_SOURCES} ${GPLUGIN_BUILT_HEADERS}
+		BUILT_SOURCES ${GPLUGIN_PUBLIC_BUILT_SOURCES}
+		              ${GPLUGIN_PUBLIC_BUILT_HEADERS}
 	)
 endif(BUILD_GIR)
 
