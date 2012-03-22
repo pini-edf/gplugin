@@ -16,6 +16,7 @@
  */
 
 #include <gplugin/gplugin-core.h>
+
 #include <gplugin/gplugin-native-plugin-loader.h>
 #include <gplugin/gplugin-native-plugin.h>
 

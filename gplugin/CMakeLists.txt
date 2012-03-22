@@ -8,8 +8,6 @@ add_definitions(
 
 set(GPLUGIN_HEADERS
 	gplugin-core.h
-	gplugin-native-plugin.h
-	gplugin-native-plugin-loader.h
 	gplugin-plugin.h
 	gplugin-plugin-loader.h
 	gplugin-plugin-manager.h
@@ -17,8 +15,6 @@ set(GPLUGIN_HEADERS
 
 set(GPLUGIN_SOURCES
 	gplugin-core.c
-	gplugin-native-plugin.c
-	gplugin-native-plugin-loader.c
 	gplugin-plugin.c
 	gplugin-plugin-loader.c
 	gplugin-plugin-manager.c
@@ -39,6 +35,16 @@ set(GPLUGIN_PUBLIC_BUILT_SOURCES
 
 set(GPLUGIN_PRIVATE_BUILT_SOURCES
 	gplugin-marshallers.c
+)
+
+set(GPLUGIN_NATIVE_HEADERS
+	gplugin-native-plugin.h
+	gplugin-native-plugin-loader.h
+)
+
+set(GPLUGIN_NATIVE_SOURCES
+	gplugin-native-plugin.c
+	gplugin-native-plugin-loader.c
 )
 
 ##############################################################################
@@ -67,6 +73,14 @@ foreach(HEADER ${PUBLIC_HEADERS})
 endforeach(HEADER)
 
 configure_file(gplugin.h.in gplugin.h @ONLY)
+
+# build gplugin-native.h
+set(GPLUGIN_NATIVE_H_INCLUDES "")
+foreach(HEADER ${GPLUGIN_NATIVE_HEADERS})
+	set(GPLUGIN_NATIVE_H_INCLUDES "${GPLUGIN_NATIVE_H_INCLUDES}\n#include <gplugin/${HEADER}>")
+endforeach(HEADER)
+
+configure_file(gplugin-native.h.in gplugin-native.h @ONLY)
 
 ###############################################################################
 # gplugin-enum.[ch] generation
@@ -115,8 +129,10 @@ add_custom_command(
 ###############################################################################
 add_library(gplugin SHARED
 	${GPLUGIN_SOURCES}
+	${GPLUGIN_NATIVE_SOURCES}
 	${GPLUGIN_PUBLIC_BUILT_SOURCES}
 	${GPLUGIN_PRIVATE_BUILT_SOURCES}
+	${GPLUGIN_NATIVE_HEADERS}
 	${PUBLIC_HEADERS}
 	${PRIVATE_HEADERS}
 )

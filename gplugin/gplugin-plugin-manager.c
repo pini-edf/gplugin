@@ -19,9 +19,10 @@
 
 #include <gplugin/gplugin-plugin-manager.h>
 #include <gplugin/gplugin-core.h>
-#include <gplugin/gplugin-native-plugin-loader.h>
 
 #include <gplugin/gplugin-private.h>
+
+#include <gplugin/gplugin-native.h>
 
 /******************************************************************************
  * Structs
