@@ -4,7 +4,7 @@ includedir=${prefix}/include/gplugin
 
 Name: libgplugin
 Description: A fully featured GModule based plugin library
-Version: @GIDBITS_VERSION@
+Version: @GPLUGIN_VERSION@
 Libs: -L${libdir} -lgplugin
 Cflags: -I${includedir}
 
