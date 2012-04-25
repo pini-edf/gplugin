@@ -29,7 +29,7 @@
  *****************************************************************************/
 static void
 test_gplugin_plugin_manager_paths_single(void) {
-	gplugin_plugin_manager_add_path("foo");
+	gplugin_plugin_manager_append_path("foo");
 	test_path_count(1);
 
 	gplugin_plugin_manager_remove_path("foo");
@@ -38,8 +38,8 @@ test_gplugin_plugin_manager_paths_single(void) {
 
 static void
 test_gplugin_plugin_manager_paths_duplicate(void) {
-	gplugin_plugin_manager_add_path("foo");
-	gplugin_plugin_manager_add_path("foo");
+	gplugin_plugin_manager_append_path("foo");
+	gplugin_plugin_manager_append_path("foo");
 
 	test_path_count(1);
 
@@ -50,10 +50,10 @@ test_gplugin_plugin_manager_paths_duplicate(void) {
 static void
 test_gplugin_plugin_manager_paths_multiple_fifo(void) {
 	/* add */
-	gplugin_plugin_manager_add_path("foo");
+	gplugin_plugin_manager_append_path("foo");
 	test_path_count(1);
 
-	gplugin_plugin_manager_add_path("bar");
+	gplugin_plugin_manager_append_path("bar");
 	test_path_count(2);
 
 	/* remove */
@@ -67,10 +67,10 @@ test_gplugin_plugin_manager_paths_multiple_fifo(void) {
 static void
 test_gplugin_plugin_manager_paths_multiple_filo(void) {
 	/* add */
-	gplugin_plugin_manager_add_path("foo");
+	gplugin_plugin_manager_append_path("foo");
 	test_path_count(1);
 
-	gplugin_plugin_manager_add_path("bar");
+	gplugin_plugin_manager_append_path("bar");
 	test_path_count(2);
 
 	/* remove */
