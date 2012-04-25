@@ -108,7 +108,7 @@ gplugin_plugin_manager_file_tree_new(void) {
 		GDir *d = NULL;
 		GError *error = NULL;
 		GNode *dir = NULL;
-		const gchar *path = (const gchar *)iter;
+		const gchar *path = (const gchar *)iter->data;
 		const gchar *filename = NULL;
 
 		d = g_dir_open(path, 0, &error);

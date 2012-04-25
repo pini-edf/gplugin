@@ -28,7 +28,7 @@ test_gplugin_native_plugin_loader(void) {
 	GSList *plugins = NULL, *l = NULL;
 
 	/* add the test directory to the plugin manager's search paths */
-	gplugin_plugin_manager_add_path(TEST_DIR);
+	gplugin_plugin_manager_append_path(TEST_DIR);
 
 	/* refresh the plugin manager */
 	gplugin_plugin_manager_refresh();
