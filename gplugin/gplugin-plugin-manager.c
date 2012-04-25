@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
+
 #include <glib.h>
 
 #include <gplugin/gplugin-plugin-manager.h>
@@ -35,7 +37,7 @@ typedef struct {
 /******************************************************************************
  * Globals
  *****************************************************************************/
-static GHashTable *paths = NULL;
+static GQueue *paths = NULL;
 
 static GHashTable *plugins = NULL;
 static GHashTable *plugins_filename_view = NULL;
@@ -96,19 +98,17 @@ gplugin_plugin_manager_tree_entry_free(GPluginPluginManagerTreeEntry *e) {
  */
 static GNode *
 gplugin_plugin_manager_file_tree_new(void) {
-	GHashTableIter iter;
+	GList *iter = NULL;
 	GNode *root = NULL;
-	gpointer key = NULL;
 
 	/* read all of the files from all of our paths and store then in a tree */
 	root = g_node_new(NULL);
 
-	g_hash_table_iter_init(&iter, paths);
-	while(g_hash_table_iter_next(&iter, &key, NULL)) {
+	for(iter = paths->head; iter; iter = iter->next) {
 		GDir *d = NULL;
 		GError *error = NULL;
 		GNode *dir = NULL;
-		const gchar *path = (const gchar *)key;
+		const gchar *path = (const gchar *)iter;
 		const gchar *filename = NULL;
 
 		d = g_dir_open(path, 0, &error);
@@ -188,7 +188,7 @@ gplugin_plugin_manager_remove_list_value(gpointer data) {
  *****************************************************************************/
 void
 gplugin_plugin_manager_init(void) {
-	paths = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
+	paths = g_queue_new();
 
 	plugins = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
 	                                gplugin_plugin_manager_remove_list_value);
@@ -216,7 +216,12 @@ gplugin_plugin_manager_init(void) {
 
 void
 gplugin_plugin_manager_uninit(void) {
-	g_hash_table_destroy(paths);
+	GList *iter = NULL;
+
+	for(iter = paths->head; iter; iter = iter->next)
+		g_free(iter->data);
+	g_queue_free(paths);
+
 	g_hash_table_destroy(plugins);
 	g_hash_table_destroy(plugins_filename_view);
 	g_hash_table_destroy(loaders);
@@ -227,28 +232,64 @@ gplugin_plugin_manager_uninit(void) {
  *****************************************************************************/
 
 /**
- * gplugin_plugin_manager_add_path:
- * @path_str: A path to add to the plugin search paths
+ * gplugin_plugin_manager_append_path:
+ * @path: A path to add to the end of the plugin search paths
  *
- * Adds @path_str to the list of paths to search for plugins.
+ * Adds @path to the end of the list of paths to search for plugins.
  */
 void
-gplugin_plugin_manager_add_path(const gchar *path_str) {
-	if(!path_str)
+gplugin_plugin_manager_append_path(const gchar *path) {
+	GList *l = NULL;
+
+	if(!path)
 		return;
 
-	g_hash_table_insert(paths, g_strdup(path_str), NULL);
+	for(l = paths->head; l; l = l->next)
+		if(strcmp(l->data, path) == 0)
+			return;
+
+	g_queue_push_tail(paths, g_strdup(path));
+}
+
+/**
+ * gplugin_plugin_manager_prepend_path:
+ * @path: A path to add to the beginning of the plugin search paths
+ *
+ * Adds @path to the beginning of the list of paths to search for plugins.
+ */
+void
+gplugin_plugin_manager_prepend_path(const gchar *path) {
+	GList *l = NULL;
+
+	if(!path)
+		return;
+
+	for(l = paths->head; l; l = l->next)
+		if(strcmp(l->data, path) == 0)
+			return;
+
+	g_queue_push_head(paths, g_strdup(path));
 }
 
 /**
  * gplugin_plugin_manager_remove_path:
- * @path_str: A path to remove from the plugin search paths
+ * @path: A path to remove from the plugin search paths
  *
- * Removes @path_str from the list of paths to search for plugins.
+ * Removes @path from the list of paths to search for plugins.
  */
 void
-gplugin_plugin_manager_remove_path(const gchar *path_str) {
-	g_hash_table_remove(paths, path_str);
+gplugin_plugin_manager_remove_path(const gchar *path) {
+	GList *l = NULL, *link = NULL;
+
+	g_return_if_fail(path != NULL);
+
+	for(l = paths->head; l; l = l->next)
+		if(strcmp(l->data, path) == 0) {
+			g_free(l->data);
+			link = l;
+		}
+
+	g_queue_delete_link(paths, link);
 }
 
 /**
@@ -256,13 +297,13 @@ gplugin_plugin_manager_remove_path(const gchar *path_str) {
  *
  * Gets the list of paths which will be search for plugins.
  *
- * Return value: (element-type utf8) (transfer full): list of paths which will
+ * Return value: (element-type utf8) (transfer none): list of paths which will
  *               be searched for plugins.  free the list with g_list_free when
  *               done.
  */
 GList *
 gplugin_plugin_manager_get_paths(void) {
-	return g_hash_table_get_keys(paths);
+	return paths->head;
 }
 
 /**

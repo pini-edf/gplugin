@@ -29,8 +29,9 @@
 
 G_BEGIN_DECLS
 
-void gplugin_plugin_manager_add_path(const gchar *path_str);
-void gplugin_plugin_manager_remove_path(const gchar *path_str);
+void gplugin_plugin_manager_append_path(const gchar *path);
+void gplugin_plugin_manager_prepend_path(const gchar *path);
+void gplugin_plugin_manager_remove_path(const gchar *path);
 GList *gplugin_plugin_manager_get_paths(void);
 
 void gplugin_plugin_manager_register_loader(GType type);
