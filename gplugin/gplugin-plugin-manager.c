@@ -538,6 +538,10 @@ gplugin_plugin_manager_refresh(void) {
 					const GPluginPluginInfo *info =
 						gplugin_plugin_get_info(plugin);
 
+					/* throw a warning if the info->id is NULL */
+					if(info->id == NULL)
+						g_warning("Plugin %s has a NULL id.",  real_filename);
+
 					/* We need a GSList for the plugins hash table since
 					 * multiple plugins could have the same id.
 					 */
