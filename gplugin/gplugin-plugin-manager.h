@@ -27,6 +27,8 @@
 #include <glib.h>
 #include <glib-object.h>
 
+#include <gplugin/gplugin-plugin.h>
+
 G_BEGIN_DECLS
 
 void gplugin_plugin_manager_append_path(const gchar *path);
@@ -41,6 +43,9 @@ void gplugin_plugin_manager_refresh(void);
 
 GSList *gplugin_plugin_manager_find_plugins(const gchar *id);
 void gplugin_plugin_manager_free_plugin_list(GSList *plugins_list);
+
+gboolean gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error);
+gboolean gplugin_plugin_manager_unload_plugin(GPluginPlugin *plugin, GError **error);
 
 G_END_DECLS
 

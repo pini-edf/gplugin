@@ -626,3 +626,52 @@ gplugin_plugin_manager_free_plugin_list(GSList *plugins_list) {
 	g_slist_free(plugins_list);
 }
 
+/**
+ * gplugin_plugin_manager_load_plugin:
+ * @plugin: #GPluginPlugin instance
+ * @error: (out): return location for a #GError or null
+ *
+ * Loads @plugin and all of it's dependencies.  If a dependency can not be
+ * loaded, @plugin will not be loaded either.  However, any other plugins that
+ * @plugin depends on that were loaded from this call, will not be unloaded.
+ *
+ * Return value: TRUE if @plugin was loaded successfully or already loaded,
+ *               FALSE otherwise.
+ */
+gboolean
+gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
+	return FALSE;
+}
+
+/**
+ * gplugin_plugin_manager_unload_plugin:
+ * @plugin: #GPluginPlugin instance
+ * @error: (out): return location for a #GError or null
+ *
+ * Unloads @plugin.  If @plugin has dependencies, they are not unloaded.
+ *
+ * Return value: TRUE if @plugin was unloaded successfully or not loaded,
+ *               FALSE otherwise.
+ */
+gboolean
+gplugin_plugin_manager_unload_plugin(GPluginPlugin *plugin, GError **error) {
+	GPluginPluginLoader *loader = NULL;
+
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
+
+	if(gplugin_plugin_get_state(plugin) != GPLUGIN_PLUGIN_STATE_LOADED)
+		return TRUE;
+
+	loader = gplugin_plugin_get_loader(plugin);
+	if(!GPLUGIN_IS_PLUGIN_LOADER(loader)) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "Plugin loader is not a loader");
+		}
+
+		return FALSE;
+	}
+
+	return gplugin_plugin_loader_load_plugin(loader, plugin, error);
+}
+
