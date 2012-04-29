@@ -758,6 +758,6 @@ gplugin_plugin_manager_unload_plugin(GPluginPlugin *plugin, GError **error) {
 		return FALSE;
 	}
 
-	return gplugin_plugin_loader_load_plugin(loader, plugin, error);
+	return gplugin_plugin_loader_unload_plugin(loader, plugin, error);
 }
 
