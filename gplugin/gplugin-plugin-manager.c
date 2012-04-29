@@ -644,7 +644,89 @@ gplugin_plugin_manager_free_plugin_list(GSList *plugins_list) {
  */
 gboolean
 gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
-	return FALSE;
+	const GPluginPluginInfo *info = NULL;
+	GPluginPluginLoader *loader = NULL;
+	GSList *l = NULL;
+
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
+
+	/* if the plugin is already loaded there's nothing for us to do */
+	if(gplugin_plugin_get_state(plugin) == GPLUGIN_PLUGIN_STATE_LOADED)
+		return TRUE;
+
+	/* now try to get the plugin info from the plugin */
+	info = gplugin_plugin_get_info(plugin);
+	if(info == NULL) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "Plugin %s did not return value plugin info",
+			                     gplugin_plugin_get_filename(plugin));
+		}
+
+		return FALSE;
+	}
+
+	/* now walk through any dependencies the plugin has and load them.  If they
+	 * fail to load we need to fail as well.
+	 */
+	for(l = info->dependencies; l; l = l->next) {
+		GSList *matches = NULL, *m = NULL;
+		const gchar *dep_id = NULL;
+		gboolean ret = FALSE;
+
+		dep_id = (gchar *)l->data;
+
+		matches = gplugin_plugin_manager_find_plugins(dep_id);
+
+		/* make sure we got at least 1 match */
+		if(matches == NULL) {
+			if(error && *error == NULL) {
+				*error = g_error_new(GPLUGIN_DOMAIN, 0,
+				                     "Failed to find plugin %s which %s "
+				                     "depends on",
+				                     dep_id,
+				                     gplugin_plugin_get_filename(plugin));
+			}
+
+			return FALSE;
+		}
+
+		for(m = matches; m; m = m->next) {
+			GPluginPlugin *plugin = g_object_ref(G_OBJECT(l->data));
+
+			ret = gplugin_plugin_manager_load_plugin(plugin, error);
+
+			if(ret == TRUE)
+				break;
+		}
+
+		if(ret == FALSE) {
+			if(error && *error == NULL) {
+				*error = g_error_new(GPLUGIN_DOMAIN, 0,
+				                     "Found at least one plugin with an id of "
+				                     "%s, but failed to load it.",
+				                     dep_id);
+			}
+
+			return FALSE;
+		}
+	}
+
+	/* now load the actual plugin */
+	loader = gplugin_plugin_get_loader(plugin);
+
+	if(!GPLUGIN_IS_PLUGIN_LOADER(loader)) {
+		if(error && *error == NULL) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "The loader for %s is not a loader.  This "
+			                     "should not happend!",
+			                     gplugin_plugin_get_filename(plugin));
+		}
+
+		return FALSE;
+	}
+
+	return gplugin_plugin_loader_load_plugin(loader, plugin, error);
 }
 
 /**
