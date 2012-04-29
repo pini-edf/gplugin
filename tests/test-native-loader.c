@@ -26,6 +26,7 @@
 static void
 test_gplugin_native_plugin_loader(void) {
 	GSList *plugins = NULL, *l = NULL;
+	GError *error = NULL;
 
 	/* add the test directory to the plugin manager's search paths */
 	gplugin_plugin_manager_append_path(TEST_DIR);
@@ -34,7 +35,7 @@ test_gplugin_native_plugin_loader(void) {
 	gplugin_plugin_manager_refresh();
 
 	/* now look for the plugin */
-	plugins = gplugin_plugin_manager_find_plugins("test-native-plugin");
+	plugins = gplugin_plugin_manager_find_plugins("basic-native-plugin");
 	g_assert(plugins != NULL);
 
 	/* now iterate through the plugins (we really only should have one...) */
@@ -49,16 +50,26 @@ test_gplugin_native_plugin_loader(void) {
 		info = gplugin_plugin_get_info(plugin);
 		g_assert(info != NULL);
 
-		g_assert_cmpstr(info->id, ==, "test-native-plugin");
+		g_assert_cmpstr(info->id, ==, "basic-native-plugin");
 		g_assert_cmpint(info->abi_version, ==,
 		                GPLUGIN_NATIVE_PLUGIN_ABI_VERSION);
 		g_assert_cmpuint(info->flags, ==, 0);
-		g_assert_cmpstr(info->name, ==, "test plugin name");
-		g_assert_cmpstr(info->version, ==, "test plugin version");
-		g_assert_cmpstr(info->summary, ==, "test plugin summary");
-		g_assert_cmpstr(info->description, ==, "test plugin description");
-		g_assert_cmpstr(info->author, ==, "test plugin author");
-		g_assert_cmpstr(info->website, ==, "test plugin website");
+		g_assert_cmpstr(info->name, ==, "name");
+		g_assert_cmpstr(info->version, ==, "version");
+		g_assert_cmpstr(info->summary, ==, "summary");
+		g_assert_cmpstr(info->description, ==, "description");
+		g_assert_cmpstr(info->author, ==, "author");
+		g_assert_cmpstr(info->website, ==, "website");
+
+		g_assert(gplugin_plugin_manager_load_plugin(plugin, &error));
+
+		state = gplugin_plugin_get_state(plugin);
+		g_assert_cmpint(state, ==, GPLUGIN_PLUGIN_STATE_LOADED);
+
+		g_assert(gplugin_plugin_manager_unload_plugin(plugin, &error));
+
+		state = gplugin_plugin_get_state(plugin);
+		g_assert_cmpint(state, !=, GPLUGIN_PLUGIN_STATE_LOADED);
 	}
 
 	/* make sure the free function works too */

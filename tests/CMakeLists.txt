@@ -11,16 +11,15 @@ macro(add_gtest target)
 	list(APPEND TESTS ${_output_name})
 endmacro(add_gtest)
 
-add_library(test-plugin MODULE test-plugin.c)
-set_target_properties(test-plugin PROPERTIES PREFIX "")
+add_subdirectory(plugins)
 
 add_gtest(test-plugin-manager-paths)
 add_gtest(test-boxed-types)
 
 add_gtest(test-native-loader)
-add_dependencies(test-native-loader test-plugin)
+add_dependencies(test-native-loader basic-plugin)
 
-add_definitions(-DTEST_DIR="${CMAKE_CURRENT_BINARY_DIR}")
+add_definitions(-DTEST_DIR="${CMAKE_CURRENT_BINARY_DIR}/plugins/")
 
 set(GTESTER_TESTS "${TESTS}")
 set(GTESTER_LOG "testgplugin.log")

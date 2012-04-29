@@ -192,8 +192,14 @@ gplugin_native_plugin_loader_load(GPluginPluginLoader *loader,
 
 	/* now call the load function and exit */
 	load = (GPluginNativePluginLoadFunc)func;
-	if(!load(GPLUGIN_NATIVE_PLUGIN(plugin)))
+	if(!load(GPLUGIN_NATIVE_PLUGIN(plugin))) {
+		*error = g_error_new(GPLUGIN_DOMAIN, 0,
+		                     "Plugin load function returned FALSE");
+
 		return FALSE;
+	}
+
+	gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOADED);
 
 	return TRUE;
 }
@@ -216,7 +222,7 @@ gplugin_native_plugin_loader_unload(GPluginPluginLoader *loader,
 	/* grab the load function from the plugin */
 	g_object_get(G_OBJECT(plugin), "unload-func", &func, NULL);
 
-	/* if the load function is null, we need to bail */
+	/* if the unload function is null, we need to bail */
 	if(func == NULL) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
@@ -229,8 +235,14 @@ gplugin_native_plugin_loader_unload(GPluginPluginLoader *loader,
 
 	/* now call the unload function and exit */
 	unload = (GPluginNativePluginLoadFunc)func;
-	if(!unload(GPLUGIN_NATIVE_PLUGIN(plugin)))
+	if(!unload(GPLUGIN_NATIVE_PLUGIN(plugin))) {
+		*error = g_error_new(GPLUGIN_DOMAIN, 0,
+		                     "Plugin unload function returned FALSE");
+
 		return FALSE;
+	}
+
+	gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_QUERIED);
 
 	return TRUE;
 }
