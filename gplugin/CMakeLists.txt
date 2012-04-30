@@ -174,6 +174,9 @@ endif(BUILD_GIR)
 # install the main library
 install(TARGETS gplugin LIBRARY DESTINATION lib)
 
+# install gplugin-query
+install(TARGETS gplugin-query RUNTIME DESTINATION bin)
+
 # install the single includes into the main directory
 install(
 	FILES ${CMAKE_CURRENT_BINARY_DIR}/gplugin.h
