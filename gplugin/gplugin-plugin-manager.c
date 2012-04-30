@@ -793,3 +793,31 @@ gplugin_plugin_manager_unload_plugin(GPluginPlugin *plugin, GError **error) {
 	return gplugin_plugin_loader_unload_plugin(loader, plugin, error);
 }
 
+/**
+ * gplugin_plugin_manager_list_plugins:
+ *
+ * Returns a #GList of all plugin id's.  Each id should be queried directly
+ * for more information.
+ *
+ * Return value: (element-type utf8) (transfer full): A #GList of each unique
+ *               plugin id.
+ */
+GList *
+gplugin_plugin_manager_list_plugins(void) {
+	GQueue *queue = g_queue_new();
+	GList *ret = NULL;
+	GHashTableIter iter;
+	gchar *id = NULL;
+
+	g_hash_table_iter_init(&iter, plugins);
+	while(g_hash_table_iter_next(&iter, &id, NULL)) {
+		g_queue_push_tail(queue, id);
+	}
+
+	ret = g_list_copy(queue->head);
+
+	g_queue_free(queue);
+
+	return ret;
+}
+

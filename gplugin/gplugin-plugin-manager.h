@@ -49,6 +49,8 @@ GPluginPlugin *gplugin_plugin_manager_find_plugin(const gchar *id);
 gboolean gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error);
 gboolean gplugin_plugin_manager_unload_plugin(GPluginPlugin *plugin, GError **error);
 
+GList *gplugin_plugin_manager_list_plugins(void);
+
 G_END_DECLS
 
 #endif /* GPLUGIN_PLUGIN_MANAGER_H */
