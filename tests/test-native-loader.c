@@ -110,6 +110,30 @@ test_dependent_plugin_load(void) {
 	g_assert_cmpint(state, ==, GPLUGIN_PLUGIN_STATE_LOADED);
 }
 
+static void
+test_broken_depend_plugin_load(void) {
+	GPluginPlugin *plugin = NULL;
+	GPluginPluginState state;
+	GError *error = NULL;
+
+	/* add the test directory to the plugin manager's search paths */
+	gplugin_plugin_manager_append_path(TEST_DIR);
+
+	/* refresh the plugin manager */
+	gplugin_plugin_manager_refresh();
+
+	/* find the dependent plugin and make sure it isn't loaded */
+	plugin =
+		gplugin_plugin_manager_find_plugin("broken-dependent-native-plugin");
+	g_assert(plugin != NULL);
+
+	state = gplugin_plugin_get_state(plugin);
+	g_assert_cmpint(state, !=, GPLUGIN_PLUGIN_STATE_LOADED);
+
+	/* now attempt to load the dependent plugin, it's supposed to fail */
+	g_assert(!gplugin_plugin_manager_load_plugin(plugin, &error));
+}
+
 gint
 main(gint argc, gchar **argv) {
 
@@ -118,7 +142,10 @@ main(gint argc, gchar **argv) {
 	gplugin_init();
 
 	g_test_add_func("/loaders/native/load", test_basic_plugin_load);
-	g_test_add_func("/loaders/native/load_dependent", test_dependent_plugin_load);
+	g_test_add_func("/loaders/native/load_dependent",
+	                test_dependent_plugin_load);
+	g_test_add_func("/loaders/native/load_broken_dependent",
+	                test_broken_depend_plugin_load);
 
 	return g_test_run();
 }
