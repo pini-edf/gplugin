@@ -1,5 +1,7 @@
 0.0.2: 2012/04/29
   * Fixed the broken pkg-config file...
+  * Added gplugin_plugin_manager_list_plugins
+  * Added gplugin-query to query the plugins that gplugin knows about
 
 0.0.1: 2012/04/29
   * Initial release
