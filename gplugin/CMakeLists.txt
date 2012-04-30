@@ -50,8 +50,9 @@ set(GPLUGIN_NATIVE_SOURCES
 ##############################################################################
 # Helper Variables
 ###############################################################################
+# don't add gplugin.h to this, EVER!
 list(APPEND PUBLIC_HEADERS
-	${GPLUGIN_HEADERS} ${GPLUGIN_PUBLIC_BUILT_HEADERS} gplugin.h gplugin-native.h
+	${GPLUGIN_HEADERS} ${GPLUGIN_PUBLIC_BUILT_HEADERS}
 )
 list(SORT PUBLIC_HEADERS)
 
@@ -66,10 +67,7 @@ configure_file(gplugin-version.h.in gplugin-version.h @ONLY)
 set(GPLUGIN_H_INCLUDES "")
 
 foreach(HEADER ${PUBLIC_HEADERS})
-	if(${HEADER} STREQUAL gplugin.h)
-	else(${HEADER} STREQUAL gplugin.h)
-		set(GPLUGIN_H_INCLUDES "${GPLUGIN_H_INCLUDES}\n#include <gplugin/${HEADER}>")
-	endif(${HEADER} STREQUAL gplugin.h)
+	set(GPLUGIN_H_INCLUDES "${GPLUGIN_H_INCLUDES}\n#include <gplugin/${HEADER}>")
 endforeach(HEADER)
 
 configure_file(gplugin.h.in gplugin.h @ONLY)
@@ -135,12 +133,8 @@ add_library(gplugin SHARED
 	${GPLUGIN_NATIVE_HEADERS}
 	${PUBLIC_HEADERS}
 	${PRIVATE_HEADERS}
-)
-
-set_target_properties(gplugin PROPERTIES
-	PUBLIC_HEADER "${PUBLIC_HEADERS}"
-	PRIVATE_HEADER "${PRIVATE_HEADERS}"
-	SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
+	gplugin.h
+	gplugin-native.h
 )
 
 target_link_libraries(gplugin
