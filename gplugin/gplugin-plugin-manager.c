@@ -631,6 +631,36 @@ gplugin_plugin_manager_free_plugin_list(GSList *plugins_list) {
 }
 
 /**
+ * gplugin_plugin_manager_find_plugin:
+ * @id: The id of the plugin to find.
+ *
+ * Finds the first plugin matching @id.  This function uses
+ * #gplugin_plugin_manager_find_plugins and returns the first plugin in the
+ * list.
+ *
+ * Return value: (transfer full): A referenced #GPluginPlugin instance or NULL
+ *               if no plugin matching @id was found.
+ */
+GPluginPlugin *
+gplugin_plugin_manager_find_plugin(const gchar *id) {
+	GSList *plugins_list = NULL;
+	GPluginPlugin *plugin = NULL;
+
+	g_return_val_if_fail(id != NULL, NULL);
+
+	plugins_list = gplugin_plugin_manager_find_plugins(id);
+	if(plugins_list == NULL)
+		return NULL;
+
+	plugin = g_object_ref(G_OBJECT(plugins_list->data));
+
+	gplugin_plugin_manager_free_plugin_list(plugins_list);
+
+	return plugin;
+}
+
+
+/**
  * gplugin_plugin_manager_load_plugin:
  * @plugin: #GPluginPlugin instance
  * @error: (out): return location for a #GError or null
@@ -692,7 +722,7 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 		}
 
 		for(m = matches; m; m = m->next) {
-			GPluginPlugin *plugin = g_object_ref(G_OBJECT(l->data));
+			GPluginPlugin *plugin = g_object_ref(G_OBJECT(m->data));
 
 			ret = gplugin_plugin_manager_load_plugin(plugin, error);
 

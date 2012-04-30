@@ -24,7 +24,7 @@
  * Tests
  *****************************************************************************/
 static void
-test_gplugin_native_plugin_loader(void) {
+test_basic_plugin_load(void) {
 	GSList *plugins = NULL, *l = NULL;
 	GError *error = NULL;
 
@@ -76,6 +76,40 @@ test_gplugin_native_plugin_loader(void) {
 	gplugin_plugin_manager_free_plugin_list(plugins);
 }
 
+static void
+test_dependent_plugin_load(void) {
+	GPluginPlugin *dependent = NULL, *parent = NULL;
+	GPluginPluginState state;
+	GError *error = NULL;
+
+	/* add the test directory to the plugin manager's search paths */
+	gplugin_plugin_manager_append_path(TEST_DIR);
+
+	/* refresh the plugin manager */
+	gplugin_plugin_manager_refresh();
+
+	/* find the parent plugin and make sure it isn't loaded */
+	parent = gplugin_plugin_manager_find_plugin("basic-native-plugin");
+	g_assert(parent != NULL);
+
+	state = gplugin_plugin_get_state(parent);
+	g_assert_cmpint(state, !=, GPLUGIN_PLUGIN_STATE_LOADED);
+
+	/* find the dependent plugin and make sure it isn't loaded */
+	dependent = gplugin_plugin_manager_find_plugin("dependent-native-plugin");
+	g_assert(dependent != NULL);
+
+	state = gplugin_plugin_get_state(dependent);
+	g_assert_cmpint(state, !=, GPLUGIN_PLUGIN_STATE_LOADED);
+
+	/* now load the dependent plugin */
+	g_assert(gplugin_plugin_manager_load_plugin(dependent, &error));
+
+	/* make sure the parent plugin got loaded too */
+	state = gplugin_plugin_get_state(parent);
+	g_assert_cmpint(state, ==, GPLUGIN_PLUGIN_STATE_LOADED);
+}
+
 gint
 main(gint argc, gchar **argv) {
 
@@ -83,7 +117,8 @@ main(gint argc, gchar **argv) {
 
 	gplugin_init();
 
-	g_test_add_func("/loaders/native/load", test_gplugin_native_plugin_loader);
+	g_test_add_func("/loaders/native/load", test_basic_plugin_load);
+	g_test_add_func("/loaders/native/load_dependent", test_dependent_plugin_load);
 
 	return g_test_run();
 }
