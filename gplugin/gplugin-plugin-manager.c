@@ -726,6 +726,8 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 
 			ret = gplugin_plugin_manager_load_plugin(plugin, error);
 
+			g_object_unref(G_OBJECT(plugin));
+
 			if(ret == TRUE)
 				break;
 		}
