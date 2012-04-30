@@ -143,6 +143,12 @@ target_link_libraries(gplugin
 )
 
 ###############################################################################
+# gplugin-query executable
+###############################################################################
+add_executable(gplugin-query gplugin-query.c)
+target_link_libraries(gplugin-query ${GLIB_LIBRARIES} gplugin)
+
+###############################################################################
 # GObject Introspection
 ###############################################################################
 if(BUILD_GIR)
