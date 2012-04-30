@@ -807,11 +807,11 @@ gplugin_plugin_manager_list_plugins(void) {
 	GQueue *queue = g_queue_new();
 	GList *ret = NULL;
 	GHashTableIter iter;
-	gchar *id = NULL;
+	gpointer key = NULL;
 
 	g_hash_table_iter_init(&iter, plugins);
-	while(g_hash_table_iter_next(&iter, &id, NULL)) {
-		g_queue_push_tail(queue, id);
+	while(g_hash_table_iter_next(&iter, &key, NULL)) {
+		g_queue_push_tail(queue, (gchar *)key);
 	}
 
 	ret = g_list_copy(queue->head);
