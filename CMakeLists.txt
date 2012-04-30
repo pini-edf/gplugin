@@ -108,3 +108,12 @@ add_subdirectory(gplugin)
 add_subdirectory(python)
 add_subdirectory(tests)
 
+###############################################################################
+# Install stuff
+###############################################################################
+# documentation
+install(FILES ChangeLog INSTALL README DESTINATION share/doc/gplugin)
+
+# pkg-config files
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gplugin.pc DESTINATION lib/pkgconfig)
+

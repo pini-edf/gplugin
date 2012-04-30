@@ -51,7 +51,7 @@ set(GPLUGIN_NATIVE_SOURCES
 # Helper Variables
 ###############################################################################
 list(APPEND PUBLIC_HEADERS
-	${GPLUGIN_HEADERS} ${GPLUGIN_PUBLIC_BUILT_HEADERS} gplugin.h
+	${GPLUGIN_HEADERS} ${GPLUGIN_PUBLIC_BUILT_HEADERS} gplugin.h gplugin-native.h
 )
 list(SORT PUBLIC_HEADERS)
 
@@ -167,4 +167,33 @@ if(BUILD_GIR)
 		              ${GPLUGIN_PUBLIC_BUILT_HEADERS}
 	)
 endif(BUILD_GIR)
+
+###############################################################################
+# Install Stuff
+###############################################################################
+# install the main library
+install(TARGETS gplugin LIBRARY DESTINATION lib)
+
+# install the single includes into the main directory
+install(
+	FILES ${CMAKE_CURRENT_BINARY_DIR}/gplugin.h
+	      ${CMAKE_CURRENT_BINARY_DIR}/gplugin-native.h
+	DESTINATION include/gplugin-1.0
+)
+
+# install the normal includes into the gplugin subdirectory
+foreach(HEADER ${GPLUGIN_HEADERS} ${GPLUGIN_NATIVE_HEADERS})
+	install(
+		FILES ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}
+		DESTINATION include/gplugin-1.0/gplugin
+	)
+endforeach(HEADER)
+
+# install the built include into the gplugin subdirectory
+foreach(HEADER ${GPLUGIN_PUBLIC_BUILT_HEADERS})
+	install(
+		FILES ${CMAKE_CURRENT_BINARY_DIR}/${HEADER}
+		DESTINATION include/gplugin-1.0/gplugin
+	)
+endforeach(HEADER)
 
