@@ -32,6 +32,12 @@ option(
 	"On"
 )
 
+option(
+	BUILD_GTK3
+	"Whether or not to build the gtk3 library"
+	"On"
+)
+
 ###############################################################################
 # Dependencies
 ###############################################################################
@@ -105,6 +111,7 @@ configure_file(gplugin.pc.in ${CMAKE_BINARY_DIR}/gplugin.pc @ONLY)
 # Subdirectories
 ###############################################################################
 add_subdirectory(gplugin)
+add_subdirectory(gplugin-gtk)
 add_subdirectory(python)
 add_subdirectory(tests)
 
