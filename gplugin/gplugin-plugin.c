@@ -367,7 +367,7 @@ gplugin_plugin_info_free(GPluginPluginInfo *info) {
 
 	g_free(info->name);
 	g_free(info->version);
-	g_free(info->liecense);
+	g_free(info->license);
 	g_free(info->icon);
 
 	g_free(info->summary);
