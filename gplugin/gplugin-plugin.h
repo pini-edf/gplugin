@@ -80,6 +80,10 @@ struct _GPluginPluginInfo {
 
 	gchar *name;
 	gchar *version;
+	gchar *license;
+
+	gchar *icon;
+
 	gchar *summary;
 	gchar *description;
 	gchar *author;

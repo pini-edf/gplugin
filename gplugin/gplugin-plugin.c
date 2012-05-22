@@ -364,8 +364,12 @@ gplugin_plugin_info_free(GPluginPluginInfo *info) {
 	g_return_if_fail(info);
 
 	g_free(info->id);
+
 	g_free(info->name);
 	g_free(info->version);
+	g_free(info->liecense);
+	g_free(info->icon);
+
 	g_free(info->summary);
 	g_free(info->description);
 	g_free(info->author);
@@ -399,8 +403,12 @@ gplugin_plugin_info_copy(const GPluginPluginInfo *info) {
 	copy->id = (info->id) ? g_strdup(info->id) : NULL;
 	copy->abi_version = info->abi_version;
 	copy->flags = info->flags;
+
 	copy->name = (info->name) ? g_strdup(info->name) : NULL;
 	copy->version = (info->version) ? g_strdup(info->version) : NULL;
+	copy->license = (info->license) ? g_strdup(info->license) : NULL;
+	copy->icon = (info->icon) ? g_strdup(info->icon) : NULL;
+
 	copy->summary = (info->summary) ? g_strdup(info->summary) : NULL;
 	copy->description = (info->description) ? g_strdup(info->description)
 	                                        : NULL;
