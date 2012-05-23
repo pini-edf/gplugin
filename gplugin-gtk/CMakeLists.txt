@@ -5,7 +5,10 @@ if(BUILD_GTK3)
 ###############################################################################
 pkg_check_modules(GTK3 REQUIRED gtk+-3.0>=3.0.0)
 
-add_definitions(-DGPLUGIN_GTK_COMPILATION)
+add_definitions(
+	-DGPLUGIN_GTK_COMPILATION
+	-DG_LOG_DOMAIN="GPluginGtk"
+)
 
 link_directories(
 	${GTK3_LIBRARY_DIRS}
