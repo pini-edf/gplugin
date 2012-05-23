@@ -17,7 +17,7 @@
 
 #ifndef __GI_SCANNER__ /* hide this bit from g-ir-scanner */
 #if !defined(GPLUGIN_GTK_GLOBAL_HEADER_INSIDE) && !defined(GPLUGIN_GTK_COMPILATION)
-#error "only <gpluin/gtk.h> may be included directly"
+#error "only <gplugin/gplugin-gtk.h> may be included directly"
 #endif
 #endif /* __GI_SCANNER__ */
 
