@@ -43,7 +43,7 @@ option(
 ###############################################################################
 include(FindPkgConfig)
 
-set(REQ_GLIB_VER 2.16.0)
+set(REQ_GLIB_VER 2.28.0)
 
 pkg_check_modules(GLIB REQUIRED
 	glib-2.0>=${REQ_GLIB_VER}
