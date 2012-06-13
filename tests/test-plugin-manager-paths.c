@@ -81,6 +81,45 @@ test_gplugin_plugin_manager_paths_multiple_filo(void) {
 	test_path_count(0);
 }
 
+static void
+test_gplugin_plugin_manager_add_app_paths(void) {
+	GHashTable *req = NULL;
+	GList *paths = NULL, *l = NULL;
+	const gchar *appname = "foo";
+	gchar *path = NULL;
+
+	/* build our table of required paths */
+	req = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
+#ifdef __unix__
+	path = g_build_path("/usr/lib", appname, "plugins", NULL);
+	g_hash_table_insert(req, path, GINT_TO_POINTER(FALSE));
+
+	path = g_build_path("/usr/local/lib", appname, "plugins", NULL);
+	g_hash_table_insert(req, path, GINT_TO_POINTER(FALSE));
+#endif /* __unix__ */
+
+	path = g_build_path(g_get_user_config_dir(), appname, "plugins", NULL);
+	g_hash_table_insert(req, path, GINT_TO_POINTER(FALSE));
+
+	/* now add the app paths */
+	gplugin_plugin_manager_add_app_paths("foo");
+
+	/* now get all the paths that the manager is managing and remove them from
+	 * our required table.
+	 */
+	paths = gplugin_plugin_manager_get_paths();
+	for(l = paths; l != NULL; l = l->next)
+		g_hash_table_remove(req, l->data);
+	g_list_free(paths);
+
+	/* now check the hash table size, if it's > 0 then an expected path wasn't
+	 * added.
+	 */
+	g_assert_cmpuint(0, ==, g_hash_table_size(req));
+
+	g_hash_table_destroy(req);
+}
+
 gint
 main(gint argc, gchar **argv) {
 
@@ -99,6 +138,9 @@ main(gint argc, gchar **argv) {
 
 	g_test_add_func("/plugins/paths/add_remove_multiple_filo",
 	                test_gplugin_plugin_manager_paths_multiple_filo);
+
+	g_test_add_func("/plugins/paths/add_app_paths",
+	                test_gplugin_plugin_manager_add_app_paths);
 
 	return g_test_run();
 }
