@@ -1,3 +1,6 @@
+0.0.3:
+  * Added gplugin_plugin_manager_add_app_paths
+
 0.0.2: 2012/04/29
   * Fixed the broken pkg-config file...
   * Added gplugin_plugin_manager_list_plugins
