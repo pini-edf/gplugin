@@ -91,10 +91,10 @@ test_gplugin_plugin_manager_add_app_paths(void) {
 	/* build our table of required paths */
 	req = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 #ifdef __unix__
-	path = g_build_path("/usr/lib", appname, "plugins", NULL);
+	path = g_build_path("/usr/lib", appname, NULL);
 	g_hash_table_insert(req, path, GINT_TO_POINTER(FALSE));
 
-	path = g_build_path("/usr/local/lib", appname, "plugins", NULL);
+	path = g_build_path("/usr/local/lib", appname, NULL);
 	g_hash_table_insert(req, path, GINT_TO_POINTER(FALSE));
 #endif /* __unix__ */
 

@@ -299,8 +299,7 @@ gplugin_plugin_manager_remove_path(const gchar *path) {
  * Adds the application specific paths for @appname.  This will add
  * $prefix/@appname/plugins to the list.
  *
- * On UNIX /usr/lib/@appname/plugins and /usr/local/lib/@appname/plugins will be
- * added.
+ * On UNIX /usr/lib/@appname and /usr/local/lib/@appname will be added.
  *
  * On all platforms $XDG_CONFIG_HOME/@appname/plugins will be added.
  */
@@ -311,11 +310,11 @@ gplugin_plugin_manager_add_app_paths(const gchar *appname) {
 	g_return_if_fail(appname != NULL);
 
 #ifdef __unix__
-	path = g_build_path("/usr/lib", appname, "plugins", NULL);
+	path = g_build_path("/usr/lib", appname, NULL);
 	gplugin_plugin_manager_prepend_path(path);
 	g_free(path);
 
-	path = g_build_path("/usr/local/lib", appname, "plugins", NULL);
+	path = g_build_path("/usr/local/lib", appname, NULL);
 	gplugin_plugin_manager_prepend_path(path);
 	g_free(path);
 #endif
