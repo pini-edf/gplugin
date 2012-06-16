@@ -21,37 +21,52 @@
 #endif
 #endif /* __GI_SCANNER__ */
 
-#ifndef GPLUGIN_GTK_MANAGER_H
-#define GPLUGIN_GTK_MANAGER_H
+#ifndef GPLUGIN_GTK_VIEW_H
+#define GPLUGIN_GTK_VIEW_H
 
-#define GPLUGIN_GTK_TYPE_MANAGER            (gplugin_gtk_manager_get_type())
-#define GPLUGIN_GTK_MANAGER(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GPLUGIN_GTK_TYPE_MANAGER, GPluginGtkManager))
-#define GPLUGIN_GTK_MANAGER_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), GPLUGIN_GTK_TYPE_MANAGER, GPluginGtkManagerClass))
-#define GPLUGIN_GTK_IS_MANAGER(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), GPLUGIN_GTK_TYPE_MANAGER))
-#define GPLUGIN_GTK_IS_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), GPLUGIN_GTK_TYPE_MANAGER))
-#define GPLUING_GTK_MANAGER_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), GPLUGIN_GTK_TYPE_MANAGER, GPluginGtkManagerClass))
+#define GPLUGIN_GTK_TYPE_VIEW            (gplugin_gtk_view_get_type())
+#define GPLUGIN_GTK_VIEW(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GPLUGIN_GTK_TYPE_VIEW, GPluginGtkView))
+#define GPLUGIN_GTK_VIEW_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), GPLUGIN_GTK_TYPE_VIEW, GPluginGtkViewClass))
+#define GPLUGIN_GTK_IS_VIEW(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), GPLUGIN_GTK_TYPE_VIEW))
+#define GPLUGIN_GTK_IS_VIEW_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), GPLUGIN_GTK_TYPE_VIEW))
+#define GPLUING_GTK_VIEW_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), GPLUGIN_GTK_TYPE_VIEW, GPluginGtkViewClass))
 
-typedef struct _GPluginGtkManager           GPluginGtkManager;
-typedef struct _GPluginGtkManagerClass      GPluginGtkManagerClass;
+typedef struct _GPluginGtkView           GPluginGtkView;
+typedef struct _GPluginGtkViewClass      GPluginGtkViewClass;
 
 #include <glib.h>
 #include <glib-object.h>
 
 #include <gtk/gtk.h>
 
-struct _GPluginGtkManager {
-	GtkBox parent;
+struct _GPluginGtkView {
+	GtkTreeView parent;
+
+	void (*_gplugin_reserved1)(void);
+	void (*_gplugin_reserved2)(void);
+	void (*_gplugin_reserved3)(void);
+	void (*_gplugin_reserved4)(void);
 };
 
-struct _GPluginGtkManagerClass {
-	GtkBoxClass parent;
+struct _GPluginGtkViewClass {
+	GtkTreeViewClass parent;
+
+	void (*_gplugin_reserved1)(void);
+	void (*_gplugin_reserved2)(void);
+	void (*_gplugin_reserved3)(void);
+	void (*_gplugin_reserved4)(void);
 };
 
 G_BEGIN_DECLS
 
-GtkWidget *gplugin_gtk_manager_new(void);
+GType gplugin_gtk_view_get_type(void);
+
+GtkWidget *gplugin_gtk_view_new(void);
+
+void gplugin_gtk_view_set_show_internal(GPluginGtkView *view, gboolean show_internal);
+gboolean gplugin_gtk_view_get_show_internal(const GPluginGtkView *view);
 
 G_END_DECLS
 
-#endif /* GPLUGIN_GTK_MANAGER_H */
+#endif /* GPLUGIN_GTK_VIEW_H */
 
