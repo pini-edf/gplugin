@@ -50,6 +50,7 @@ typedef enum /*< prefix=GPLUGIN_PLUGIN_STATE,underscore_name=GPLUGIN_PLUGIN_STAT
 
 typedef enum /*< prefix=GPLUGIN_PLUGIN_FLAGS,underscore_name=GPLUGIN_PLUGIN_FLAGS >*/ {
 	GPLUGIN_PLUGIN_FLAGS_LOAD_ON_QUERY = 1 << 1,
+	GPLUGIN_PLUGIN_FLAGS_INTERNAL = 1 << 2,
 } GPluginPluginFlags;
 
 #include <glib.h>
