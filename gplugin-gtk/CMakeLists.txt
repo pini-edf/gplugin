@@ -1,3 +1,9 @@
+option(
+    BUILD_GTK3
+    "Whether or not to build the gtk3 library"
+    "On"
+)
+
 if(BUILD_GTK3)
 
 ###############################################################################
@@ -19,11 +25,11 @@ include_directories(
 )
 
 set(GPLUGIN_GTK_SOURCES
-	gplugin-gtk-manager.c
+	gplugin-gtk-view.c
 )
 
 set(GPLUGIN_GTK_HEADERS
-	gplugin-gtk-manager.h
+	gplugin-gtk-view.h
 )
 
 ###############################################################################
