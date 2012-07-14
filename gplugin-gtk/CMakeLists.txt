@@ -26,10 +26,20 @@ include_directories(
 
 set(GPLUGIN_GTK_SOURCES
 	gplugin-gtk-view.c
+	gplugin-gtk-store.c
 )
 
 set(GPLUGIN_GTK_HEADERS
 	gplugin-gtk-view.h
+	gplugin-gtk-store.h
+)
+
+set(GPLUGIN_GTK_PRIVATE_SOURCES
+	gplugin-gtk-private.c
+)
+
+set(GPLUGIN_GTK_PRIVATE_HEADERS
+	gplugin-gtk-private.h
 )
 
 ###############################################################################
@@ -49,6 +59,8 @@ configure_file(gplugin-gtk.h.in gplugin-gtk.h @ONLY)
 add_library(gplugin-gtk SHARED
 	${GPLUGIN_GTK_SOURCES}
 	${GPLUGIN_GTK_HEADERS}
+	${GPLUGIN_GTK_PRIVATE_SOURCES}
+	${GPLUGIN_GTK_PRIVATE_HEADERS}
 )
 
 target_link_libraries(gplugin-gtk
