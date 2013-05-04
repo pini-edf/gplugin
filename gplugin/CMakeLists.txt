@@ -155,7 +155,7 @@ if(BUILD_GIR)
 	include(GObjectIntrospection)
 
 	gobject_introspection(
-		FILENAME GPlugin-0.1.gir
+		FILENAME GPlugin-${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.gir
 		PACKAGES gobject-2.0
 		LIBRARY gplugin
 		QUIET
