@@ -26,12 +26,6 @@ option(
 	"On"
 )
 
-option(
-	BUILD_PYTHON
-	"Whether or not to build the Python plugin loader"
-	"On"
-)
-
 ###############################################################################
 # Dependencies
 ###############################################################################
@@ -66,15 +60,6 @@ find_program(GTESTER
 	DOC "gtester executable"
 )
 mark_as_advanced(GTESTER)
-
-# Python
-if(BUILD_PYTHON)
-	include(FindPythonLibs)
-
-	if(PYTHONLIBS_FOUND)
-		pkg_check_modules(PYGOBJECT REQUIRED pygobject-3.0>=3.0.0)
-	endif(PYTHONLIBS_FOUND)
-endif(BUILD_PYTHON)
 
 ###############################################################################
 # Build Info
