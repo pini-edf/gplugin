@@ -33,8 +33,15 @@ endmacro(_gir_list_prefix)
 ###############################################################################
 _pkg_config_variable(g_ir_scanner GIR_SCANNER)
 _pkg_config_variable(g_ir_compiler GIR_COMPILER)
-_pkg_config_variable(girdir GIR_GIRDIR)
-_pkg_config_variable(typelibdir GIR_TYPELIBDIR)
+
+# check if cmake_install_prefix was specified, if so build our paths using that
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+	_pkg_config_variable(girdir GIR_GIRDIR)
+	_pkg_config_variable(typelibdir GIR_TYPELIBDIR)
+else(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+	set(GIR_GIRDIR "${CMAKE_INSTALL_PREFIX}/share/gir-1.0")
+	set(GIR_TYPELIBDIR "${CMAKE_INSTALL_PREFIX}/lib/girepository-1.0")
+endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 ###############################################################################
 # The main function
