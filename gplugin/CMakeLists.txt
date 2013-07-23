@@ -152,20 +152,25 @@ target_link_libraries(gplugin-query ${GLIB_LIBRARIES} gplugin)
 # GObject Introspection
 ###############################################################################
 if(BUILD_GIR)
-	include(GObjectIntrospection)
+	if(APPLE)
+		message("The GObject Introspection build always fails on OS X, "
+		        "skipping")
+	else(APPLE)
+		include(GObjectIntrospection)
 
-	gobject_introspection(
-		FILENAME GPlugin-${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.gir
-		PACKAGES gobject-2.0
-		LIBRARY gplugin
-		QUIET
-		SCANNER_ARGS --add-include-path=${CMAKE_CURRENT_SOURCE_DIR} --warn-all
-		COMPILER_ARGS --includedir=${CMAKE_CURRENT_SOURCE_DIR}
-		SYMBOL_PREFIXES gplugin
-		SOURCES ${GPLUGIN_SOURCES} ${GPLUGIN_HEADERS}
-		BUILT_SOURCES ${GPLUGIN_PUBLIC_BUILT_SOURCES}
-		              ${GPLUGIN_PUBLIC_BUILT_HEADERS}
-	)
+		gobject_introspection(
+			FILENAME GPlugin-${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.gir
+			PACKAGES gobject-2.0
+			LIBRARY gplugin
+			QUIET
+			SCANNER_ARGS --add-include-path=${CMAKE_CURRENT_SOURCE_DIR} --warn-all
+			COMPILER_ARGS --includedir=${CMAKE_CURRENT_SOURCE_DIR}
+			SYMBOL_PREFIXES gplugin
+			SOURCES ${GPLUGIN_SOURCES} ${GPLUGIN_HEADERS}
+			BUILT_SOURCES ${GPLUGIN_PUBLIC_BUILT_SOURCES}
+			              ${GPLUGIN_PUBLIC_BUILT_HEADERS}
+		)
+	endif(APPLE)
 endif(BUILD_GIR)
 
 ###############################################################################
