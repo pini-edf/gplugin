@@ -45,9 +45,18 @@ if(APPLE)
 			OUTPUT_STRIP_TRAILING_WHITESPACE
 		)
 		if(FFI_PREFIX)
-			set(FFI_PKG_CONFIG "${FFI_PREFIX}/lib/pkgconfig")
-			set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${FFI_PKG_CONFIG}")
+			set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${FFI_PREFIX}/lib/pkgconfig")
 		endif(FFI_PREFIX)
+
+		execute_process(
+			COMMAND ${BREW} --prefix cairo
+			OUTPUT_VARIABLE CAIRO_PREFIX
+			OUTPUT_STRIP_TRAILING_WHITESPACE
+		)
+
+		if(CAIRO_PREFIX)
+			set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${CAIRO_PREFIX}/lib/pkgconfig")
+		endif(CAIRO_PREFIX)
 	endif(BREW)
 
 	# fink and macports
