@@ -30,8 +30,6 @@
  */
 void
 gplugin_init(void) {
-	g_type_init();
-
 	gplugin_plugin_manager_init();
 }
 
