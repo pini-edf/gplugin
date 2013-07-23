@@ -31,6 +31,10 @@ option(
 ###############################################################################
 include(FindPkgConfig)
 
+if(${CMAKE_HOST_APPLE})
+	set(ENV{PKG_CONFIG_PATH} $ENV{PKG_CONFIG_PATH} /sw/lib/pkgconfig /opt/local/lib/pkgconfig /usr/local/lib/pkgconfig)
+endif(${CMAKE_HOST_APPLE})
+
 set(REQ_GLIB_VER 2.28.0)
 
 pkg_check_modules(GLIB REQUIRED
