@@ -29,11 +29,32 @@ option(
 ###############################################################################
 # Dependencies
 ###############################################################################
-include(FindPkgConfig)
+if(APPLE)
+	# homebrew stuff
+	set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig")
 
-if(${CMAKE_HOST_APPLE})
-	set(ENV{PKG_CONFIG_PATH} $ENV{PKG_CONFIG_PATH} /sw/lib/pkgconfig /opt/local/lib/pkgconfig /usr/local/lib/pkgconfig)
-endif(${CMAKE_HOST_APPLE})
+	# look for homebrew, if it's installed theres so more mucking we need to do
+	find_program(BREW
+		NAMES brew
+		DOC "brew executable"
+	)
+	if(BREW)
+		execute_process(
+			COMMAND ${BREW} --prefix libffi
+			OUTPUT_VARIABLE FFI_PREFIX
+			OUTPUT_STRIP_TRAILING_WHITESPACE
+		)
+		if(FFI_PREFIX)
+			set(FFI_PKG_CONFIG "${FFI_PREFIX}/lib/pkgconfig")
+			set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${FFI_PKG_CONFIG}")
+		endif(FFI_PREFIX)
+	endif(BREW)
+
+	# fink and macports
+	set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:/sw/lib/pkgconfig:/opt/local/lib/pkgconfig")
+endif(APPLE)
+
+include(FindPkgConfig)
 
 set(REQ_GLIB_VER 2.28.0)
 
