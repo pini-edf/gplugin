@@ -84,7 +84,7 @@ find_program(GLIB_GENMARSHAL
 mark_as_advanced(GLIB_GENMARSHAL)
 
 if(${GLIB_gobject-2.0_VERSION} LESS 2.32.0)
-	set(GLIB_MKENUMS ${CMAKE_SOURCE_DIR}/tools/glib-mkenums)
+	set(GLIB_MKENUMS ${CMAKE_SOURCE_DIR}/tools/glib-mkenums CACHE FILEPATH)
 else(${GLIB_gobject-2.0_VERSION} LESS 2.32.0)
 	find_program(GLIB_MKENUMS
 		NAMES glib-mkenums
