@@ -1,7 +1,7 @@
 ###############################################################################
 # CMake Initialization
 ###############################################################################
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.0)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
 
@@ -65,7 +65,7 @@ endif(APPLE)
 
 include(FindPkgConfig)
 
-set(REQ_GLIB_VER 2.36.0)
+set(REQ_GLIB_VER 2.0.0)
 
 pkg_check_modules(GLIB REQUIRED
 	glib-2.0>=${REQ_GLIB_VER}
