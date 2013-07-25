@@ -83,10 +83,15 @@ find_program(GLIB_GENMARSHAL
 )
 mark_as_advanced(GLIB_GENMARSHAL)
 
-find_program(GLIB_MKENUMS
-	NAMES glib-mkenums
-	DOC "glib-mkenums executable"
-)
+if(${GLIB_gobject-2.0_VERSION} LESS 2.32.0)
+	set(GLIB_MKENUMS ${CMAKE_SOURCE_DIR}/tools/glib-mkenums)
+else(${GLIB_gobject-2.0_VERSION} LESS 2.32.0)
+	find_program(GLIB_MKENUMS
+		NAMES glib-mkenums
+		DOC "glib-mkenums executable"
+	)
+endif(${GLIB_gobject-2.0_VERSION} LESS 2.32.0)
+
 mark_as_advanced(GLIB_MKENUMS)
 
 find_program(GTESTER
