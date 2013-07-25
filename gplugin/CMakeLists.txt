@@ -91,7 +91,8 @@ add_custom_command(
 	OUTPUT gplugin-enums.h
 	DEPENDS ${ENUM_HEADERS} gplugin-enums.h.tmpl
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-	COMMAND ${GLIB_MKENUMS} --template gplugin-enums.h.tmpl ${ENUM_HEADERS} >
+	COMMAND ${GLIB_MKENUMS} --template gplugin-enums.h.tmpl
+		--identifier-prefix GPlugin ${ENUM_HEADERS} >
 		${CMAKE_CURRENT_BINARY_DIR}/gplugin-enums.h
 )
 
@@ -99,7 +100,8 @@ add_custom_command(
 	OUTPUT gplugin-enums.c
 	DEPENDS ${ENUM_HEADERS} gplugin-enums.c.tmpl gplugin-enums.h
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-	COMMAND ${GLIB_MKENUMS} --template gplugin-enums.c.tmpl ${ENUM_HEADERS} >
+	COMMAND ${GLIB_MKENUMS} --template gplugin-enums.c.tmpl
+		--identifier-prefix GPlugin ${ENUM_HEADERS} >
 		${CMAKE_CURRENT_BINARY_DIR}/gplugin-enums.c
 )
 
