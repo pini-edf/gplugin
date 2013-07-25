@@ -30,6 +30,10 @@
  */
 void
 gplugin_init(void) {
+#if !GLIB_CHECK_VERSION(2, 36, 0)
+	g_type_init();
+#endif /* !GLIB_CHECK_VERSION(2, 36, 0) */
+
 	gplugin_plugin_manager_init();
 }
 
