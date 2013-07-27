@@ -179,7 +179,7 @@ endif(BUILD_GIR)
 # Install Stuff
 ###############################################################################
 # install the main library
-install(TARGETS gplugin LIBRARY DESTINATION lib)
+install(TARGETS gplugin DESTINATION lib)
 
 # install gplugin-query
 install(TARGETS gplugin-query RUNTIME DESTINATION bin)
