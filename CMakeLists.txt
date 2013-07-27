@@ -66,6 +66,7 @@ if(APPLE)
 endif(APPLE)
 
 include(FindPkgConfig)
+include(PkgConfigVariable)
 
 set(REQ_GLIB_VER 2.20.0)
 
@@ -79,24 +80,15 @@ pkg_check_modules(GMODULE REQUIRED
 	gmodule-2.0>=${REQ_GLIB_VER}
 )
 
-find_program(GLIB_GENMARSHAL
-	NAMES glib-genmarshal
-	DOC "glib-genmarshal executable"
-)
-mark_as_advanced(GLIB_GENMARSHAL)
+pkg_config_variable(glib-2.0 glib_genmarshal GLIB_GENMARSHAL)
 
 if(${GLIB_gobject-2.0_VERSION} LESS 2.32.0)
 	set(GLIB_MKENUMS ${CMAKE_SOURCE_DIR}/tools/glib-mkenums
 		CACHE FILEPATH "glib-mkenums executable"
 	)
 else(${GLIB_gobject-2.0_VERSION} LESS 2.32.0)
-	find_program(GLIB_MKENUMS
-		NAMES glib-mkenums
-		DOC "glib-mkenums executable"
-	)
+	pkg_config_variable(glib-2.0 glib_mkenums GLIB_MKENUMS)
 endif(${GLIB_gobject-2.0_VERSION} LESS 2.32.0)
-
-mark_as_advanced(GLIB_MKENUMS)
 
 find_program(GTESTER
 	NAMES gtester
