@@ -52,6 +52,7 @@ struct _GPluginPluginLoaderClass {
 	GObjectClass gparent;
 
 	GSList *supported_extensions;
+	GType implementation_type;
 
 	GPluginPlugin *(*query)(GPluginPluginLoader *loader, const gchar *filename, GError **error);
 
@@ -72,6 +73,9 @@ GPluginPlugin *gplugin_plugin_loader_query_plugin(GPluginPluginLoader *loader, c
 
 gboolean gplugin_plugin_loader_load_plugin(GPluginPluginLoader *loader, GPluginPlugin *plugin, GError **error);
 gboolean gplugin_plugin_loader_unload_plugin(GPluginPluginLoader *loader, GPluginPlugin *plugin, GError **error);
+
+void gplugin_plugin_loader_set_implementation_type(GPluginPluginLoader *loader, GType type);
+GType gplugin_plugin_loader_get_implementation_type(GPluginPluginLoader *loader);
 
 G_END_DECLS
 

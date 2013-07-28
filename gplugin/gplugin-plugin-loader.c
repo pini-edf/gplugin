@@ -16,6 +16,12 @@
  */
 
 #include <gplugin/gplugin-plugin-loader.h>
+#include <gplugin/gplugin-plugin-implementation.h>
+
+static void
+gplugin_plugin_loader_class_init(GPluginPluginLoaderClass *klass) {
+	klass->implementation_type = G_TYPE_NONE;
+}
 
 GType
 gplugin_plugin_loader_get_type(void) {
@@ -24,6 +30,7 @@ gplugin_plugin_loader_get_type(void) {
 	if(G_UNLIKELY(type == 0)) {
 		static const GTypeInfo info = {
 			.class_size = sizeof(GPluginPluginLoaderClass),
+			.class_init = (GClassInitFunc)gplugin_plugin_loader_class_init,
 			.instance_size = sizeof(GPluginPluginLoader),
 		};
 
@@ -113,5 +120,42 @@ gplugin_plugin_loader_unload_plugin(GPluginPluginLoader *loader,
 		return klass->unload(loader, plugin, error);
 
 	return FALSE;
+}
+
+/**
+ * gplugin_plugin_loader_set_implementation_type:
+ * @loader: #GPluginPluginLoader instance for which implementation type is set
+ * @type: #GType of a #GPluginPluginLoader
+ *
+ * Sets @type as the implementation type for the loader. When the loader
+ * creates plugins, a #GPluginPluginImplementation instance of the provided type
+ * will also be created.
+ */
+void
+gplugin_plugin_loader_set_implementation_type(GPluginPluginLoader *loader, GType type) {
+	GPluginPluginLoaderClass *klass = NULL;
+
+	g_return_if_fail(loader != NULL);
+	g_return_if_fail(g_type_is_a(type, GPLUGIN_TYPE_PLUGIN_IMPLEMENTATION));
+
+	klass = GPLUGIN_PLUGIN_LOADER_GET_CLASS(loader);
+	klass->implementation_type = type;
+}
+
+/**
+ * gplugin_plugin_loader_get_implementation_type:
+ * @loader: #GPluginPluginLoader instance whose implementation type is returned
+ *
+ * Return value: #GType of the #GPluginPluginImplementation instantiated by
+ *               @loader
+ */
+GType
+gplugin_plugin_loader_get_implementation_type(GPluginPluginLoader *loader) {
+	GPluginPluginLoaderClass *klass = NULL;
+
+	g_return_val_if_fail(loader != NULL, G_TYPE_NONE);
+
+	klass = GPLUGIN_PLUGIN_LOADER_GET_CLASS(loader);
+	return klass->implementation_type;
 }
 

@@ -9,6 +9,7 @@ add_definitions(
 set(GPLUGIN_HEADERS
 	gplugin-core.h
 	gplugin-plugin.h
+	gplugin-plugin-implementation.h
 	gplugin-plugin-loader.h
 	gplugin-plugin-manager.h
 )
@@ -16,6 +17,7 @@ set(GPLUGIN_HEADERS
 set(GPLUGIN_SOURCES
 	gplugin-core.c
 	gplugin-plugin.c
+	gplugin-plugin-implementation.c
 	gplugin-plugin-loader.c
 	gplugin-plugin-manager.c
 )

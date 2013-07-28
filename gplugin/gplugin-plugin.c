@@ -32,6 +32,7 @@ typedef struct {
 
 	GPluginPluginLoader *loader;
 	GPluginPluginInfo *info;
+	GPluginPluginImplementation *implementation;
 
 	GPluginPluginState state;
 } GPluginPluginPrivate;
@@ -160,11 +161,31 @@ gplugin_plugin_set_property(GObject *obj, guint param_id, const GValue *value,
 }
 
 static void
+gplugin_plugin_constructed(GObject *obj) {
+	GPluginPluginLoaderClass *klass;
+	GPluginPluginPrivate *priv;
+
+	G_OBJECT_CLASS(parent_class)->constructed(obj);
+
+	priv = GPLUGIN_PLUGIN_GET_PRIVATE(obj);
+	klass = GPLUGIN_PLUGIN_LOADER_GET_CLASS(priv->loader);
+
+	if (klass->implementation_type != G_TYPE_NONE) {
+		priv->implementation = g_object_new(klass->implementation_type,
+		                                    "gplugin-plugin", obj,
+		                                    NULL);
+	}
+}
+
+static void
 gplugin_plugin_finalize(GObject *obj) {
 	GPluginPluginPrivate *priv = GPLUGIN_PLUGIN_GET_PRIVATE(obj);
 
+	g_object_set(priv->implementation, "gplugin-plugin", NULL, NULL);
+
 	g_free(priv->filename);
 	g_object_unref(priv->loader);
+	g_object_unref(priv->implementation);
 	gplugin_plugin_info_free(priv->info);
 
 	G_OBJECT_CLASS(parent_class)->finalize(obj);
@@ -180,6 +201,7 @@ gplugin_plugin_class_init(GPluginPluginClass *klass) {
 
 	obj_class->get_property = gplugin_plugin_get_property;
 	obj_class->set_property = gplugin_plugin_set_property;
+	obj_class->constructed = gplugin_plugin_constructed;
 	obj_class->finalize = gplugin_plugin_finalize;
 
 	g_object_class_install_property(obj_class, PROP_FILENAME,
@@ -290,6 +312,24 @@ gplugin_plugin_get_info(const GPluginPlugin *plugin) {
 	priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
 
 	return priv->info;
+}
+
+/**
+ * gplugin_plugin_get_implementation:
+ * @plugin: #GPluginPlugin instance
+ *
+ * Return value: (transfer none): The #GPluginPluginImplementation instance of
+ *                                @plugin
+ */
+GPluginPluginImplementation *
+gplugin_plugin_get_implementation(const GPluginPlugin *plugin) {
+	GPluginPluginPrivate *priv = NULL;
+
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), NULL);
+
+	priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
+
+	return priv->implementation;
 }
 
 /**
