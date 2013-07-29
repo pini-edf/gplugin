@@ -432,7 +432,7 @@ gplugin_plugin_info_get_type(void) {
 }
 
 /**
- * gplugin_plugin_info_new:
+ * gplugin_plugin_info_new: (skip)
  * @first: The first property name, or %NULL
  * @...: The value of the first property, followed optionally by more name/value
  *       pairs, followed by %NULL
@@ -440,7 +440,7 @@ gplugin_plugin_info_get_type(void) {
  * Creates a new #GPluginPluginInfo instance of the type provided by
  * gplugin_set_plugin_info_type().
  *
- * Return value: The new #GPluginPluginInfo instance.
+ * Return value: (transfer full): The new #GPluginPluginInfo instance.
  */
 GPluginPluginInfo *
 gplugin_plugin_info_new(const char *first, ...) {
