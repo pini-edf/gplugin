@@ -25,6 +25,7 @@
 #define GPLUGIN_CORE_H
 
 #include <glib.h>
+#include <glib-object.h>
 
 #define GPLUGIN_DOMAIN    (g_quark_from_static_string("gplugin"))
 
@@ -32,6 +33,9 @@ G_BEGIN_DECLS
 
 void gplugin_init(void);
 void gplugin_uninit(void);
+
+void gplugin_set_plugin_info_type(GType type);
+GType gplugin_get_plugin_info_type(void);
 
 G_END_DECLS
 

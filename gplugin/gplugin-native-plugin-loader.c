@@ -29,7 +29,7 @@
 /******************************************************************************
  * Typedefs
  *****************************************************************************/
-typedef const GPluginPluginInfo *(*GPluginNativePluginQueryFunc)(void);
+typedef const GPluginPluginInfo *(*GPluginNativePluginQueryFunc)(GType info_type);
 typedef gboolean (*GPluginNativePluginLoadFunc)(GPluginNativePlugin *plugin);
 typedef gboolean (*GPluginNativePluginUnloadFunc)(GPluginNativePlugin *plugin);
 
@@ -126,14 +126,14 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	/* now we have all of our symbols, so let's see if this plugin will return a
 	 * valid GPluginPluginInfo structure
 	 */
-	info = ((GPluginNativePluginQueryFunc)(query))();
-	if(!info) {
+	info = ((GPluginNativePluginQueryFunc)(query))(gplugin_get_plugin_info_type());
+	if(!GPLUGIN_IS_PLUGIN_INFO(info)) {
 		g_module_close(module);
 
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     "the query function did not return a "
-			                     "GPluginPluginInfo structure");
+			                     "GPluginPluginInfo instance");
 		}
 
 		return NULL;
@@ -154,6 +154,8 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     "failed to create plugin instance");
 		}
+
+		g_object_unref(G_OBJECT(info));
 
 		return NULL;
 	}
@@ -184,7 +186,7 @@ gplugin_native_plugin_loader_load(GPluginPluginLoader *loader,
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     "load function for %s is NULL",
-			                      info->name);
+			                     gplugin_plugin_info_get_name(info));
 		}
 
 		return FALSE;
@@ -227,7 +229,7 @@ gplugin_native_plugin_loader_unload(GPluginPluginLoader *loader,
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     "unload function for %s is NULL",
-			                      info->name);
+			                     gplugin_plugin_info_get_name(info));
 		}
 
 		return FALSE;

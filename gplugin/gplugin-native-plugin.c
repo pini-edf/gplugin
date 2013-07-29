@@ -131,7 +131,13 @@ gplugin_native_plugin_priv_use(GTypePlugin *plugin) {
 	if(!gplugin_native_plugin_use(native)) {
 		const GPluginPluginInfo *info =
 			gplugin_plugin_get_info(GPLUGIN_PLUGIN(native));
-		const gchar *name = (info) ? info->name : "(unknown)";
+		const gchar *name = NULL;
+
+		if(GPLUGIN_IS_PLUGIN_INFO(info))
+			name = gplugin_plugin_info_get_name(info);
+
+		if(name == NULL)
+			name = "(unknown)";
 
 		g_warning("Could not reload previously loaded plugin '%s'\n", name);
 	}
@@ -318,8 +324,13 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
 			if(!info->loaded) {
 				const GPluginPluginInfo *plugin_info =
 					gplugin_plugin_get_info(GPLUGIN_PLUGIN(plugin));
-				const gchar *name = (plugin_info) ? plugin_info->name
-				                                  : "(unknown)";
+				const gchar *name = NULL;
+
+				if(GPLUGIN_IS_PLUGIN_INFO(plugin_info))
+					name = gplugin_plugin_info_get_name(plugin_info);
+
+				if(name == NULL)
+					name = "(unknown)";
 
 				g_warning("plugin '%s' failed to register type '%s'\n",
 				          name, g_type_name(info->type));

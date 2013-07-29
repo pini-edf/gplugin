@@ -21,6 +21,27 @@
 #include <glib.h>
 
 /******************************************************************************
+ * GTypes
+ *****************************************************************************/
+typedef struct {
+	GPluginPluginInfo parent;
+} TestGPluginPluginInfo;
+
+typedef struct {
+	GPluginPluginInfoClass parent;
+} TestGPluginPluginInfoClass;
+
+G_DEFINE_TYPE(TestGPluginPluginInfo, test_gplugin_plugin_info, GPLUGIN_TYPE_PLUGIN_INFO);
+
+static void
+test_gplugin_plugin_info_init(TestGPluginPluginInfo *info) {
+}
+
+static void
+test_gplugin_plugin_info_class_init(TestGPluginPluginInfoClass *klass) {
+}
+
+/******************************************************************************
  * Tests
  *****************************************************************************/
 static void
@@ -50,16 +71,21 @@ test_basic_plugin_load(void) {
 		info = gplugin_plugin_get_info(plugin);
 		g_assert(info != NULL);
 
-		g_assert_cmpstr(info->id, ==, "basic-native-plugin");
-		g_assert_cmpint(info->abi_version, ==,
+		g_assert_cmpuint(G_OBJECT_TYPE(info), ==,
+		                 test_gplugin_plugin_info_get_type());
+
+		g_assert_cmpstr(gplugin_plugin_info_get_id(info), ==,
+		                "basic-native-plugin");
+		g_assert_cmpint(gplugin_plugin_info_get_abi_version(info), ==,
 		                GPLUGIN_NATIVE_PLUGIN_ABI_VERSION);
-		g_assert_cmpuint(info->flags, ==, 0);
-		g_assert_cmpstr(info->name, ==, "name");
-		g_assert_cmpstr(info->version, ==, "version");
-		g_assert_cmpstr(info->summary, ==, "summary");
-		g_assert_cmpstr(info->description, ==, "description");
-		g_assert_cmpstr(info->author, ==, "author");
-		g_assert_cmpstr(info->website, ==, "website");
+		g_assert_cmpuint(gplugin_plugin_info_get_flags(info), ==, 0);
+		g_assert_cmpstr(gplugin_plugin_info_get_name(info), ==, "name");
+		g_assert_cmpstr(gplugin_plugin_info_get_version(info), ==, "version");
+		g_assert_cmpstr(gplugin_plugin_info_get_summary(info), ==, "summary");
+		g_assert_cmpstr(gplugin_plugin_info_get_description(info), ==,
+		                "description");
+		g_assert_cmpstr(gplugin_plugin_info_get_author(info), ==, "author");
+		g_assert_cmpstr(gplugin_plugin_info_get_website(info), ==, "website");
 
 		g_assert(gplugin_plugin_manager_load_plugin(plugin, &error));
 
@@ -140,6 +166,7 @@ main(gint argc, gchar **argv) {
 	g_test_init(&argc, &argv, NULL);
 
 	gplugin_init();
+	gplugin_set_plugin_info_type(test_gplugin_plugin_info_get_type());
 
 	g_test_add_func("/loaders/native/load", test_basic_plugin_load);
 	g_test_add_func("/loaders/native/load_dependent",

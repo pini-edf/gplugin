@@ -17,21 +17,20 @@
 #include <gplugin.h>
 #include <gplugin-native.h>
 
-static const GPluginPluginInfo info = {
-	.id = "basic-native-plugin",
-	.abi_version = GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-	.flags = 0,
-	.name = "name",
-	.version = "version",
-	.summary = "summary",
-	.description = "description",
-	.author = "author",
-	.website = "website",
-};
-
-G_MODULE_EXPORT const GPluginPluginInfo *
-gplugin_plugin_query(void) {
-	return &info;
+G_MODULE_EXPORT GPluginPluginInfo *
+gplugin_plugin_query(GType type) {
+	return g_object_new(type,
+		"id", "basic-native-plugin",
+		"abi_version", GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
+		"flags", 0,
+		"name", "name",
+		"version", "version",
+		"summary", "summary",
+		"description", "description",
+		"author", "author",
+		"website", "website",
+		NULL
+	);
 }
 
 G_MODULE_EXPORT gboolean

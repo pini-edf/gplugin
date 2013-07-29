@@ -9,7 +9,7 @@ add_definitions(
 set(GPLUGIN_HEADERS
 	gplugin-core.h
 	gplugin-plugin.h
-	gplugin-plugin-implementation.h
+	gplugin-plugin-info.h
 	gplugin-plugin-loader.h
 	gplugin-plugin-manager.h
 )
@@ -17,7 +17,7 @@ set(GPLUGIN_HEADERS
 set(GPLUGIN_SOURCES
 	gplugin-core.c
 	gplugin-plugin.c
-	gplugin-plugin-implementation.c
+	gplugin-plugin-info.c
 	gplugin-plugin-loader.c
 	gplugin-plugin-manager.c
 )
@@ -87,6 +87,7 @@ configure_file(gplugin-native.h.in gplugin-native.h @ONLY)
 ###############################################################################
 set(ENUM_HEADERS
 	gplugin-plugin.h
+	gplugin-plugin-info.h
 )
 
 add_custom_command(
@@ -181,7 +182,7 @@ endif(BUILD_GIR)
 # Install Stuff
 ###############################################################################
 # install the main library
-install(TARGETS gplugin LIBRARY DESTINATION lib)
+install(TARGETS gplugin DESTINATION lib)
 
 # install gplugin-query
 install(TARGETS gplugin-query RUNTIME DESTINATION bin)

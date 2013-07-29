@@ -34,10 +34,6 @@
 typedef struct _GPluginPlugin          GPluginPlugin;
 typedef struct _GPluginPluginClass     GPluginPluginClass;
 
-#define GPLUGIN_TYPE_PLUGIN_INFO       (gplugin_plugin_info_get_type())
-
-typedef struct _GPluginPluginInfo      GPluginPluginInfo;
-
 typedef enum /*< prefix=GPLUGIN_PLUGIN_STATE,underscore_name=GPLUGIN_PLUGIN_STATE >*/ {
 	GPLUGIN_PLUGIN_STATE_UNKNOWN = -1,
 	GPLUGIN_PLUGIN_STATE_ERROR = 0,
@@ -48,16 +44,11 @@ typedef enum /*< prefix=GPLUGIN_PLUGIN_STATE,underscore_name=GPLUGIN_PLUGIN_STAT
 	GPLUGIN_PLUGIN_STATES, /*< skip >*/
 } GPluginPluginState;
 
-typedef enum /*< prefix=GPLUGIN_PLUGIN_FLAGS,underscore_name=GPLUGIN_PLUGIN_FLAGS >*/ {
-	GPLUGIN_PLUGIN_FLAGS_LOAD_ON_QUERY = 1 << 1,
-	GPLUGIN_PLUGIN_FLAGS_INTERNAL = 1 << 2,
-} GPluginPluginFlags;
-
 #include <glib.h>
 #include <glib-object.h>
 
+#include <gplugin/gplugin-plugin-info.h>
 #include <gplugin/gplugin-plugin-loader.h>
-#include <gplugin/gplugin-plugin-implementation.h>
 
 struct _GPluginPlugin {
 	GObject gparent;
@@ -74,40 +65,13 @@ struct _GPluginPluginClass {
 	void (*_gplugin_reserved_4)(void);
 };
 
-struct _GPluginPluginInfo {
-	gchar *id;
-
-	guint32 abi_version;
-	GPluginPluginFlags flags;
-
-	gchar *name;
-	gchar *version;
-	gchar *license;
-
-	gchar *icon;
-
-	gchar *summary;
-	gchar *description;
-	gchar *author;
-	gchar *website;
-
-	GSList *dependencies;
-};
-
 G_BEGIN_DECLS
 
 GType gplugin_plugin_get_type(void);
 
 const gchar *gplugin_plugin_get_filename(const GPluginPlugin *plugin);
 GPluginPluginLoader *gplugin_plugin_get_loader(const GPluginPlugin *plugin);
-const GPluginPluginInfo *gplugin_plugin_get_info(const GPluginPlugin *plugin);
-
-GPluginPluginImplementation *gplugin_plugin_get_implementation(const GPluginPlugin *plugin);
-
-GType gplugin_plugin_info_get_type(void);
-
-GPluginPluginInfo *gplugin_plugin_info_copy(const GPluginPluginInfo *info);
-void gplugin_plugin_info_free(GPluginPluginInfo *info);
+GPluginPluginInfo *gplugin_plugin_get_info(const GPluginPlugin *plugin);
 
 GPluginPluginState gplugin_plugin_get_state(const GPluginPlugin *plugin);
 void gplugin_plugin_set_state(GPluginPlugin *plugin, GPluginPluginState state);
