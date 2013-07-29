@@ -70,7 +70,6 @@ enum {
  * Globals
  *****************************************************************************/
 static GObjectClass *parent_class = NULL;
-static GParamSpec *properties[N_PROPERTIES] = { NULL };
 
 /******************************************************************************
  * Private API
@@ -325,90 +324,88 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 	obj_class->finalize = gplugin_plugin_info_finalize;
 
 	/* properties */
-	properties[PROP_ID] =
+	g_object_class_install_property(obj_class, PROP_ID,
 		g_param_spec_string("id", "id",
 		                    "The ID of the plugin",
 		                    NULL,
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
-		                    G_PARAM_CONSTRUCT_ONLY);
+		                    G_PARAM_CONSTRUCT_ONLY));
 
-	properties[PROP_ABI_VERSION] =
+	g_object_class_install_property(obj_class, PROP_ABI_VERSION,
 		g_param_spec_uint("abi_version", "abi_version",
 		                  "The ABI version of the plugin",
 		                  0, G_MAXUINT32, 0,
 		                  G_PARAM_READWRITE |
-		                  G_PARAM_CONSTRUCT_ONLY);
+		                  G_PARAM_CONSTRUCT_ONLY));
 
-	properties[PROP_FLAGS] =
+	g_object_class_install_property(obj_class, PROP_FLAGS,
 		g_param_spec_flags("flags", "flags",
 		                   "The flags for the plugin",
 		                   GPLUGIN_TYPE_PLUGIN_INFO_FLAGS, 0,
 		                   G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
-		                   G_PARAM_CONSTRUCT_ONLY);
+		                   G_PARAM_CONSTRUCT_ONLY));
 
-	properties[PROP_NAME] =
+	g_object_class_install_property(obj_class, PROP_NAME,
 		g_param_spec_string("name", "name",
 		                    "The name of the plugin",
 		                    NULL,
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
-		                    G_PARAM_CONSTRUCT_ONLY);
+		                    G_PARAM_CONSTRUCT_ONLY));
 
-	properties[PROP_VERSION] =
+	g_object_class_install_property(obj_class, PROP_VERSION,
 		g_param_spec_string("version", "version",
 		                    "The version of the plugin",
 		                    NULL,
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
-		                    G_PARAM_CONSTRUCT_ONLY);
+		                    G_PARAM_CONSTRUCT_ONLY));
 
-	properties[PROP_LICENSE] =
+	g_object_class_install_property(obj_class, PROP_LICENSE,
 		g_param_spec_string("license", "license",
 		                    "The license of the plugin",
 		                    NULL,
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
-		                    G_PARAM_CONSTRUCT_ONLY);
+		                    G_PARAM_CONSTRUCT_ONLY));
 
-	properties[PROP_ICON] =
+	g_object_class_install_property(obj_class, PROP_ICON,
 		g_param_spec_string("icon", "icon",
 		                    "The file path of the icon for the plugin",
 		                    NULL,
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
-		                    G_PARAM_CONSTRUCT_ONLY);
+		                    G_PARAM_CONSTRUCT_ONLY));
 
-	properties[PROP_SUMMARY] =
+	g_object_class_install_property(obj_class, PROP_SUMMARY,
 		g_param_spec_string("summary", "summary",
 		                    "The summary of the plugin",
 		                    NULL,
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
-		                    G_PARAM_CONSTRUCT_ONLY);
+		                    G_PARAM_CONSTRUCT_ONLY));
 
-	properties[PROP_DESCRIPTION] =
+	g_object_class_install_property(obj_class, PROP_DESCRIPTION,
 		g_param_spec_string("description", "description",
 		                    "The description of the plugin",
 		                    NULL,
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
-		                    G_PARAM_CONSTRUCT_ONLY);
+		                    G_PARAM_CONSTRUCT_ONLY));
 
-	properties[PROP_AUTHOR] =
+	g_object_class_install_property(obj_class, PROP_AUTHOR,
 		g_param_spec_string("author", "author",
 		                    "The author of the plugin",
 		                    NULL,
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
-		                    G_PARAM_CONSTRUCT_ONLY);
+		                    G_PARAM_CONSTRUCT_ONLY));
 
-	properties[PROP_WEBSITE] =
+	g_object_class_install_property(obj_class, PROP_WEBSITE,
 		g_param_spec_string("website", "website",
 		                    "The website of the plugin",
 		                    NULL,
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
-		                    G_PARAM_CONSTRUCT_ONLY);
+		                    G_PARAM_CONSTRUCT_ONLY));
 
-	properties[PROP_DEPENDENCIES] =
+	g_object_class_install_property(obj_class, PROP_DEPENDENCIES,
 		g_param_spec_pointer("dependencies", "dependencies",
 		                     "The dependencies of the plugin",
 		                     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
-		                     G_PARAM_CONSTRUCT_ONLY);
-
-	g_object_class_install_properties(obj_class, N_PROPERTIES, properties);
+		                     G_PARAM_CONSTRUCT_ONLY));
 }
 
 /******************************************************************************
