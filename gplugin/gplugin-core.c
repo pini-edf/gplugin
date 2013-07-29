@@ -51,12 +51,12 @@ gplugin_init(void) {
  */
 void
 gplugin_init_with_args(GType info_type) {
-	g_return_if_fail(g_type_is_a(info_type, GPLUGIN_TYPE_PLUGIN_INFO));
-	g_return_if_fail(!G_TYPE_IS_ABSTRACT(info_type));
-
 #if !GLIB_CHECK_VERSION(2, 36, 0)
 	g_type_init();
 #endif /* !GLIB_CHECK_VERSION(2, 36, 0) */
+
+	g_return_if_fail(g_type_is_a(info_type, GPLUGIN_TYPE_PLUGIN_INFO));
+	g_return_if_fail(!G_TYPE_IS_ABSTRACT(info_type));
 
 	plugin_info_type = info_type;
 
