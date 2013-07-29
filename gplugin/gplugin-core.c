@@ -39,26 +39,11 @@ GType plugin_info_type = G_TYPE_INVALID;
  */
 void
 gplugin_init(void) {
-	gplugin_init_with_args(GPLUGIN_TYPE_PLUGIN_INFO);
-}
-
-/**
- * gplugin_init_with_args:
- * @info_type: The #GType to use when creating #GPluginPluginInfo instances.
- *
- * Initializes the GPlugin library and sets the #GType to use when creating
- * #GPluginPluginInfo instances.
- */
-void
-gplugin_init_with_args(GType info_type) {
 #if !GLIB_CHECK_VERSION(2, 36, 0)
 	g_type_init();
 #endif /* !GLIB_CHECK_VERSION(2, 36, 0) */
 
-	g_return_if_fail(g_type_is_a(info_type, GPLUGIN_TYPE_PLUGIN_INFO));
-	g_return_if_fail(!G_TYPE_IS_ABSTRACT(info_type));
-
-	plugin_info_type = info_type;
+	plugin_info_type = GPLUGIN_TYPE_PLUGIN_INFO;
 
 	gplugin_plugin_manager_init();
 }
@@ -71,6 +56,21 @@ gplugin_init_with_args(GType info_type) {
 void
 gplugin_uninit(void) {
 	gplugin_plugin_manager_uninit();
+}
+
+/**
+ * gplugin_set_plugin_info_type:
+ * @info_type: The #GType of the #GPluginPluginInfo instance that plugins
+ *             should create in their query method.
+ *
+ * Sets the #GPluginPluginInfo instance type that plugins should create.
+ */
+void
+gplugin_set_plugin_info_type(GType info_type) {
+	g_return_if_fail(g_type_is_a(info_type, GPLUGIN_TYPE_PLUGIN_INFO));
+	g_return_if_fail(!G_TYPE_IS_ABSTRACT(info_type));
+
+	plugin_info_type = info_type;
 }
 
 /**

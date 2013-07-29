@@ -165,7 +165,8 @@ main(gint argc, gchar **argv) {
 
 	g_test_init(&argc, &argv, NULL);
 
-	gplugin_init_with_args(test_gplugin_plugin_info_get_type());
+	gplugin_init();
+	gplugin_set_plugin_info_type(test_gplugin_plugin_info_get_type());
 
 	g_test_add_func("/loaders/native/load", test_basic_plugin_load);
 	g_test_add_func("/loaders/native/load_dependent",

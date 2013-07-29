@@ -32,7 +32,6 @@
 G_BEGIN_DECLS
 
 void gplugin_init(void);
-void gplugin_init_with_args(GType info_type);
 void gplugin_uninit(void);
 
 void gplugin_set_plugin_info_type(GType type);
