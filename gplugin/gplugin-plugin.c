@@ -91,12 +91,9 @@ gplugin_plugin_set_info(GPluginPlugin *plugin, GPluginPluginInfo *info) {
 	GPluginPluginPrivate *priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
 
 	if(priv->info)
-		gplugin_plugin_info_free(priv->info);
+		g_object_unref(G_OBJECT(priv->info));
 
-	if(info)
-		priv->info = gplugin_plugin_info_copy(info);
-	else
-		priv->info = NULL;
+	priv->info = (info) ? g_object_ref(G_OBJECT(info)) : NULL;
 }
 
 gchar *
@@ -123,7 +120,7 @@ gplugin_plugin_get_property(GObject *obj, guint param_id, GValue *value,
 			g_value_set_object(value, gplugin_plugin_get_loader(plugin));
 			break;
 		case PROP_INFO:
-			g_value_set_boxed(value, gplugin_plugin_get_info(plugin));
+			g_value_set_object(value, gplugin_plugin_get_info(plugin));
 			break;
 		case PROP_STATE:
 			g_value_set_enum(value, gplugin_plugin_get_state(plugin));
@@ -148,7 +145,7 @@ gplugin_plugin_set_property(GObject *obj, guint param_id, const GValue *value,
 			gplugin_plugin_set_loader(plugin, g_value_get_object(value));
 			break;
 		case PROP_INFO:
-			gplugin_plugin_set_info(plugin, g_value_get_boxed(value));
+			gplugin_plugin_set_info(plugin, g_value_get_object(value));
 			break;
 		case PROP_STATE:
 			gplugin_plugin_set_state(plugin, g_value_get_enum(value));
@@ -165,7 +162,9 @@ gplugin_plugin_finalize(GObject *obj) {
 
 	g_free(priv->filename);
 	g_object_unref(priv->loader);
-	gplugin_plugin_info_free(priv->info);
+
+	if(priv->info)
+		g_object_unref(G_OBJECT(priv->info));
 
 	G_OBJECT_CLASS(parent_class)->finalize(obj);
 }
@@ -195,7 +194,7 @@ gplugin_plugin_class_init(GPluginPluginClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
 
 	g_object_class_install_property(obj_class, PROP_INFO,
-		g_param_spec_boxed("info", "info",
+		g_param_spec_object("info", "info",
 		                   "The information for the plugin",
 		                   GPLUGIN_TYPE_PLUGIN_INFO,
 		                   G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
@@ -207,6 +206,14 @@ gplugin_plugin_class_init(GPluginPluginClass *klass) {
 		                  GPLUGIN_PLUGIN_STATE_UNKNOWN,
 		                  G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 
+	/**
+	 * GPluginPlugin::state-changed:
+	 * @plugin: The #GPluginPlugin that changed states.
+	 * @oldstate: The old #GPluginPluginState.
+	 * @newstate: The new state of @plugin.
+	 *
+	 * Emitted when @plugin changes state.
+	 */
 	signals[SIG_STATE_CHANGED] =
 		g_signal_new("state-changed",
 		             G_OBJECT_CLASS_TYPE(klass),
@@ -279,9 +286,9 @@ gplugin_plugin_get_loader(const GPluginPlugin *plugin) {
  * gplugin_plugin_get_info:
  * @plugin: #GPluginPlugin instance
  *
- * Return value: (transfer none): The #GPluginPluginInfo instance for @plugin
+ * Return value: (transfer full): The #GPluginPluginInfo instance for @plugin
  */
-const GPluginPluginInfo *
+GPluginPluginInfo *
 gplugin_plugin_get_info(const GPluginPlugin *plugin) {
 	GPluginPluginPrivate *priv = NULL;
 
@@ -289,7 +296,7 @@ gplugin_plugin_get_info(const GPluginPlugin *plugin) {
 
 	priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
 
-	return priv->info;
+	return (priv->info) ? g_object_ref(G_OBJECT(priv->info)) : NULL;
 }
 
 /**
@@ -333,95 +340,5 @@ gplugin_plugin_set_state(GPluginPlugin *plugin, GPluginPluginState state) {
 
 	g_signal_emit(plugin, signals[SIG_STATE_CHANGED], 0,
 	              oldstate, priv->state);
-}
-
-/******************************************************************************
- * GPluginPluginInfo API
- *****************************************************************************/
-GType
-gplugin_plugin_info_get_type(void) {
-	static GType type = 0;
-
-	if(G_UNLIKELY(type == 0)) {
-		type = g_boxed_type_register_static("GPluginPluginInfo",
-		                                    (GBoxedCopyFunc)gplugin_plugin_info_copy,
-		                                    (GBoxedFreeFunc)gplugin_plugin_info_free);
-	}
-
-	return type;
-}
-
-/**
- * gplugin_plugin_info_free:
- * @info: #GPluginPluginInfo instance to free
- *
- * Free's an allocated #GPluginPluginInfo instance
- */
-void
-gplugin_plugin_info_free(GPluginPluginInfo *info) {
-	GSList *l = NULL;
-
-	g_return_if_fail(info);
-
-	g_free(info->id);
-
-	g_free(info->name);
-	g_free(info->version);
-	g_free(info->license);
-	g_free(info->icon);
-
-	g_free(info->summary);
-	g_free(info->description);
-	g_free(info->author);
-	g_free(info->website);
-
-	for(l = info->dependencies; l; l = l->next)
-		g_free(l->data);
-
-	g_slist_free(info->dependencies);
-
-	g_slice_free(GPluginPluginInfo, info);
-}
-
-/**
- * gplugin_plugin_info_copy:
- * @info: #GPluginPluginInfo instance
- *
- * Creates an allocated copy of @info
- *
- * Return value: (transfer full): A newly allocated #GPluginPluginInfo instance
- */
-GPluginPluginInfo *
-gplugin_plugin_info_copy(const GPluginPluginInfo *info) {
-	GPluginPluginInfo *copy = NULL;
-	GSList *l = NULL;
-
-	g_return_val_if_fail(info, NULL);
-
-	copy = g_slice_new(GPluginPluginInfo);
-
-	copy->id = (info->id) ? g_strdup(info->id) : NULL;
-	copy->abi_version = info->abi_version;
-	copy->flags = info->flags;
-
-	copy->name = (info->name) ? g_strdup(info->name) : NULL;
-	copy->version = (info->version) ? g_strdup(info->version) : NULL;
-	copy->license = (info->license) ? g_strdup(info->license) : NULL;
-	copy->icon = (info->icon) ? g_strdup(info->icon) : NULL;
-
-	copy->summary = (info->summary) ? g_strdup(info->summary) : NULL;
-	copy->description = (info->description) ? g_strdup(info->description)
-	                                        : NULL;
-	copy->author = (info->author) ? g_strdup(info->author) : NULL;
-	copy->website = (info->website) ? g_strdup(info->website) : NULL;
-
-	copy->dependencies = NULL;
-
-	for(l = info->dependencies; l; l = l->next) {
-		copy->dependencies = g_slist_append(copy->dependencies,
-		                                    g_strdup(l->data));
-	}
-
-	return copy;
 }
 

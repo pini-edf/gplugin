@@ -62,21 +62,23 @@ output_plugin(const gchar *id) {
 		if(!first)
 			printf("\n");
 
-		printf("  name:        %s\n", info->name);
-		printf("  version:     %s\n", info->version);
-		printf("  summary:     %s\n", info->summary);
-		printf("  author:      %s\n", info->author);
-		printf("  website:     %s\n", info->website);
+		printf("  name:        %s\n", gplugin_plugin_info_get_name(info));
+		printf("  version:     %s\n", gplugin_plugin_info_get_version(info));
+		printf("  summary:     %s\n", gplugin_plugin_info_get_summary(info));
+		printf("  author:      %s\n", gplugin_plugin_info_get_author(info));
+		printf("  website:     %s\n", gplugin_plugin_info_get_website(info));
 		if(verbosity > 0)
 			printf("  filename:    %s\n", gplugin_plugin_get_filename(plugin));
 		if(verbosity > 1) {
 			GPluginPluginLoader *loader = gplugin_plugin_get_loader(plugin);
 
-			printf("  abi version: %d\n", info->abi_version);
-			printf("  flags:       %u\n", info->flags);
+			printf("  abi version: %d\n",
+			       gplugin_plugin_info_get_abi_version(info));
+			printf("  flags:       %u\n", gplugin_plugin_info_get_flags(info));
 			printf("  loader:      %s\n", G_OBJECT_TYPE_NAME(loader));
 		}
-		printf("  description: %s\n", info->description);
+		printf("  description: %s\n",
+		       gplugin_plugin_info_get_description(info));
 
 		if(first)
 			first = FALSE;

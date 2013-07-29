@@ -570,14 +570,13 @@ gplugin_plugin_manager_refresh(void) {
 					const GPluginPluginInfo *info =
 						gplugin_plugin_get_info(plugin);
 
-					/* throw a warning if the info->id is NULL */
-					if(info->id == NULL)
-						g_warning("Plugin %s has a NULL id.",  real_filename);
 
-					/* We need a GSList for the plugins hash table since
-					 * multiple plugins could have the same id.
-					 */
+					const gchar *id = gplugin_plugin_info_get_id(info);
 					GSList *l = NULL;
+
+					/* throw a warning if the info->id is NULL */
+					if(id == NULL)
+						g_warning("Plugin %s has a NULL id.",  real_filename);
 
 					/* now insert into our view */
 					g_hash_table_insert(plugins_filename_view, real_filename,
@@ -586,9 +585,9 @@ gplugin_plugin_manager_refresh(void) {
 					/* Grab the list of plugins with our id and prepend the new
 					 * plugin to it before updating it.
 					 */
-					l = g_hash_table_lookup(plugins, info->id);
+					l = g_hash_table_lookup(plugins, id);
 					l = g_slist_prepend(l, g_object_ref(plugin));
-					g_hash_table_insert(plugins, g_strdup(info->id), l);
+					g_hash_table_insert(plugins, g_strdup(id), l);
 
 					/* finally set the plugin state queried */
 					gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_QUERIED);
@@ -731,7 +730,7 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 	/* now walk through any dependencies the plugin has and load them.  If they
 	 * fail to load we need to fail as well.
 	 */
-	for(l = info->dependencies; l; l = l->next) {
+	for(l = gplugin_plugin_info_get_dependencies(info); l; l = l->next) {
 		GSList *matches = NULL, *m = NULL;
 		const gchar *dep_id = NULL;
 		gboolean ret = FALSE;

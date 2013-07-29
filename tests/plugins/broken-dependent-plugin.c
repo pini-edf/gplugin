@@ -17,24 +17,23 @@
 #include <gplugin.h>
 #include <gplugin-native.h>
 
-static GPluginPluginInfo info = {
-	.id = "broken-dependent-native-plugin",
-	.abi_version = GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-	.flags = 0,
-	.name = "name",
-	.version = "version",
-	.summary = "summary",
-	.description = "description",
-	.author = "author",
-	.website = "website",
-};
+G_MODULE_EXPORT GPluginPluginInfo *
+gplugin_plugin_query(GType type) {
+	GSList *depends = g_slist_prepend(NULL, "plugin-does-not-exist");
 
-G_MODULE_EXPORT const GPluginPluginInfo *
-gplugin_plugin_query(void) {
-	if(info.dependencies == NULL)
-		info.dependencies = g_slist_prepend(NULL, "plugin-does-not-exist");
-
-	return &info;
+	return g_object_new(type,
+		"id", "broken-dependent-native-plugin",
+		"abi_version", GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
+		"flags", 0,
+		"name", "name",
+		"version", "version",
+		"summary", "summary",
+		"description", "description",
+		"author", "author",
+		"website", "website",
+		"dependencies", depends,
+		NULL
+	);
 }
 
 G_MODULE_EXPORT gboolean

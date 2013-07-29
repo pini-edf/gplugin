@@ -14,7 +14,6 @@ endmacro(add_gtest)
 add_subdirectory(plugins)
 
 add_gtest(test-plugin-manager-paths)
-add_gtest(test-boxed-types)
 
 add_gtest(test-native-loader)
 add_dependencies(test-native-loader basic-plugin dependent-plugin broken-dependent-plugin)

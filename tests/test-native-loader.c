@@ -50,16 +50,18 @@ test_basic_plugin_load(void) {
 		info = gplugin_plugin_get_info(plugin);
 		g_assert(info != NULL);
 
-		g_assert_cmpstr(info->id, ==, "basic-native-plugin");
-		g_assert_cmpint(info->abi_version, ==,
+		g_assert_cmpstr(gplugin_plugin_info_get_id(info), ==,
+		                "basic-native-plugin");
+		g_assert_cmpint(gplugin_plugin_info_get_abi_version(info), ==,
 		                GPLUGIN_NATIVE_PLUGIN_ABI_VERSION);
-		g_assert_cmpuint(info->flags, ==, 0);
-		g_assert_cmpstr(info->name, ==, "name");
-		g_assert_cmpstr(info->version, ==, "version");
-		g_assert_cmpstr(info->summary, ==, "summary");
-		g_assert_cmpstr(info->description, ==, "description");
-		g_assert_cmpstr(info->author, ==, "author");
-		g_assert_cmpstr(info->website, ==, "website");
+		g_assert_cmpuint(gplugin_plugin_info_get_flags(info), ==, 0);
+		g_assert_cmpstr(gplugin_plugin_info_get_name(info), ==, "name");
+		g_assert_cmpstr(gplugin_plugin_info_get_version(info), ==, "version");
+		g_assert_cmpstr(gplugin_plugin_info_get_summary(info), ==, "summary");
+		g_assert_cmpstr(gplugin_plugin_info_get_description(info), ==,
+		                "description");
+		g_assert_cmpstr(gplugin_plugin_info_get_author(info), ==, "author");
+		g_assert_cmpstr(gplugin_plugin_info_get_website(info), ==, "website");
 
 		g_assert(gplugin_plugin_manager_load_plugin(plugin, &error));
 
