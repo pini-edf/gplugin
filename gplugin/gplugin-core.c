@@ -48,8 +48,6 @@ gplugin_init(void) {
  *
  * Initializes the GPlugin library and sets the #GType to use when creating
  * #GPluginPluginInfo instances.
- *
- * Since: 0.3
  */
 void
 gplugin_init_with_args(GType info_type) {
