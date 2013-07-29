@@ -18,18 +18,18 @@
 #include <gplugin-native.h>
 
 G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_plugin_query(GType type) {
-	return g_object_new(type,
-		"id", "basic-native-plugin",
-		"abi_version", GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-		"flags", 0,
-		"name", "name",
-		"version", "version",
-		"summary", "summary",
-		"description", "description",
-		"author", "author",
-		"website", "website",
-		NULL
+gplugin_plugin_query(void) {
+	return gplugin_plugin_info_new(
+		"id",           "basic-native-plugin",
+		"abi_version",  GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
+		"flags",        0,
+		"name",         "name",
+		"version",      "version",
+		"summary",      "summary",
+		"description",  "description",
+		"author",       "author",
+		"website",      "website",
+		 NULL
 	);
 }
 

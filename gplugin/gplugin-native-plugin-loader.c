@@ -29,7 +29,7 @@
 /******************************************************************************
  * Typedefs
  *****************************************************************************/
-typedef const GPluginPluginInfo *(*GPluginNativePluginQueryFunc)(GType info_type);
+typedef const GPluginPluginInfo *(*GPluginNativePluginQueryFunc)(void);
 typedef gboolean (*GPluginNativePluginLoadFunc)(GPluginNativePlugin *plugin);
 typedef gboolean (*GPluginNativePluginUnloadFunc)(GPluginNativePlugin *plugin);
 
@@ -126,7 +126,7 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	/* now we have all of our symbols, so let's see if this plugin will return a
 	 * valid GPluginPluginInfo structure
 	 */
-	info = ((GPluginNativePluginQueryFunc)(query))(gplugin_get_plugin_info_type());
+	info = ((GPluginNativePluginQueryFunc)(query))();
 	if(!GPLUGIN_IS_PLUGIN_INFO(info)) {
 		g_module_close(module);
 

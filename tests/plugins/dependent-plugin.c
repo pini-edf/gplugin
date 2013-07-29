@@ -18,21 +18,21 @@
 #include <gplugin-native.h>
 
 G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_plugin_query(GType type) {
+gplugin_plugin_query(void) {
 	GSList *depends = g_slist_prepend(NULL, "basic-native-plugin");
 
-	return g_object_new(type,
-		"id", "dependent-native-plugin",
-		"abi_version", GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-		"flags", 0,
-		"name", "name",
-		"version", "version",
-		"summary", "summary",
-		"description", "description",
-		"author", "author",
-		"website", "website",
-		"dependencies", depends,
-		NULL
+	return gplugin_plugin_info_new(
+		"id",            "dependent-native-plugin",
+		"abi_version",   GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
+		"flags",         0,
+		"name",          "name",
+		"version",       "version",
+		"summary",       "summary",
+		"description",   "description",
+		"author",        "author",
+		"website",       "website",
+		"dependencies",  depends,
+		 NULL
 	);
 }
 
