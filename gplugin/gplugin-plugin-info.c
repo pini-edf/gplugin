@@ -16,6 +16,7 @@
  */
 
 #include <gplugin/gplugin-plugin-info.h>
+#include <gplugin/gplugin-core.h>
 
 #include <gplugin/gplugin-enums.h>
 #include <gplugin/gplugin-private.h>
@@ -428,6 +429,35 @@ gplugin_plugin_info_get_type(void) {
 	}
 
 	return type;
+}
+
+/**
+ * gplugin_plugin_info_new: (skip)
+ * @first: The first property name, or %NULL
+ * @...: The value of the first property, followed optionally by more name/value
+ *       pairs, followed by %NULL
+ *
+ * Creates a new #GPluginPluginInfo instance of the type provided by
+ * gplugin_set_plugin_info_type().
+ *
+ * Return value: (transfer full): The new #GPluginPluginInfo instance.
+ */
+GPluginPluginInfo *
+gplugin_plugin_info_new(const char *first, ...) {
+	GObject *plugin_info;
+	va_list var_args;
+
+	if (!first) {
+		plugin_info = g_object_newv(gplugin_get_plugin_info_type(), 0, NULL);
+		return GPLUGIN_PLUGIN_INFO(plugin_info);
+	}
+
+	va_start (var_args, first);
+	plugin_info = g_object_new_valist(gplugin_get_plugin_info_type(), first,
+	                                  var_args);
+	va_end (var_args);
+
+	return GPLUGIN_PLUGIN_INFO(plugin_info);
 }
 
 /**
