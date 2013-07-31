@@ -101,6 +101,7 @@ mark_as_advanced(GTESTER)
 ###############################################################################
 add_definitions(
 	-g -g3 -Wall
+	-DPREFIX="${CMAKE_INSTALL_PREFIX}"
 )
 
 include_directories(

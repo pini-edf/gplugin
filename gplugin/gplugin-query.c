@@ -131,6 +131,7 @@ main(gint argc, gchar **argv) {
 	GError *error = NULL;
 	GOptionContext *ctx = NULL;
 	gint i = 0, ret = 0;
+	gchar *def_path = NULL;
 
 	gplugin_init();
 
@@ -148,6 +149,12 @@ main(gint argc, gchar **argv) {
 		return EXIT_FAILURE;
 	}
 
+	/* add the default gplugin path according to PREFIX */
+	def_path = g_build_filename(PREFIX, "lib", "gplugin");
+	gplugin_plugin_manager_prepend_path(def_path);
+	g_free(def_path);
+
+	/* now add any paths the user provided */
 	if(paths) {
 		/* go through the paths and add them to the plugin manager */
 		for(i = 0; paths[i]; i++)
