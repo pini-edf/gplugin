@@ -29,7 +29,8 @@ gplugin_plugin_query(void) {
 		"description", "This plugin allows the load of plugins written in "
 		               "the python programming language.",
 		"author", "Gary Kramlich <grim@reaperworld.com>",
-		"website", "http://bitbucket.org/rw_grim/gplugin"
+		"website", "http://bitbucket.org/rw_grim/gplugin",
+		NULL
 	);
 }
 
