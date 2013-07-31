@@ -1,4 +1,6 @@
-0.0.3:
+0.0.4:
+
+0.0.3: 2013/07/30
   * Added gplugin_plugin_manager_add_app_paths
   * Moved GPluginPluginInfo from a boxed type to a GObject
   * Added gplugin_[gs]et_plugin_info_type to allow applications to specify
