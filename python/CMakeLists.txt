@@ -7,7 +7,7 @@ option(
 if(BUILD_PYTHON)
 	find_package(PythonLibs)
 
-	if(PYTHON_LIBS_FOUND)
+	if(PYTHONLIBS_FOUND)
 		pkg_check_modules(PYGOBJECT REQUIRED pygobject-3.0>=3.0.0)
 
 		set(GPLUGIN_PYTHON_SOURCES
@@ -26,6 +26,8 @@ if(BUILD_PYTHON)
 			${GPLUGIN_PYTHON_HEADERS}
 		)
 
+		set_target_properties(gplugin-python PROPERTIES PREFIX "")
+
 		include_directories(
 			${PYTHON_INCLUDE_DIR}
 			${PYGOBJECT_INCLUDE_DIRS}
@@ -36,6 +38,8 @@ if(BUILD_PYTHON)
 			${PYGOBJECT_LIBS}
 			gplugin
 		)
-	endif(PYTHON_LIBS_FOUND)
+
+		install(TARGETS gplugin-python DESTINATION lib/gplugin)
+	endif(PYTHONLIBS_FOUND)
 endif(BUILD_PYTHON)
 
