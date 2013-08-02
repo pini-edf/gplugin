@@ -164,11 +164,13 @@ gplugin_plugin_manager_file_tree_free_nonleaves(GNode *n, gpointer d) {
 
 static void
 gplugin_plugin_manager_file_tree_free(GNode *root) {
-	g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_LEAVES, -1,
-	                gplugin_plugin_manager_file_tree_free_leaves, NULL);
+	if (root->data) {
+		g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_LEAVES, -1,
+		                gplugin_plugin_manager_file_tree_free_leaves, NULL);
 
-	g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_NON_LEAVES, -1,
-	                gplugin_plugin_manager_file_tree_free_nonleaves, NULL);
+		g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_NON_LEAVES, -1,
+		                gplugin_plugin_manager_file_tree_free_nonleaves, NULL);
+	}
 
 	g_node_destroy(root);
 }
