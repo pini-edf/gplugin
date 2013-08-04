@@ -47,6 +47,37 @@ internal_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
 	return TRUE;
 }
 
+static gchar *
+flags_to_string(GPluginPluginInfoFlags flags) {
+	GString *str = g_string_new("");
+	gchar *ret = NULL;
+	GFlagsValue *value = NULL;
+	GFlagsClass *klass = NULL;
+	gboolean first = TRUE;
+
+	klass = g_type_class_ref(GPLUGIN_TYPE_PLUGIN_INFO_FLAGS);
+
+	while((value = g_flags_get_first_value(klass, flags))) {
+		if(!first)
+			str = g_string_append(str, ",");
+		else
+			first = FALSE;
+
+		str = g_string_append(str, value->value_nick);
+
+		flags ^= value->value;
+	}
+
+	g_type_class_unref(klass);
+
+	/* hold on to the final string then free the gstring */
+	ret = str->str;
+	g_string_free(str, FALSE);
+
+	return ret;
+
+}
+
 static gboolean
 output_plugin(const gchar *id) {
 	GSList *plugins = NULL, *l = NULL;
@@ -82,12 +113,16 @@ output_plugin(const gchar *id) {
 		if(verbosity > 0)
 			printf("  filename:    %s\n", gplugin_plugin_get_filename(plugin));
 		if(verbosity > 1) {
+			gchar *flags_str = flags_to_string(flags);
+
 			GPluginPluginLoader *loader = gplugin_plugin_get_loader(plugin);
 
 			printf("  abi version: %d\n",
 			       gplugin_plugin_info_get_abi_version(info));
-			printf("  flags:       %u\n", flags);
+			printf("  flags:       %s\n", flags_str);
 			printf("  loader:      %s\n", G_OBJECT_TYPE_NAME(loader));
+
+			g_free(flags_str);
 		}
 		printf("  description: %s\n",
 		       gplugin_plugin_info_get_description(info));
