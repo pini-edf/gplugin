@@ -23,6 +23,8 @@ gplugin_plugin_query(void) {
 	return gplugin_plugin_info_new(
 		"id", "gplugin-python-loader",
 		"abi_version", GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
+		"flags", GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY |
+		         GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL,
 		"name", "Python Plugin Loader",
 		"version", GPLUGIN_VERSION,
 		"summary", "A plugin that can load python plugins",
