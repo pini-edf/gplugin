@@ -152,7 +152,7 @@ main(gint argc, gchar **argv) {
 	}
 
 	/* add the default gplugin path according to PREFIX */
-	def_path = g_build_filename(PREFIX, "lib", "gplugin");
+	def_path = g_build_filename(PREFIX, "lib", "gplugin", NULL);
 	gplugin_plugin_manager_prepend_path(def_path);
 	g_free(def_path);
 
