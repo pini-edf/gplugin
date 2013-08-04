@@ -45,7 +45,7 @@ typedef enum /*< prefix=GPLUGIN_PLUGIN_INFO_FLAGS,underscore_name=GPLUGIN_PLUGIN
 #include <gplugin/gplugin-plugin-loader.h>
 
 struct _GPluginPluginInfo {
-	GObject gparent;
+	GInitiallyUnowned gparent;
 };
 
 struct _GPluginPluginInfoClass {

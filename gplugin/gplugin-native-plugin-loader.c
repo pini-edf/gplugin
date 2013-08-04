@@ -139,6 +139,9 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 		return NULL;
 	}
 
+	/* claim ownership of the info object */
+	g_object_ref_sink(G_OBJECT(info));
+
 	/* now create the actual plugin instance */
 	plugin = g_object_new(GPLUGIN_TYPE_NATIVE_PLUGIN,
 	                      "module", module,
@@ -149,13 +152,14 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	                      "filename", filename,
 	                      NULL);
 
+	/* now that the plugin instance owns the info, remove our ref */
+	g_object_unref(G_OBJECT(info));
+
 	if(!GPLUGIN_IS_NATIVE_PLUGIN(plugin)) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     "failed to create plugin instance");
 		}
-
-		g_object_unref(G_OBJECT(info));
 
 		return NULL;
 	}
