@@ -27,6 +27,7 @@
  * Globals
  *****************************************************************************/
 static gint verbosity = 0;
+static gboolean internal = FALSE;
 static gchar **paths = NULL;
 
 /******************************************************************************
@@ -35,6 +36,13 @@ static gchar **paths = NULL;
 static gboolean
 verbosity_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
 	verbosity++;
+
+	return TRUE;
+}
+
+static gboolean
+internal_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
+	internal = TRUE;
 
 	return TRUE;
 }
@@ -58,6 +66,10 @@ output_plugin(const gchar *id) {
 	for(l = plugins; l; l = l->next) {
 		GPluginPlugin *plugin = GPLUGIN_PLUGIN(l->data);
 		const GPluginPluginInfo *info = gplugin_plugin_get_info(plugin);
+		GPluginPluginInfoFlags flags = gplugin_plugin_info_get_flags(info);
+
+		if(!internal && (flags & GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL))
+			continue;
 
 		if(!first)
 			printf("\n");
@@ -74,7 +86,7 @@ output_plugin(const gchar *id) {
 
 			printf("  abi version: %d\n",
 			       gplugin_plugin_info_get_abi_version(info));
-			printf("  flags:       %u\n", gplugin_plugin_info_get_flags(info));
+			printf("  flags:       %u\n", flags);
 			printf("  loader:      %s\n", G_OBJECT_TYPE_NAME(loader));
 		}
 		printf("  description: %s\n",
@@ -116,13 +128,17 @@ output_plugins(GList *plugins) {
  *****************************************************************************/
 static GOptionEntry entries[] = {
 	{
-		"verbose", 'v', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
-		verbosity_cb, "Increase verbosity.",
+		"internal", 'i', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+		internal_cb, "Show internal plugins.",
 		NULL,
 	}, {
 		"path", 'p', 0, G_OPTION_ARG_STRING_ARRAY,
 		&paths, "Additional path to look for plugins",
 		"PATH",
+	}, {
+		"verbose", 'v', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+		verbosity_cb, "Increase verbosity.",
+		NULL,
 	}, {
 		NULL
 	},
