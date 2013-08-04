@@ -164,11 +164,13 @@ gplugin_plugin_manager_file_tree_free_nonleaves(GNode *n, gpointer d) {
 
 static void
 gplugin_plugin_manager_file_tree_free(GNode *root) {
-	g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_LEAVES, -1,
-	                gplugin_plugin_manager_file_tree_free_leaves, NULL);
+	if (root->data) {
+		g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_LEAVES, -1,
+		                gplugin_plugin_manager_file_tree_free_leaves, NULL);
 
-	g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_NON_LEAVES, -1,
-	                gplugin_plugin_manager_file_tree_free_nonleaves, NULL);
+		g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_NON_LEAVES, -1,
+		                gplugin_plugin_manager_file_tree_free_nonleaves, NULL);
+	}
 
 	g_node_destroy(root);
 }
@@ -570,7 +572,6 @@ gplugin_plugin_manager_refresh(void) {
 					const GPluginPluginInfo *info =
 						gplugin_plugin_get_info(plugin);
 
-
 					const gchar *id = gplugin_plugin_info_get_id(info);
 					GSList *l = NULL;
 
@@ -588,6 +589,8 @@ gplugin_plugin_manager_refresh(void) {
 					l = g_hash_table_lookup(plugins, id);
 					l = g_slist_prepend(l, g_object_ref(plugin));
 					g_hash_table_insert(plugins, g_strdup(id), l);
+
+					g_object_unref(G_OBJECT(info));
 
 					/* finally set the plugin state queried */
 					gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_QUERIED);
@@ -748,6 +751,7 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 				                     dep_id,
 				                     gplugin_plugin_get_filename(plugin));
 			}
+			g_object_unref(G_OBJECT(info));
 
 			return FALSE;
 		}
@@ -770,10 +774,13 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 				                     "%s, but failed to load it.",
 				                     dep_id);
 			}
+			g_object_unref(G_OBJECT(info));
 
 			return FALSE;
 		}
 	}
+
+	g_object_unref(G_OBJECT(info));
 
 	/* now load the actual plugin */
 	loader = gplugin_plugin_get_loader(plugin);

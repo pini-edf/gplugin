@@ -188,9 +188,12 @@ gplugin_native_plugin_loader_load(GPluginPluginLoader *loader,
 			                     "load function for %s is NULL",
 			                     gplugin_plugin_info_get_name(info));
 		}
+		g_object_unref(G_OBJECT(info));
 
 		return FALSE;
 	}
+
+	g_object_unref(G_OBJECT(info));
 
 	/* now call the load function and exit */
 	load = (GPluginNativePluginLoadFunc)func;
@@ -231,9 +234,12 @@ gplugin_native_plugin_loader_unload(GPluginPluginLoader *loader,
 			                     "unload function for %s is NULL",
 			                     gplugin_plugin_info_get_name(info));
 		}
+		g_object_unref(G_OBJECT(info));
 
 		return FALSE;
 	}
+
+	g_object_unref(G_OBJECT(info));
 
 	/* now call the unload function and exit */
 	unload = (GPluginNativePluginLoadFunc)func;

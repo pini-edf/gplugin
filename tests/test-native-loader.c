@@ -87,6 +87,8 @@ test_basic_plugin_load(void) {
 		g_assert_cmpstr(gplugin_plugin_info_get_author(info), ==, "author");
 		g_assert_cmpstr(gplugin_plugin_info_get_website(info), ==, "website");
 
+		g_object_unref(G_OBJECT(info));
+
 		g_assert(gplugin_plugin_manager_load_plugin(plugin, &error));
 
 		state = gplugin_plugin_get_state(plugin);

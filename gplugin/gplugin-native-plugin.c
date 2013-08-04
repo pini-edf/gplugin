@@ -140,6 +140,8 @@ gplugin_native_plugin_priv_use(GTypePlugin *plugin) {
 			name = "(unknown)";
 
 		g_warning("Could not reload previously loaded plugin '%s'\n", name);
+
+		g_object_unref(G_OBJECT(info));
 	}
 }
 
@@ -334,6 +336,8 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
 
 				g_warning("plugin '%s' failed to register type '%s'\n",
 				          name, g_type_name(info->type));
+
+				g_object_unref(G_OBJECT(plugin_info));
 
 				return FALSE;
 			}

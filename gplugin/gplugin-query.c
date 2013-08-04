@@ -80,6 +80,8 @@ output_plugin(const gchar *id) {
 		printf("  description: %s\n",
 		       gplugin_plugin_info_get_description(info));
 
+		g_object_unref(G_OBJECT(info));
+
 		if(first)
 			first = FALSE;
 	}
