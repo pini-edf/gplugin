@@ -191,6 +191,7 @@ main(gint argc, gchar **argv) {
 	ctx = g_option_context_new("PLUGIN-ID...");
 	g_option_context_add_main_entries(ctx, entries, NULL);
 	g_option_context_parse(ctx, &argc, &argv, &error);
+	g_option_context_free(ctx);
 
 	if(error) {
 		fprintf(stderr, "%s\n", error->message);
