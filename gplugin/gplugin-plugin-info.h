@@ -49,7 +49,7 @@ struct _GPluginPluginInfo {
 };
 
 struct _GPluginPluginInfoClass {
-	GObjectClass gparent;
+	GInitiallyUnownedClass gparent;
 
 	void (*_gplugin_reserved_1)(void);
 	void (*_gplugin_reserved_2)(void);
