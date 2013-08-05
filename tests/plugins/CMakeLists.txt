@@ -3,6 +3,7 @@ macro(add_plugin plugin)
 	set_target_properties(${plugin} PROPERTIES PREFIX "")
 	target_link_libraries(${plugin}
 		${GLIB_LIBRARIES}
+		gplugin
 	)
 endmacro(add_plugin)
 

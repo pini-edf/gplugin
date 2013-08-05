@@ -23,11 +23,6 @@
 #include <gplugin/gplugin-plugin.h>
 
 /******************************************************************************
- * Globals
- *****************************************************************************/
-GType plugin_info_type = G_TYPE_INVALID;
-
-/******************************************************************************
  * API
  *****************************************************************************/
 /**
@@ -43,8 +38,6 @@ gplugin_init(void) {
 	g_type_init();
 #endif /* !GLIB_CHECK_VERSION(2, 36, 0) */
 
-	plugin_info_type = GPLUGIN_TYPE_PLUGIN_INFO;
-
 	gplugin_plugin_manager_init();
 }
 
@@ -56,34 +49,5 @@ gplugin_init(void) {
 void
 gplugin_uninit(void) {
 	gplugin_plugin_manager_uninit();
-}
-
-/**
- * gplugin_set_plugin_info_type:
- * @info_type: The #GType of the #GPluginPluginInfo instance that plugins
- *             should create in their query method.
- *
- * Sets the #GPluginPluginInfo instance type that plugins should create.
- */
-void
-gplugin_set_plugin_info_type(GType info_type) {
-	g_return_if_fail(g_type_is_a(info_type, GPLUGIN_TYPE_PLUGIN_INFO));
-	g_return_if_fail(!G_TYPE_IS_ABSTRACT(info_type));
-
-	plugin_info_type = info_type;
-}
-
-/**
- * gpluin_get_plugin_info_type:
- *
- * Returns the #GType of the #GPluginPluginInfo instance that plugins should
- * create in their query method.
- *
- * Return Value: (transfer none): The #GType that plugins should use to create
- *                                their info instance.
- */
-GType
-gplugin_get_plugin_info_type(void) {
-	return plugin_info_type;
 }
 

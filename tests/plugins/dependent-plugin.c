@@ -21,7 +21,7 @@ G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(void) {
 	GSList *depends = g_slist_prepend(NULL, "basic-native-plugin");
 
-	return gplugin_plugin_info_new(
+	return g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
 		"id",            "dependent-native-plugin",
 		"abi_version",   GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
 		"flags",         0,

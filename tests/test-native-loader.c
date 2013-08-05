@@ -71,8 +71,7 @@ test_basic_plugin_load(void) {
 		info = gplugin_plugin_get_info(plugin);
 		g_assert(info != NULL);
 
-		g_assert_cmpuint(G_OBJECT_TYPE(info), ==,
-		                 test_gplugin_plugin_info_get_type());
+		g_assert_cmpuint(G_OBJECT_TYPE(info), ==, GPLUGIN_TYPE_PLUGIN_INFO);
 
 		g_assert_cmpstr(gplugin_plugin_info_get_id(info), ==,
 		                "basic-native-plugin");
@@ -168,7 +167,6 @@ main(gint argc, gchar **argv) {
 	g_test_init(&argc, &argv, NULL);
 
 	gplugin_init();
-	gplugin_set_plugin_info_type(test_gplugin_plugin_info_get_type());
 
 	g_test_add_func("/loaders/native/load", test_basic_plugin_load);
 	g_test_add_func("/loaders/native/load_dependent",

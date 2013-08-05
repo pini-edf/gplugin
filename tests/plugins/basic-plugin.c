@@ -19,7 +19,7 @@
 
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(void) {
-	return gplugin_plugin_info_new(
+	return g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
 		"id",           "basic-native-plugin",
 		"abi_version",  GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
 		"flags",        0,
