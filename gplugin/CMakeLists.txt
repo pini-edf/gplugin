@@ -163,6 +163,8 @@ if(BUILD_GIR)
 	else(APPLE)
 		include(GObjectIntrospection)
 
+		set(ENV{PKG_CONFIG_PATH} $ENV{PKG_CONFIG_PATH} ${CMAKE_BINARY_DIR})
+
 		gobject_introspection(
 			FILENAME GPlugin-${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.gir
 			PACKAGES gobject-2.0
@@ -174,6 +176,17 @@ if(BUILD_GIR)
 			SOURCES ${GPLUGIN_SOURCES} ${GPLUGIN_HEADERS}
 			BUILT_SOURCES ${GPLUGIN_PUBLIC_BUILT_SOURCES}
 			              ${GPLUGIN_PUBLIC_BUILT_HEADERS}
+		)
+
+		gobject_introspection(
+			FILENAME GPluginNative-${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.gir
+			PACKAGES glib-2.0 gobject-2.0 gplugin
+			LIBRARY gplugin
+			QUIET
+			SCANNER_ARGS --add-include-path=${CMAKE_CURRENT_SOURCE_DIR} --warn-all
+			COMPILER_ARGS --includedir=${CMAKE_CURRENT_SOURCE_DIR}
+			SYMBOL_PREFIXES gplugin_native
+			SOURCES ${GPLUGIN_NATIVE_SOURCES} ${GPLUGIN_NATIVE_HEADERS}
 		)
 	endif(APPLE)
 endif(BUILD_GIR)
