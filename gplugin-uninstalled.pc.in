@@ -1,0 +1,6 @@
+Name: libgplugin
+Description: A fully featured GModule based plugin library
+Version: @GPLUGIN_VERSION@
+Libs: -L@CMAKE_BINARY_DIR@/gplugin -lgplugin
+Cflags: -I@CMAKE_SOURCE_DIR@/gplugin -I@CMAKE_BINARY_DIR@/gplugin
+
