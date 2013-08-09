@@ -35,7 +35,10 @@ typedef struct {
 
     gchar *name;
     gchar *version;
+
     gchar *license;
+	gchar *license_text;
+	gchar *license_url;
 
     gchar *icon;
 
@@ -58,6 +61,8 @@ enum {
 	PROP_NAME,
 	PROP_VERSION,
 	PROP_LICENSE,
+	PROP_LICENSE_TEXT,
+	PROP_LICENSE_URL,
 	PROP_ICON,
 	PROP_SUMMARY,
 	PROP_DESCRIPTION,
@@ -127,6 +132,28 @@ gplugin_plugin_info_set_license(GPluginPluginInfo *info,
 
 	g_free(priv->license);
 	priv->license = (license) ? g_strdup(license) : NULL;
+}
+
+
+static void
+gplugin_plugin_info_set_license_text(GPluginPluginInfo *info,
+                                     const gchar *license_text)
+{
+	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	g_free(priv->license_text);
+	priv->license_text = (license_text) ? g_strdup(license_text) : NULL;
+}
+
+
+static void
+gplugin_plugin_info_set_license_url(GPluginPluginInfo *info,
+                                    const gchar *license_url)
+{
+	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	g_free(priv->license_url);
+	priv->license_url = (license_url) ? g_strdup(license_url) : NULL;
 }
 
 static void
@@ -215,6 +242,14 @@ gplugin_plugin_info_get_property(GObject *obj, guint param_id, GValue *value,
 		case PROP_LICENSE:
 			g_value_set_string(value, gplugin_plugin_info_get_license(info));
 			break;
+		case PROP_LICENSE_TEXT:
+			g_value_set_string(value,
+			                   gplugin_plugin_info_get_license_text(info));
+			break;
+		case PROP_LICENSE_URL:
+			g_value_set_string(value,
+			                   gplugin_plugin_info_get_license_url(info));
+			break;
 		case PROP_ICON:
 			g_value_set_string(value, gplugin_plugin_info_get_icon(info));
 			break;
@@ -266,6 +301,14 @@ gplugin_plugin_info_set_property(GObject *obj, guint param_id,
 		case PROP_LICENSE:
 			gplugin_plugin_info_set_license(info, g_value_get_string(value));
 			break;
+		case PROP_LICENSE_TEXT:
+			gplugin_plugin_info_set_license_text(info,
+			                                     g_value_get_string(value));
+			break;
+		case PROP_LICENSE_URL:
+			gplugin_plugin_info_set_license_url(info,
+			                                    g_value_get_string(value));
+			break;
 		case PROP_ICON:
 			gplugin_plugin_info_set_icon(info, g_value_get_string(value));
 			break;
@@ -300,6 +343,8 @@ gplugin_plugin_info_finalize(GObject *obj) {
     g_free(priv->name);
     g_free(priv->version);
     g_free(priv->license);
+    g_free(priv->license_text);
+    g_free(priv->license_url);
     g_free(priv->icon);
     g_free(priv->summary);
     g_free(priv->description);
@@ -361,8 +406,22 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_CONSTRUCT_ONLY));
 
 	g_object_class_install_property(obj_class, PROP_LICENSE,
-		g_param_spec_string("license", "license",
-		                    "The license of the plugin",
+		g_param_spec_string("license", "license id",
+		                    "The license id of the plugin according to SPDX",
+		                    NULL,
+		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
+		                    G_PARAM_CONSTRUCT_ONLY));
+
+	g_object_class_install_property(obj_class, PROP_LICENSE_TEXT,
+		g_param_spec_string("license-text", "license text",
+		                    "The text of the license for the plugin",
+		                    NULL,
+		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
+		                    G_PARAM_CONSTRUCT_ONLY));
+
+	g_object_class_install_property(obj_class, PROP_LICENSE_URL,
+		g_param_spec_string("license-url", "license url",
+		                    "The url to the license of the plugin",
 		                    NULL,
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
@@ -531,6 +590,40 @@ gplugin_plugin_info_get_license(const GPluginPluginInfo *info) {
 	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
 	return priv->license;
+}
+
+/**
+ * gplugin_plugin_info_get_license_text:
+ * @info: #GPluginPluginInfo instance
+ *
+ * Return value: The text of the license from @info.
+ */
+const gchar *
+gplugin_plugin_info_get_license_text(const GPluginPluginInfo *info) {
+	GPluginPluginInfoPrivate *priv = NULL;
+
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_INFO(info), NULL);
+
+	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	return priv->license_text;
+}
+
+/**
+ * gplugin_plugin_info_get_license_url:
+ * @info: #GPluginPluginInfo instance
+ *
+ * Return value: The url of the license from @info.
+ */
+const gchar *
+gplugin_plugin_info_get_license_url(const GPluginPluginInfo *info) {
+	GPluginPluginInfoPrivate *priv = NULL;
+
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_INFO(info), NULL);
+
+	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	return priv->license_url;
 }
 
 /**
