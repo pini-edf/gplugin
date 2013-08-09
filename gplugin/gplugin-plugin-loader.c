@@ -17,6 +17,9 @@
 
 #include <gplugin/gplugin-plugin-loader.h>
 
+/******************************************************************************
+ * API
+ *****************************************************************************/
 GType
 gplugin_plugin_loader_get_type(void) {
 	static GType type = 0;
