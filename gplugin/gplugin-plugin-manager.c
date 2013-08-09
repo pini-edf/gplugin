@@ -218,11 +218,15 @@ gplugin_plugin_manager_init(void) {
 
 void
 gplugin_plugin_manager_uninit(void) {
+#if GLIB_CHECK_VERSION(2,32,0)
+	g_queue_free_full(paths, g_free);
+#else
 	GList *iter = NULL;
 
 	for(iter = paths->head; iter; iter = iter->next)
 		g_free(iter->data);
 	g_queue_free(paths);
+#endif /* GLIB_CHECK_VERSION(2,32,0) */
 
 	g_hash_table_destroy(plugins);
 	g_hash_table_destroy(plugins_filename_view);
@@ -549,6 +553,8 @@ gplugin_plugin_manager_refresh(void) {
 					 */
 					if(plugin != NULL && GPLUGIN_IS_PLUGIN(plugin))
 						break;
+
+					g_object_unref(G_OBJECT(plugin));
 				}
 
 				/* check if our plugin instance is good.  If it's not good we
