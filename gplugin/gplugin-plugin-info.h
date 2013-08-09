@@ -34,8 +34,19 @@
 typedef struct _GPluginPluginInfo           GPluginPluginInfo;
 typedef struct _GPluginPluginInfoClass      GPluginPluginInfoClass;
 
+/**
+ * GPluginPluginInfoFlags:
+ * @LOAD_ON_QUERY: Load the plugin when queried.  This
+ *                 is primarily used by loaders and
+ *                 other plugins that user is not
+ *                 interested in.
+ * @GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL: Plugin is internal and should not be
+ *                                      shown in user interfaces.
+ *
+ * Flags that can be used to treat plugins differently.
+ */
 typedef enum /*< prefix=GPLUGIN_PLUGIN_INFO_FLAGS,underscore_name=GPLUGIN_PLUGIN_INFO_FLAGS >*/ {
-    GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY = 1 << 1,
+    GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY = 1 << 1, /*< soemthing >*/
     GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL = 1 << 2,
 } GPluginPluginInfoFlags;
 

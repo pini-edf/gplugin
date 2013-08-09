@@ -167,7 +167,7 @@ if(BUILD_GIR)
 
 		gobject_introspection(
 			FILENAME GPlugin-${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.gir
-			PACKAGES gobject-2.0
+			PACKAGES glib-2.0 gmodule-2.0 gobject-2.0
 			LIBRARY gplugin
 			QUIET
 			SCANNER_ARGS --add-include-path=${CMAKE_CURRENT_SOURCE_DIR} --warn-all
