@@ -370,6 +370,17 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 	obj_class->finalize = gplugin_plugin_info_finalize;
 
 	/* properties */
+	/**
+	 * GPluginPluginInfo:id:
+	 *
+	 * The id of the plugin.
+	 *
+	 * While not required, the recommended convention is to use the following
+	 * format: <application or library>/<name of the plugin>.
+	 *
+	 * For example, the python loader in GPlugin has an id of
+	 * "gplugin/python-plugin-loader".
+	 */
 	g_object_class_install_property(obj_class, PROP_ID,
 		g_param_spec_string("id", "id",
 		                    "The ID of the plugin",
@@ -377,13 +388,25 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:abi-version:
+	 *
+	 * The GPlugin ABI version that the plugin was compiled against.
+	 *
+	 * In most cases, this is defined by the loader.
+	 */
 	g_object_class_install_property(obj_class, PROP_ABI_VERSION,
-		g_param_spec_uint("abi_version", "abi_version",
+		g_param_spec_uint("abi-version", "abi_version",
 		                  "The ABI version of the plugin",
 		                  0, G_MAXUINT32, 0,
 		                  G_PARAM_READWRITE |
 		                  G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:flags:
+	 *
+	 * The #GPluginPluginInfoFlags for the plugin.
+	 */
 	g_object_class_install_property(obj_class, PROP_FLAGS,
 		g_param_spec_flags("flags", "flags",
 		                   "The flags for the plugin",
@@ -391,6 +414,11 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                   G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                   G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:name:
+	 *
+	 * The display name of the plugin.  This should be a translated string.
+	 */
 	g_object_class_install_property(obj_class, PROP_NAME,
 		g_param_spec_string("name", "name",
 		                    "The name of the plugin",
@@ -398,6 +426,11 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:version:
+	 *
+	 * The version of the plugin.
+	 */
 	g_object_class_install_property(obj_class, PROP_VERSION,
 		g_param_spec_string("version", "version",
 		                    "The version of the plugin",
@@ -405,6 +438,17 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:license:
+	 *
+	 * The short name of the license.
+	 *
+	 * It is recommended to use the identifier of the license from
+	 * http://spdx.org/licenses/ and should be "Other" for custom licenses
+	 * that are not on the SPDX list.
+	 *
+	 * If a plugin has multiple license, they should be separated by a comma.
+	 */
 	g_object_class_install_property(obj_class, PROP_LICENSE,
 		g_param_spec_string("license", "license id",
 		                    "The license id of the plugin according to SPDX",
@@ -412,6 +456,12 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:license-text:
+	 *
+	 * The text of the license for this plugin.  This should only be used when
+	 * the plugin is licensed under a license that is not listed on SPDX.
+	 */
 	g_object_class_install_property(obj_class, PROP_LICENSE_TEXT,
 		g_param_spec_string("license-text", "license text",
 		                    "The text of the license for the plugin",
@@ -419,6 +469,12 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:license-url:
+	 *
+	 * The url to the text of the license.  This should primarily only be used
+	 * for licenses not listed on SPDX.
+	 */
 	g_object_class_install_property(obj_class, PROP_LICENSE_URL,
 		g_param_spec_string("license-url", "license url",
 		                    "The url to the license of the plugin",
@@ -426,6 +482,12 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:icon:
+	 *
+	 * A string representing an icon for the plugin.  The actual use of this
+	 * is determined by the application/library using GPlugin.
+	 */
 	g_object_class_install_property(obj_class, PROP_ICON,
 		g_param_spec_string("icon", "icon",
 		                    "The file path of the icon for the plugin",
@@ -433,6 +495,12 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:summary:
+	 *
+	 * A short description of the plugin that can be listed with the name in a
+	 * user interface.
+	 */
 	g_object_class_install_property(obj_class, PROP_SUMMARY,
 		g_param_spec_string("summary", "summary",
 		                    "The summary of the plugin",
@@ -440,6 +508,12 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:description:
+	 *
+	 * The full description of the plugin that will be used in a "more
+	 * information" section in a user interface.
+	 */
 	g_object_class_install_property(obj_class, PROP_DESCRIPTION,
 		g_param_spec_string("description", "description",
 		                    "The description of the plugin",
@@ -447,6 +521,15 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:author:
+	 *
+	 * The name and email address of the author.
+	 *
+	 * It is recommended to use the RFC 822, 2822 format of:
+	 * "First Last <user@domain.com>" with additional authors separated by a
+	 * comma.
+	 */
 	g_object_class_install_property(obj_class, PROP_AUTHOR,
 		g_param_spec_string("author", "author",
 		                    "The author of the plugin",
@@ -454,6 +537,11 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:website:
+	 *
+	 * The url of the plugin that can be represented in a user interface.
+	 */
 	g_object_class_install_property(obj_class, PROP_WEBSITE,
 		g_param_spec_string("website", "website",
 		                    "The website of the plugin",
@@ -461,6 +549,11 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:dependencies:
+	 *
+	 * A #GList of plugin id's that this plugin depends on.
+	 */
 	g_object_class_install_property(obj_class, PROP_DEPENDENCIES,
 		g_param_spec_pointer("dependencies", "dependencies",
 		                     "The dependencies of the plugin",
