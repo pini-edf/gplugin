@@ -28,26 +28,26 @@
  * Structs
  *****************************************************************************/
 typedef struct {
-    gchar *id;
+	gchar *id;
 
-    guint32 abi_version;
-    GPluginPluginInfoFlags flags;
+	guint32 abi_version;
+	GPluginPluginInfoFlags flags;
 
-    gchar *name;
-    gchar *version;
+	gchar *name;
+	gchar *version;
 
-    gchar *license;
+	gchar *license;
 	gchar *license_text;
 	gchar *license_url;
 
-    gchar *icon;
+	gchar *icon;
 
-    gchar *summary;
-    gchar *description;
-    gchar *author;
-    gchar *website;
+	gchar *summary;
+	gchar *description;
+	gchar *author;
+	gchar *website;
 
-    GSList *dependencies;
+	GSList *dependencies;
 } GPluginPluginInfoPrivate;
 
 /******************************************************************************
