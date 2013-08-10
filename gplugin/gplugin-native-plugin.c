@@ -290,9 +290,11 @@ gplugin_native_plugin_class_init(GPluginNativePluginClass *klass) {
  *****************************************************************************/
 GType
 gplugin_native_plugin_get_type(void) {
-	static GType type = 0;
+	static volatile gsize type_volatile = 0;
 
-	if(G_UNLIKELY(type == 0)) {
+	if(g_once_init_enter(&type_volatile)) {
+		GType type = 0;
+
 		static const GTypeInfo info = {
 			.class_size = sizeof(GPluginNativePluginClass),
 			.class_init = (GClassInitFunc)gplugin_native_plugin_class_init,
@@ -308,9 +310,11 @@ gplugin_native_plugin_get_type(void) {
 		                              &info, 0);
 
 		g_type_add_interface_static(type, G_TYPE_TYPE_PLUGIN, &iface_info);
+
+		g_once_init_leave(&type_volatile, type);
 	}
 
-	return type;
+	return type_volatile;
 }
 
 gboolean

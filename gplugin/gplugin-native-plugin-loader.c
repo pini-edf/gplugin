@@ -281,9 +281,11 @@ gplugin_native_plugin_loader_class_init(GPluginNativePluginLoaderClass *klass) {
  *****************************************************************************/
 GType
 gplugin_native_plugin_loader_get_type(void) {
-	static GType type = 0;
+	static volatile gsize type_volatile = 0;
 
-	if(G_UNLIKELY(type == 0)) {
+	if(g_once_init_enter(&type_volatile)) {
+		 GType type = 0;
+
 		static const GTypeInfo info = {
 			.class_size = sizeof(GPluginNativePluginLoaderClass),
 			.class_init = (GClassInitFunc)gplugin_native_plugin_loader_class_init,
@@ -293,9 +295,11 @@ gplugin_native_plugin_loader_get_type(void) {
 		type = g_type_register_static(GPLUGIN_TYPE_PLUGIN_LOADER,
 		                              "GPluginNativePluginLoader",
 		                              &info, 0);
+
+		g_once_init_leave(&type_volatile, type);
 	}
 
-	return type;
+	return type_volatile;
 }
 
 
