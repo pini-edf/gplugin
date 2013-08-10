@@ -18,11 +18,11 @@
 #include <gplugin-native.h>
 
 G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_plugin_query(void) {
+gplugin_plugin_query(GError **error) {
 	GSList *depends = g_slist_prepend(NULL, "plugin-does-not-exist");
 
-	return gplugin_plugin_info_new(
-		"id",            "broken-dependent-native-plugin",
+	return g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
+		"id",            "gplugin/broken-dependent-native-plugin",
 		"abi_version",   GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
 		"flags",         0,
 		"name",          "name",
@@ -32,17 +32,17 @@ gplugin_plugin_query(void) {
 		"author",        "author",
 		"website",       "website",
 		"dependencies",  depends,
-		 NULL
+		NULL
 	);
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_plugin_load(GPluginNativePlugin *plugin) {
+gplugin_plugin_load(GPluginNativePlugin *plugin, GError **error) {
 	return TRUE;
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_plugin_unload(GPluginNativePlugin *plugin) {
+gplugin_plugin_unload(GPluginNativePlugin *plugin, GError **error) {
 	return TRUE;
 }
 

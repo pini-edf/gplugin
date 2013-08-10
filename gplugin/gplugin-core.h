@@ -34,9 +34,6 @@ G_BEGIN_DECLS
 void gplugin_init(void);
 void gplugin_uninit(void);
 
-void gplugin_set_plugin_info_type(GType info_type);
-GType gplugin_get_plugin_info_type(void);
-
 G_END_DECLS
 
 #endif /* GPLUGIN_CORE_H */

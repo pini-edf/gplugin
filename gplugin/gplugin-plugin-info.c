@@ -28,23 +28,26 @@
  * Structs
  *****************************************************************************/
 typedef struct {
-    gchar *id;
+	gchar *id;
 
-    guint32 abi_version;
-    GPluginPluginInfoFlags flags;
+	guint32 abi_version;
+	GPluginPluginInfoFlags flags;
 
-    gchar *name;
-    gchar *version;
-    gchar *license;
+	gchar *name;
+	gchar *version;
 
-    gchar *icon;
+	gchar *license;
+	gchar *license_text;
+	gchar *license_url;
 
-    gchar *summary;
-    gchar *description;
-    gchar *author;
-    gchar *website;
+	gchar *icon;
 
-    GSList *dependencies;
+	gchar *summary;
+	gchar *description;
+	gchar *author;
+	gchar *website;
+
+	GSList *dependencies;
 } GPluginPluginInfoPrivate;
 
 /******************************************************************************
@@ -58,6 +61,8 @@ enum {
 	PROP_NAME,
 	PROP_VERSION,
 	PROP_LICENSE,
+	PROP_LICENSE_TEXT,
+	PROP_LICENSE_URL,
 	PROP_ICON,
 	PROP_SUMMARY,
 	PROP_DESCRIPTION,
@@ -127,6 +132,28 @@ gplugin_plugin_info_set_license(GPluginPluginInfo *info,
 
 	g_free(priv->license);
 	priv->license = (license) ? g_strdup(license) : NULL;
+}
+
+
+static void
+gplugin_plugin_info_set_license_text(GPluginPluginInfo *info,
+                                     const gchar *license_text)
+{
+	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	g_free(priv->license_text);
+	priv->license_text = (license_text) ? g_strdup(license_text) : NULL;
+}
+
+
+static void
+gplugin_plugin_info_set_license_url(GPluginPluginInfo *info,
+                                    const gchar *license_url)
+{
+	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	g_free(priv->license_url);
+	priv->license_url = (license_url) ? g_strdup(license_url) : NULL;
 }
 
 static void
@@ -215,6 +242,14 @@ gplugin_plugin_info_get_property(GObject *obj, guint param_id, GValue *value,
 		case PROP_LICENSE:
 			g_value_set_string(value, gplugin_plugin_info_get_license(info));
 			break;
+		case PROP_LICENSE_TEXT:
+			g_value_set_string(value,
+			                   gplugin_plugin_info_get_license_text(info));
+			break;
+		case PROP_LICENSE_URL:
+			g_value_set_string(value,
+			                   gplugin_plugin_info_get_license_url(info));
+			break;
 		case PROP_ICON:
 			g_value_set_string(value, gplugin_plugin_info_get_icon(info));
 			break;
@@ -266,6 +301,14 @@ gplugin_plugin_info_set_property(GObject *obj, guint param_id,
 		case PROP_LICENSE:
 			gplugin_plugin_info_set_license(info, g_value_get_string(value));
 			break;
+		case PROP_LICENSE_TEXT:
+			gplugin_plugin_info_set_license_text(info,
+			                                     g_value_get_string(value));
+			break;
+		case PROP_LICENSE_URL:
+			gplugin_plugin_info_set_license_url(info,
+			                                    g_value_get_string(value));
+			break;
 		case PROP_ICON:
 			gplugin_plugin_info_set_icon(info, g_value_get_string(value));
 			break;
@@ -300,6 +343,8 @@ gplugin_plugin_info_finalize(GObject *obj) {
     g_free(priv->name);
     g_free(priv->version);
     g_free(priv->license);
+    g_free(priv->license_text);
+    g_free(priv->license_url);
     g_free(priv->icon);
     g_free(priv->summary);
     g_free(priv->description);
@@ -325,6 +370,17 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 	obj_class->finalize = gplugin_plugin_info_finalize;
 
 	/* properties */
+	/**
+	 * GPluginPluginInfo:id:
+	 *
+	 * The id of the plugin.
+	 *
+	 * While not required, the recommended convention is to use the following
+	 * format: <application or library>/<name of the plugin>.
+	 *
+	 * For example, the python loader in GPlugin has an id of
+	 * "gplugin/python-plugin-loader".
+	 */
 	g_object_class_install_property(obj_class, PROP_ID,
 		g_param_spec_string("id", "id",
 		                    "The ID of the plugin",
@@ -332,13 +388,25 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:abi-version:
+	 *
+	 * The GPlugin ABI version that the plugin was compiled against.
+	 *
+	 * In most cases, this is defined by the loader.
+	 */
 	g_object_class_install_property(obj_class, PROP_ABI_VERSION,
-		g_param_spec_uint("abi_version", "abi_version",
+		g_param_spec_uint("abi-version", "abi_version",
 		                  "The ABI version of the plugin",
 		                  0, G_MAXUINT32, 0,
 		                  G_PARAM_READWRITE |
 		                  G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:flags:
+	 *
+	 * The #GPluginPluginInfoFlags for the plugin.
+	 */
 	g_object_class_install_property(obj_class, PROP_FLAGS,
 		g_param_spec_flags("flags", "flags",
 		                   "The flags for the plugin",
@@ -346,6 +414,11 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                   G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                   G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:name:
+	 *
+	 * The display name of the plugin.  This should be a translated string.
+	 */
 	g_object_class_install_property(obj_class, PROP_NAME,
 		g_param_spec_string("name", "name",
 		                    "The name of the plugin",
@@ -353,6 +426,11 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:version:
+	 *
+	 * The version of the plugin.
+	 */
 	g_object_class_install_property(obj_class, PROP_VERSION,
 		g_param_spec_string("version", "version",
 		                    "The version of the plugin",
@@ -360,13 +438,56 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:license:
+	 *
+	 * The short name of the license.
+	 *
+	 * It is recommended to use the identifier of the license from
+	 * http://spdx.org/licenses/ and should be "Other" for custom licenses
+	 * that are not on the SPDX list.
+	 *
+	 * If a plugin has multiple license, they should be separated by a comma.
+	 */
 	g_object_class_install_property(obj_class, PROP_LICENSE,
-		g_param_spec_string("license", "license",
-		                    "The license of the plugin",
+		g_param_spec_string("license", "license id",
+		                    "The license id of the plugin according to SPDX",
 		                    NULL,
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:license-text:
+	 *
+	 * The text of the license for this plugin.  This should only be used when
+	 * the plugin is licensed under a license that is not listed on SPDX.
+	 */
+	g_object_class_install_property(obj_class, PROP_LICENSE_TEXT,
+		g_param_spec_string("license-text", "license text",
+		                    "The text of the license for the plugin",
+		                    NULL,
+		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
+		                    G_PARAM_CONSTRUCT_ONLY));
+
+	/**
+	 * GPluginPluginInfo:license-url:
+	 *
+	 * The url to the text of the license.  This should primarily only be used
+	 * for licenses not listed on SPDX.
+	 */
+	g_object_class_install_property(obj_class, PROP_LICENSE_URL,
+		g_param_spec_string("license-url", "license url",
+		                    "The url to the license of the plugin",
+		                    NULL,
+		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
+		                    G_PARAM_CONSTRUCT_ONLY));
+
+	/**
+	 * GPluginPluginInfo:icon:
+	 *
+	 * A string representing an icon for the plugin.  The actual use of this
+	 * is determined by the application/library using GPlugin.
+	 */
 	g_object_class_install_property(obj_class, PROP_ICON,
 		g_param_spec_string("icon", "icon",
 		                    "The file path of the icon for the plugin",
@@ -374,6 +495,12 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:summary:
+	 *
+	 * A short description of the plugin that can be listed with the name in a
+	 * user interface.
+	 */
 	g_object_class_install_property(obj_class, PROP_SUMMARY,
 		g_param_spec_string("summary", "summary",
 		                    "The summary of the plugin",
@@ -381,6 +508,12 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:description:
+	 *
+	 * The full description of the plugin that will be used in a "more
+	 * information" section in a user interface.
+	 */
 	g_object_class_install_property(obj_class, PROP_DESCRIPTION,
 		g_param_spec_string("description", "description",
 		                    "The description of the plugin",
@@ -388,6 +521,15 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:author:
+	 *
+	 * The name and email address of the author.
+	 *
+	 * It is recommended to use the RFC 822, 2822 format of:
+	 * "First Last <user@domain.com>" with additional authors separated by a
+	 * comma.
+	 */
 	g_object_class_install_property(obj_class, PROP_AUTHOR,
 		g_param_spec_string("author", "author",
 		                    "The author of the plugin",
@@ -395,6 +537,11 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:website:
+	 *
+	 * The url of the plugin that can be represented in a user interface.
+	 */
 	g_object_class_install_property(obj_class, PROP_WEBSITE,
 		g_param_spec_string("website", "website",
 		                    "The website of the plugin",
@@ -402,6 +549,11 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPluginInfo:dependencies:
+	 *
+	 * A #GList of plugin id's that this plugin depends on.
+	 */
 	g_object_class_install_property(obj_class, PROP_DEPENDENCIES,
 		g_param_spec_pointer("dependencies", "dependencies",
 		                     "The dependencies of the plugin",
@@ -414,9 +566,11 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
  *****************************************************************************/
 GType
 gplugin_plugin_info_get_type(void) {
-	static GType type = 0;
+	static volatile gsize type_volatile = 0;
 
-	if(G_UNLIKELY(type == 0)) {
+	if(g_once_init_enter(&type_volatile)) {
+		GType type = 0;
+
 		static const GTypeInfo info = {
 			.class_size = sizeof(GPluginPluginInfoClass),
 			.class_init = (GClassInitFunc)gplugin_plugin_info_class_init,
@@ -426,38 +580,11 @@ gplugin_plugin_info_get_type(void) {
 		type = g_type_register_static(G_TYPE_OBJECT,
 		                              "GPluginPluginInfo",
 		                              &info, 0);
+
+		g_once_init_leave(&type_volatile, type);
 	}
 
-	return type;
-}
-
-/**
- * gplugin_plugin_info_new: (skip)
- * @first: The first property name, or %NULL
- * @...: The value of the first property, followed optionally by more name/value
- *       pairs, followed by %NULL
- *
- * Creates a new #GPluginPluginInfo instance of the type provided by
- * gplugin_set_plugin_info_type().
- *
- * Return value: (transfer full): The new #GPluginPluginInfo instance.
- */
-GPluginPluginInfo *
-gplugin_plugin_info_new(const char *first, ...) {
-	GObject *plugin_info;
-	va_list var_args;
-
-	if (!first) {
-		plugin_info = g_object_newv(gplugin_get_plugin_info_type(), 0, NULL);
-		return GPLUGIN_PLUGIN_INFO(plugin_info);
-	}
-
-	va_start (var_args, first);
-	plugin_info = g_object_new_valist(gplugin_get_plugin_info_type(), first,
-	                                  var_args);
-	va_end (var_args);
-
-	return GPLUGIN_PLUGIN_INFO(plugin_info);
+	return type_volatile;
 }
 
 /**
@@ -560,6 +687,40 @@ gplugin_plugin_info_get_license(const GPluginPluginInfo *info) {
 	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
 	return priv->license;
+}
+
+/**
+ * gplugin_plugin_info_get_license_text:
+ * @info: #GPluginPluginInfo instance
+ *
+ * Return value: The text of the license from @info.
+ */
+const gchar *
+gplugin_plugin_info_get_license_text(const GPluginPluginInfo *info) {
+	GPluginPluginInfoPrivate *priv = NULL;
+
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_INFO(info), NULL);
+
+	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	return priv->license_text;
+}
+
+/**
+ * gplugin_plugin_info_get_license_url:
+ * @info: #GPluginPluginInfo instance
+ *
+ * Return value: The url of the license from @info.
+ */
+const gchar *
+gplugin_plugin_info_get_license_url(const GPluginPluginInfo *info) {
+	GPluginPluginInfoPrivate *priv = NULL;
+
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_INFO(info), NULL);
+
+	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	return priv->license_url;
 }
 
 /**

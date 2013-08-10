@@ -19,10 +19,12 @@
 #include <gplugin-native.h>
 
 G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_plugin_query(void) {
-	return gplugin_plugin_info_new(
+gplugin_plugin_query(GError **error) {
+	return g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
 		"id", "gplugin-python-loader",
 		"abi_version", GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
+		"flags", GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY |
+		         GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL,
 		"name", "Python Plugin Loader",
 		"version", GPLUGIN_VERSION,
 		"summary", "A plugin that can load python plugins",
@@ -35,12 +37,12 @@ gplugin_plugin_query(void) {
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_plugin_load(GPluginNativePlugin *plugin) {
+gplugin_plugin_load(GPluginNativePlugin *plugin, GError **error) {
 	return FALSE;
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_plugin_unload(GPluginNativePlugin *plugin) {
+gplugin_plugin_unload(GPluginNativePlugin *plugin, GError **error) {
 	return FALSE;
 }
 

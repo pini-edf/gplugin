@@ -20,15 +20,8 @@
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(GError **error) {
 	return g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
-		"id",           "gplugin/basic-native-plugin",
+		"id",           "gplugin/test-unload-error",
 		"abi_version",  GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-		"flags",        0,
-		"name",         "name",
-		"version",      "version",
-		"summary",      "summary",
-		"description",  "description",
-		"author",       "author",
-		"website",      "website",
 		NULL
 	);
 }
@@ -40,6 +33,9 @@ gplugin_plugin_load(GPluginNativePlugin *plugin, GError **error) {
 
 G_MODULE_EXPORT gboolean
 gplugin_plugin_unload(GPluginNativePlugin *plugin, GError **error) {
-	return TRUE;
+	if(error)
+		*error = g_error_new(GPLUGIN_DOMAIN, 0, "expected error");
+
+	return FALSE;
 }
 

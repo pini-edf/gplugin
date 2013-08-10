@@ -57,7 +57,7 @@ struct _GPluginPlugin {
 struct _GPluginPluginClass {
 	GObjectClass gparent;
 
-	void (*state_changed)(GPluginPlugin *, GPluginPluginState, GPluginPluginState);
+	void (*state_changed)(GPluginPlugin *plugin, GPluginPluginState oldstate, GPluginPluginState newstate);
 
 	void (*_gplugin_reserved_1)(void);
 	void (*_gplugin_reserved_2)(void);

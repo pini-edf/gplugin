@@ -17,11 +17,16 @@
 
 #include <gplugin/gplugin-plugin-loader.h>
 
+/******************************************************************************
+ * API
+ *****************************************************************************/
 GType
 gplugin_plugin_loader_get_type(void) {
-	static GType type = 0;
+	static volatile gsize type_volatile = 0;
 
-	if(G_UNLIKELY(type == 0)) {
+	if(g_once_init_enter(&type_volatile)) {
+		GType type = 0;
+
 		static const GTypeInfo info = {
 			.class_size = sizeof(GPluginPluginLoaderClass),
 			.instance_size = sizeof(GPluginPluginLoader),
@@ -30,9 +35,11 @@ gplugin_plugin_loader_get_type(void) {
 		type = g_type_register_static(G_TYPE_OBJECT,
 		                              "GPluginPluginLoader",
 		                              &info, G_TYPE_FLAG_ABSTRACT);
+
+		g_once_init_leave(&type_volatile, type);
 	}
 
-	return type;
+	return type_volatile;
 }
 
 /**

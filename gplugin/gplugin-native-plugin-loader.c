@@ -29,9 +29,9 @@
 /******************************************************************************
  * Typedefs
  *****************************************************************************/
-typedef const GPluginPluginInfo *(*GPluginNativePluginQueryFunc)(void);
-typedef gboolean (*GPluginNativePluginLoadFunc)(GPluginNativePlugin *plugin);
-typedef gboolean (*GPluginNativePluginUnloadFunc)(GPluginNativePlugin *plugin);
+typedef const GPluginPluginInfo *(*GPluginNativePluginQueryFunc)(GError **error);
+typedef gboolean (*GPluginNativePluginLoadFunc)(GPluginNativePlugin *plugin, GError **error);
+typedef gboolean (*GPluginNativePluginUnloadFunc)(GPluginNativePlugin *plugin, GError **error);
 
 /******************************************************************************
  * Helpers
@@ -126,7 +126,13 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	/* now we have all of our symbols, so let's see if this plugin will return a
 	 * valid GPluginPluginInfo structure
 	 */
-	info = ((GPluginNativePluginQueryFunc)(query))();
+	info = ((GPluginNativePluginQueryFunc)(query))(error);
+	if(error && *error) {
+		g_module_close(module);
+
+		return NULL;
+	}
+
 	if(!GPLUGIN_IS_PLUGIN_INFO(info)) {
 		g_module_close(module);
 
@@ -139,6 +145,9 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 		return NULL;
 	}
 
+	/* claim ownership of the info object */
+	g_object_ref_sink(G_OBJECT(info));
+
 	/* now create the actual plugin instance */
 	plugin = g_object_new(GPLUGIN_TYPE_NATIVE_PLUGIN,
 	                      "module", module,
@@ -149,13 +158,14 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	                      "filename", filename,
 	                      NULL);
 
+	/* now that the plugin instance owns the info, remove our ref */
+	g_object_unref(G_OBJECT(info));
+
 	if(!GPLUGIN_IS_NATIVE_PLUGIN(plugin)) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     "failed to create plugin instance");
 		}
-
-		g_object_unref(G_OBJECT(info));
 
 		return NULL;
 	}
@@ -197,7 +207,7 @@ gplugin_native_plugin_loader_load(GPluginPluginLoader *loader,
 
 	/* now call the load function and exit */
 	load = (GPluginNativePluginLoadFunc)func;
-	if(!load(GPLUGIN_NATIVE_PLUGIN(plugin))) {
+	if(!load(GPLUGIN_NATIVE_PLUGIN(plugin), error)) {
 		*error = g_error_new(GPLUGIN_DOMAIN, 0,
 		                     "Plugin load function returned FALSE");
 
@@ -243,7 +253,7 @@ gplugin_native_plugin_loader_unload(GPluginPluginLoader *loader,
 
 	/* now call the unload function and exit */
 	unload = (GPluginNativePluginLoadFunc)func;
-	if(!unload(GPLUGIN_NATIVE_PLUGIN(plugin))) {
+	if(!unload(GPLUGIN_NATIVE_PLUGIN(plugin), error)) {
 		*error = g_error_new(GPLUGIN_DOMAIN, 0,
 		                     "Plugin unload function returned FALSE");
 
@@ -271,9 +281,11 @@ gplugin_native_plugin_loader_class_init(GPluginNativePluginLoaderClass *klass) {
  *****************************************************************************/
 GType
 gplugin_native_plugin_loader_get_type(void) {
-	static GType type = 0;
+	static volatile gsize type_volatile = 0;
 
-	if(G_UNLIKELY(type == 0)) {
+	if(g_once_init_enter(&type_volatile)) {
+		 GType type = 0;
+
 		static const GTypeInfo info = {
 			.class_size = sizeof(GPluginNativePluginLoaderClass),
 			.class_init = (GClassInitFunc)gplugin_native_plugin_loader_class_init,
@@ -283,9 +295,11 @@ gplugin_native_plugin_loader_get_type(void) {
 		type = g_type_register_static(GPLUGIN_TYPE_PLUGIN_LOADER,
 		                              "GPluginNativePluginLoader",
 		                              &info, 0);
+
+		g_once_init_leave(&type_volatile, type);
 	}
 
-	return type;
+	return type_volatile;
 }
 
 

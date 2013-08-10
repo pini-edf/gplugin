@@ -34,8 +34,19 @@
 typedef struct _GPluginPluginInfo           GPluginPluginInfo;
 typedef struct _GPluginPluginInfoClass      GPluginPluginInfoClass;
 
+/**
+ * GPluginPluginInfoFlags:
+ * @LOAD_ON_QUERY: Load the plugin when queried.  This
+ *                 is primarily used by loaders and
+ *                 other plugins that user is not
+ *                 interested in.
+ * @GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL: Plugin is internal and should not be
+ *                                      shown in user interfaces.
+ *
+ * Flags that can be used to treat plugins differently.
+ */
 typedef enum /*< prefix=GPLUGIN_PLUGIN_INFO_FLAGS,underscore_name=GPLUGIN_PLUGIN_INFO_FLAGS >*/ {
-    GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY = 1 << 1,
+    GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY = 1 << 1, /*< soemthing >*/
     GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL = 1 << 2,
 } GPluginPluginInfoFlags;
 
@@ -45,11 +56,11 @@ typedef enum /*< prefix=GPLUGIN_PLUGIN_INFO_FLAGS,underscore_name=GPLUGIN_PLUGIN
 #include <gplugin/gplugin-plugin-loader.h>
 
 struct _GPluginPluginInfo {
-	GObject gparent;
+	GInitiallyUnowned gparent;
 };
 
 struct _GPluginPluginInfoClass {
-	GObjectClass gparent;
+	GInitiallyUnownedClass gparent;
 
 	void (*_gplugin_reserved_1)(void);
 	void (*_gplugin_reserved_2)(void);
@@ -61,14 +72,14 @@ G_BEGIN_DECLS
 
 GType gplugin_plugin_info_get_type(void);
 
-GPluginPluginInfo *gplugin_plugin_info_new(const char *first, ...);
-
 const gchar *gplugin_plugin_info_get_id(const GPluginPluginInfo *info);
 guint32 gplugin_plugin_info_get_abi_version(const GPluginPluginInfo *info);
 GPluginPluginInfoFlags gplugin_plugin_info_get_flags(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_name(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_version(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_license(const GPluginPluginInfo *info);
+const gchar *gplugin_plugin_info_get_license_text(const GPluginPluginInfo *info);
+const gchar *gplugin_plugin_info_get_license_url(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_icon(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_summary(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_description(const GPluginPluginInfo *info);

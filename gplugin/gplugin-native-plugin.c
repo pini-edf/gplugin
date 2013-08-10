@@ -254,14 +254,31 @@ gplugin_native_plugin_class_init(GPluginNativePluginClass *klass) {
 	obj_class->get_property = gplugin_native_plugin_get_property;
 	obj_class->set_property = gplugin_native_plugin_set_property;
 
+	/**
+	 * GPluginNativePlugin:module:
+	 *
+	 * The GModule instance for this plugin.
+	 */
 	g_object_class_install_property(obj_class, PROP_MODULE,
 		g_param_spec_pointer("module", "module handle",
 		                     "The GModule instance of the plugin",
 		                     G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
+
+	/**
+	 * GPluginNativePlugin:load-func:
+	 *
+	 * A function pointer to the load method of the plugin.
+	 */
 	g_object_class_install_property(obj_class, PROP_LOAD_FUNC,
 		g_param_spec_pointer("load-func", "load function pointer",
 		                     "address pointer to load function",
 		                     G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
+
+	/**
+	 * GPluginNativePlugin:unload-func:
+	 *
+	 * A function pointer to the unload method of the plugin.
+	 */
 	g_object_class_install_property(obj_class, PROP_UNLOAD_FUNC,
 		g_param_spec_pointer("unload-func", "unload function pointer",
 		                     "address pointer to the unload function",
@@ -273,9 +290,11 @@ gplugin_native_plugin_class_init(GPluginNativePluginClass *klass) {
  *****************************************************************************/
 GType
 gplugin_native_plugin_get_type(void) {
-	static GType type = 0;
+	static volatile gsize type_volatile = 0;
 
-	if(G_UNLIKELY(type == 0)) {
+	if(g_once_init_enter(&type_volatile)) {
+		GType type = 0;
+
 		static const GTypeInfo info = {
 			.class_size = sizeof(GPluginNativePluginClass),
 			.class_init = (GClassInitFunc)gplugin_native_plugin_class_init,
@@ -291,9 +310,11 @@ gplugin_native_plugin_get_type(void) {
 		                              &info, 0);
 
 		g_type_add_interface_static(type, G_TYPE_TYPE_PLUGIN, &iface_info);
+
+		g_once_init_leave(&type_volatile, type);
 	}
 
-	return type;
+	return type_volatile;
 }
 
 gboolean

@@ -1,4 +1,24 @@
-0.0.4:
+0.0.5:
+
+0.0.4: 2013/08/10
+  * Added the install path as a default for gplugin-query
+  * Added an option to gplugin-query to not use the default paths
+  * Fixed a bug in gplugin_plugin_manager_remove_path
+  * Made some changes to the python loader, still far from working
+  * Fixed gplugin_plugin_manager_add_app_paths to use g_build_filename instead
+    of g_build_path.
+  * Fixed some leaks involving GPluginPluginInfo
+  * Avoid a crash if no paths are added
+  * Don't show internal plugins by default in gplugin-query, use -i to see them
+  * Removed gplugin_plugin_info_new for now (this may make a comeback)
+  * Set GPluginInfoClass's parent to GInitiallyUnownedClass
+  * Updated the target names in GObjectIntrospection.cmake to be the filenames
+    that are produced.
+  * Added license_text and license_url to GPluginPluginInfo
+  * Lots of documentation updates, more to go yet
+  * Added a -D option to gplugin-query to not use the default paths
+  * Updated the query, load, and unload functions of native plugins to take
+    a GError.
 
 0.0.3: 2013/07/30
   * Added gplugin_plugin_manager_add_app_paths

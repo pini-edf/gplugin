@@ -14,7 +14,7 @@ project(gplugin C)
 
 set(GPLUGIN_MAJOR_VERSION 0)
 set(GPLUGIN_MINOR_VERSION 0)
-set(GPLUGIN_MICRO_VERSION 4)
+set(GPLUGIN_MICRO_VERSION 5)
 set(GPLUGIN_EXTRA_VERSION dev)
 
 set(GPLUGIN_VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.${GPLUGIN_MICRO_VERSION}${GPLUGIN_EXTRA_VERSION})
@@ -101,6 +101,7 @@ mark_as_advanced(GTESTER)
 ###############################################################################
 add_definitions(
 	-g -g3 -Wall
+	-DPREFIX="${CMAKE_INSTALL_PREFIX}"
 )
 
 include_directories(
@@ -120,6 +121,7 @@ link_directories(
 # Config Files
 ###############################################################################
 configure_file(gplugin.pc.in ${CMAKE_BINARY_DIR}/gplugin.pc @ONLY)
+configure_file(gplugin-uninstalled.pc.in ${CMAKE_BINARY_DIR}/gplugin-uninstalled.pc @ONLY)
 
 ###############################################################################
 # Subdirectories
