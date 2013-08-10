@@ -29,9 +29,9 @@
 /******************************************************************************
  * Typedefs
  *****************************************************************************/
-typedef const GPluginPluginInfo *(*GPluginNativePluginQueryFunc)(void);
-typedef gboolean (*GPluginNativePluginLoadFunc)(GPluginNativePlugin *plugin);
-typedef gboolean (*GPluginNativePluginUnloadFunc)(GPluginNativePlugin *plugin);
+typedef const GPluginPluginInfo *(*GPluginNativePluginQueryFunc)(GError **error);
+typedef gboolean (*GPluginNativePluginLoadFunc)(GPluginNativePlugin *plugin, GError **error);
+typedef gboolean (*GPluginNativePluginUnloadFunc)(GPluginNativePlugin *plugin, GError **error);
 
 /******************************************************************************
  * Helpers
@@ -126,7 +126,7 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	/* now we have all of our symbols, so let's see if this plugin will return a
 	 * valid GPluginPluginInfo structure
 	 */
-	info = ((GPluginNativePluginQueryFunc)(query))();
+	info = ((GPluginNativePluginQueryFunc)(query))(error);
 	if(!GPLUGIN_IS_PLUGIN_INFO(info)) {
 		g_module_close(module);
 
@@ -201,7 +201,7 @@ gplugin_native_plugin_loader_load(GPluginPluginLoader *loader,
 
 	/* now call the load function and exit */
 	load = (GPluginNativePluginLoadFunc)func;
-	if(!load(GPLUGIN_NATIVE_PLUGIN(plugin))) {
+	if(!load(GPLUGIN_NATIVE_PLUGIN(plugin), error)) {
 		*error = g_error_new(GPLUGIN_DOMAIN, 0,
 		                     "Plugin load function returned FALSE");
 
@@ -247,7 +247,7 @@ gplugin_native_plugin_loader_unload(GPluginPluginLoader *loader,
 
 	/* now call the unload function and exit */
 	unload = (GPluginNativePluginLoadFunc)func;
-	if(!unload(GPLUGIN_NATIVE_PLUGIN(plugin))) {
+	if(!unload(GPLUGIN_NATIVE_PLUGIN(plugin), error)) {
 		*error = g_error_new(GPLUGIN_DOMAIN, 0,
 		                     "Plugin unload function returned FALSE");
 
