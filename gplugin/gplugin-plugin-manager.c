@@ -765,7 +765,7 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 
 		/* make sure we got at least 1 match */
 		if(matches == NULL) {
-			if(error && *error == NULL) {
+			if(error) {
 				*error = g_error_new(GPLUGIN_DOMAIN, 0,
 				                     "Failed to find plugin %s which %s "
 				                     "depends on",
@@ -789,11 +789,15 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 		}
 
 		if(ret == FALSE) {
-			if(error && *error == NULL) {
-				*error = g_error_new(GPLUGIN_DOMAIN, 0,
-				                     "Found at least one plugin with an id of "
-				                     "%s, but failed to load it.",
-				                     dep_id);
+			if(error) {
+				if (*error == NULL) {
+					*error = g_error_new(GPLUGIN_DOMAIN, 0,
+						                 "Plugin did not give a reason.");
+				}
+
+				g_prefix_error(error,
+				               "Found at least one dependency with the id %s, "
+				               "but failed to load it: ", dep_id);
 			}
 			g_object_unref(G_OBJECT(info));
 
@@ -807,7 +811,7 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 	loader = gplugin_plugin_get_loader(plugin);
 
 	if(!GPLUGIN_IS_PLUGIN_LOADER(loader)) {
-		if(error && *error == NULL) {
+		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     "The loader for %s is not a loader.  This "
 			                     "should not happend!",
