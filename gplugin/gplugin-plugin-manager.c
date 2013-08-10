@@ -792,10 +792,12 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 			if(error) {
 				if (*error == NULL) {
 					*error = g_error_new(GPLUGIN_DOMAIN, 0,
-						                 "Found at least one plugin with an id "
-						                 "of %s, but failed to load it.",
-						                 dep_id);
+						                 "Plugin did not give a reason.");
 				}
+
+				g_prefix_error(error,
+				               "Found at least one dependee plugin with the id "
+				               "%s, but failed to load it: ", dep_id);
 			}
 			g_object_unref(G_OBJECT(info));
 
