@@ -19,10 +19,10 @@
 
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(GError **error) {
-	GSList *depends = g_slist_prepend(NULL, "basic-native-plugin");
+	GSList *depends = g_slist_prepend(NULL, "gplugin/basic-native-plugin");
 
 	return g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
-		"id",            "dependent-native-plugin",
+		"id",            "gplugin/dependent-native-plugin",
 		"abi_version",   GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
 		"flags",         0,
 		"name",          "name",
@@ -32,7 +32,7 @@ gplugin_plugin_query(GError **error) {
 		"author",        "author",
 		"website",       "website",
 		"dependencies",  depends,
-		 NULL
+		NULL
 	);
 }
 
