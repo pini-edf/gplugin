@@ -44,6 +44,7 @@ typedef struct {
 
 	gchar *summary;
 	gchar *description;
+	gchar *category;
 	gchar *author;
 	gchar *website;
 
@@ -66,6 +67,7 @@ enum {
 	PROP_ICON,
 	PROP_SUMMARY,
 	PROP_DESCRIPTION,
+	PROP_CATEGORY,
 	PROP_AUTHOR,
 	PROP_WEBSITE,
 	PROP_DEPENDENCIES,
@@ -185,6 +187,16 @@ gplugin_plugin_info_set_description(GPluginPluginInfo *info,
 }
 
 static void
+gplugin_plugin_info_set_category(GPluginPluginInfo *info,
+                                 const gchar *category)
+{
+	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	g_free(priv->category);
+	priv->category = (category) ? g_strdup(category) : NULL;
+}
+
+static void
 gplugin_plugin_info_set_author(GPluginPluginInfo *info, const gchar *author) {
 	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
@@ -260,6 +272,9 @@ gplugin_plugin_info_get_property(GObject *obj, guint param_id, GValue *value,
 			g_value_set_string(value,
 			                   gplugin_plugin_info_get_description(info));
 			break;
+		case PROP_CATEGORY:
+			g_value_set_string(value, gplugin_plugin_info_get_category(info));
+			break;
 		case PROP_AUTHOR:
 			g_value_set_string(value, gplugin_plugin_info_get_author(info));
 			break;
@@ -318,6 +333,9 @@ gplugin_plugin_info_set_property(GObject *obj, guint param_id,
 		case PROP_DESCRIPTION:
 			gplugin_plugin_info_set_description(info,
 			                                    g_value_get_string(value));
+			break;
+		case PROP_CATEGORY:
+			gplugin_plugin_info_set_category(info, g_value_get_string(value));
 			break;
 		case PROP_AUTHOR:
 			gplugin_plugin_info_set_author(info, g_value_get_string(value));
@@ -517,6 +535,23 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 	g_object_class_install_property(obj_class, PROP_DESCRIPTION,
 		g_param_spec_string("description", "description",
 		                    "The description of the plugin",
+		                    NULL,
+		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
+		                    G_PARAM_CONSTRUCT_ONLY));
+
+	/**
+	 * GPluginPluginInfo:category:
+	 *
+	 * The category of this plugin.
+	 *
+	 * This property is used to organize plugins into categories in a user
+	 * interface.  It is recommended that an application has a well defined
+	 * set of categories that plugin authors should use, and put all plugins
+	 * that don't match this category into an "Other" category.
+	 */
+	g_object_class_install_property(obj_class, PROP_CATEGORY,
+		g_param_spec_string("category", "category",
+		                    "The category of the plugin",
 		                    NULL,
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                    G_PARAM_CONSTRUCT_ONLY));
@@ -772,6 +807,23 @@ gplugin_plugin_info_get_description(const GPluginPluginInfo *info) {
 	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
 	return priv->description;
+}
+
+/**
+ * gplugin_plugin_info_get_category:
+ * @info: #GPluginPluginInfo instance
+ *
+ * Return value: The category from @info.
+ */
+const gchar *
+gplugin_plugin_info_get_category(const GPluginPluginInfo *info) {
+	GPluginPluginInfoPrivate *priv = NULL;
+
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_INFO(info), NULL);
+
+	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	return priv->category;
 }
 
 /**

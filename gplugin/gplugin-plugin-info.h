@@ -83,6 +83,7 @@ const gchar *gplugin_plugin_info_get_license_url(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_icon(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_summary(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_description(const GPluginPluginInfo *info);
+const gchar *gplugin_plugin_info_get_category(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_author(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_website(const GPluginPluginInfo *info);
 GSList *gplugin_plugin_info_get_dependencies(const GPluginPluginInfo *info);
