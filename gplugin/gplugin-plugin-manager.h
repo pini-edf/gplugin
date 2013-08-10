@@ -35,7 +35,8 @@ void gplugin_plugin_manager_append_path(const gchar *path);
 void gplugin_plugin_manager_prepend_path(const gchar *path);
 void gplugin_plugin_manager_remove_path(const gchar *path);
 
-void gplugin_plugin_manager_add_app_paths(const gchar *appname);
+void gplugin_plugin_manager_add_default_paths(void);
+void gplugin_plugin_manager_add_app_paths(const gchar *prefix, const gchar *appname);
 
 GList *gplugin_plugin_manager_get_paths(void);
 

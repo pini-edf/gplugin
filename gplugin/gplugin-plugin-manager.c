@@ -295,37 +295,52 @@ gplugin_plugin_manager_remove_path(const gchar *path) {
 			link = l;
 		}
 
-	g_queue_delete_link(paths, link);
+	if(link)
+		g_queue_delete_link(paths, link);
 }
 
 /**
- * gplugin_plugin_manager_add_app_paths:
- * @appname: The name of the application whose paths to add
+ * gplugin_plugin_manager_add_default_paths:
  *
- * Adds the application specific paths for @appname.  This will add
- * $prefix/@appname/plugins to the list.
- *
- * On UNIX /usr/lib/@appname and /usr/local/lib/@appname will be added.
- *
- * On all platforms $XDG_CONFIG_HOME/@appname/plugins will be added.
+ * Adds the path that GPlugin was installed to to the plugin search path, as
+ * well as ${XDG_CONFIG_HOME}/gplugin.
  */
 void
-gplugin_plugin_manager_add_app_paths(const gchar *appname) {
+gplugin_plugin_manager_add_default_paths(void) {
+	gchar *path;
+
+	path = g_build_filename(PREFIX, "lib", "gplugin", NULL);
+	gplugin_plugin_manager_prepend_path(path);
+	g_free(path);
+
+	path = g_build_filename(g_get_user_config_dir(), "gplugin", NULL);
+	gplugin_plugin_manager_prepend_path(path);
+	g_free(path);
+}
+
+
+/**
+ * gplugin_plugin_manager_add_app_paths:
+ * @prefix: The installation prefix for the application.
+ * @appname: The name of the application whose paths to add.
+ *
+ * Adds the application installation path for @appname.  This will add
+ * $prefix/@appname/plugins to the list as well as
+ * ${XDG_CONFIG_HOME}/@appname/plugins.
+ */
+void
+gplugin_plugin_manager_add_app_paths(const gchar *prefix,
+                                     const gchar *appname)
+{
 	gchar *path;
 
 	g_return_if_fail(appname != NULL);
 
-#ifdef __unix__
-	path = g_build_path("/usr/lib", appname, NULL);
+	path = g_build_filename(prefix, appname, NULL);
 	gplugin_plugin_manager_prepend_path(path);
 	g_free(path);
 
-	path = g_build_path("/usr/local/lib", appname, NULL);
-	gplugin_plugin_manager_prepend_path(path);
-	g_free(path);
-#endif
-
-	path = g_build_path(g_get_user_config_dir(), appname, "plugins", NULL);
+	path = g_build_filename(g_get_user_config_dir(), appname, "plugins", NULL);
 	gplugin_plugin_manager_prepend_path(path);
 	g_free(path);
 }

@@ -29,10 +29,18 @@
 static gint verbosity = 0;
 static gboolean internal = FALSE;
 static gchar **paths = NULL;
+static gboolean add_default_paths = TRUE;
 
 /******************************************************************************
  * Helpers
  *****************************************************************************/
+static gboolean
+no_default_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
+	add_default_paths = FALSE;
+
+	return TRUE;
+}
+
 static gboolean
 verbosity_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
 	verbosity++;
@@ -163,6 +171,10 @@ output_plugins(GList *plugins) {
  *****************************************************************************/
 static GOptionEntry entries[] = {
 	{
+		"no-default-paths", 'D', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+		no_default_cb, "Do not search the default plugin paths",
+		NULL,
+	}, {
 		"internal", 'i', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
 		internal_cb, "Show internal plugins.",
 		NULL,
@@ -184,7 +196,6 @@ main(gint argc, gchar **argv) {
 	GError *error = NULL;
 	GOptionContext *ctx = NULL;
 	gint i = 0, ret = 0;
-	gchar *def_path = NULL;
 
 	gplugin_init();
 
@@ -203,10 +214,9 @@ main(gint argc, gchar **argv) {
 		return EXIT_FAILURE;
 	}
 
-	/* add the default gplugin path according to PREFIX */
-	def_path = g_build_filename(PREFIX, "lib", "gplugin", NULL);
-	gplugin_plugin_manager_prepend_path(def_path);
-	g_free(def_path);
+	/* add the default gplugin paths unless asked not to */
+	if(add_default_paths)
+		gplugin_plugin_manager_add_default_paths();
 
 	/* now add any paths the user provided */
 	if(paths) {
