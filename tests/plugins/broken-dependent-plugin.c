@@ -19,8 +19,6 @@
 
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(GError **error) {
-	GSList *depends = g_slist_prepend(NULL, "plugin-does-not-exist");
-
 	return g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
 		"id",            "gplugin/broken-dependent-native-plugin",
 		"abi_version",   GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
@@ -31,7 +29,7 @@ gplugin_plugin_query(GError **error) {
 		"description",   "description",
 		"author",        "author",
 		"website",       "website",
-		"dependencies",  depends,
+		"dependencies",  "gplugin/does-not-exist",
 		NULL
 	);
 }

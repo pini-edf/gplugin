@@ -48,7 +48,7 @@ typedef struct {
 	gchar *author;
 	gchar *website;
 
-	GSList *dependencies;
+	gchar *dependencies;
 } GPluginPluginInfoPrivate;
 
 /******************************************************************************
@@ -216,14 +216,12 @@ gplugin_plugin_info_set_website(GPluginPluginInfo *info,
 
 static void
 gplugin_plugin_info_set_dependencies(GPluginPluginInfo *info,
-                                     GSList *dependencies)
+                                     const gchar *dependencies)
 {
 	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
-	if(priv->dependencies)
-		g_slist_free(priv->dependencies);
-
-	priv->dependencies = dependencies;
+	g_free(priv->dependencies);
+	priv->dependencies = (dependencies) ? g_strdup(dependencies) : NULL;
 }
 
 /******************************************************************************
@@ -282,8 +280,8 @@ gplugin_plugin_info_get_property(GObject *obj, guint param_id, GValue *value,
 			g_value_set_string(value, gplugin_plugin_info_get_website(info));
 			break;
 		case PROP_DEPENDENCIES:
-			g_value_set_pointer(value,
-			                    gplugin_plugin_info_get_dependencies(info));
+			g_value_set_string(value,
+			                   gplugin_plugin_info_get_dependencies(info));
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, param_id, pspec);
@@ -345,7 +343,7 @@ gplugin_plugin_info_set_property(GObject *obj, guint param_id,
 			break;
 		case PROP_DEPENDENCIES:
 			gplugin_plugin_info_set_dependencies(info,
-			                                     g_value_get_pointer(value));
+			                                     g_value_get_string(value));
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, param_id, pspec);
@@ -368,9 +366,7 @@ gplugin_plugin_info_finalize(GObject *obj) {
     g_free(priv->description);
     g_free(priv->author);
     g_free(priv->website);
-
-	if(priv->dependencies)
-		g_slist_free(priv->dependencies);
+	g_free(priv->dependencies);
 
 	G_OBJECT_CLASS(parent_class)->finalize(obj);
 }
@@ -587,11 +583,12 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 	/**
 	 * GPluginPluginInfo:dependencies:
 	 *
-	 * A #GList of plugin id's that this plugin depends on.
+	 * A comma separated list of plugin id's that this plugin depends on.
 	 */
 	g_object_class_install_property(obj_class, PROP_DEPENDENCIES,
-		g_param_spec_pointer("dependencies", "dependencies",
+		g_param_spec_string("dependencies", "dependencies",
 		                     "The dependencies of the plugin",
+		                     NULL,
 		                     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                     G_PARAM_CONSTRUCT_ONLY));
 }
@@ -864,10 +861,9 @@ gplugin_plugin_info_get_website(const GPluginPluginInfo *info) {
  * gplugin_plugin_info_get_dependencies:
  * @info: #GPluginPluginInfo instance
  *
- * Return value: (element-type utf8) (transfer container): The dependencies
- *               from @info.
+ * Return value: The command separate list of dependencies from @info.
  */
-GSList *
+const gchar *
 gplugin_plugin_info_get_dependencies(const GPluginPluginInfo *info) {
 	GPluginPluginInfoPrivate *priv = NULL;
 

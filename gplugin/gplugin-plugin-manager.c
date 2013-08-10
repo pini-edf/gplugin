@@ -731,7 +731,9 @@ gboolean
 gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 	const GPluginPluginInfo *info = NULL;
 	GPluginPluginLoader *loader = NULL;
-	GSList *l = NULL;
+	const gchar *dependencies = NULL;
+	gchar **dependencies_v = NULL;
+	gint i = 0;
 
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
 
@@ -754,58 +756,65 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 	/* now walk through any dependencies the plugin has and load them.  If they
 	 * fail to load we need to fail as well.
 	 */
-	for(l = gplugin_plugin_info_get_dependencies(info); l; l = l->next) {
-		GSList *matches = NULL, *m = NULL;
-		const gchar *dep_id = NULL;
-		gboolean ret = FALSE;
+	dependencies = gplugin_plugin_info_get_dependencies(info);
+	if(dependencies != NULL) {
+		dependencies_v = g_strsplit(dependencies, ",", 0);
 
-		dep_id = (gchar *)l->data;
+		for(i = 0; dependencies_v[i]; i++) {
+			GSList *matches = NULL, *m = NULL;
+			gboolean ret = FALSE;
 
-		matches = gplugin_plugin_manager_find_plugins(dep_id);
+			matches = gplugin_plugin_manager_find_plugins(dependencies_v[i]);
 
-		/* make sure we got at least 1 match */
-		if(matches == NULL) {
-			if(error) {
-				*error = g_error_new(GPLUGIN_DOMAIN, 0,
-				                     "Failed to find plugin %s which %s "
-				                     "depends on",
-				                     dep_id,
-				                     gplugin_plugin_get_filename(plugin));
-			}
-			g_object_unref(G_OBJECT(info));
-
-			return FALSE;
-		}
-
-		for(m = matches; m; m = m->next) {
-			GPluginPlugin *plugin = g_object_ref(G_OBJECT(m->data));
-
-			ret = gplugin_plugin_manager_load_plugin(plugin, error);
-
-			g_object_unref(G_OBJECT(plugin));
-
-			if(ret == TRUE)
-				break;
-		}
-
-		if(ret == FALSE) {
-			if(error) {
-				if (*error == NULL) {
+			/* make sure we got at least 1 match */
+			if(matches == NULL) {
+				if(error) {
 					*error = g_error_new(GPLUGIN_DOMAIN, 0,
-						                 "Plugin did not give a reason.");
+					                     "Failed to find plugin %s which %s "
+					                     "depends on",
+					                     dependencies_v[i],
+					                     gplugin_plugin_get_filename(plugin));
 				}
 
-				g_prefix_error(error,
-				               "Found at least one dependency with the id %s, "
-				               "but failed to load it: ", dep_id);
-			}
-			g_object_unref(G_OBJECT(info));
+				g_object_unref(G_OBJECT(info));
+				g_strfreev(dependencies_v);
 
-			return FALSE;
+				return FALSE;
+			}
+
+			for(m = matches; m; m = m->next) {
+				GPluginPlugin *plugin = g_object_ref(G_OBJECT(m->data));
+
+				ret = gplugin_plugin_manager_load_plugin(plugin, error);
+
+				g_object_unref(G_OBJECT(plugin));
+
+				if(ret == TRUE)
+					break;
+			}
+
+			if(ret == FALSE) {
+				if(error) {
+					if (*error == NULL) {
+						*error = g_error_new(GPLUGIN_DOMAIN, 0,
+							                 "Plugin did not give a reason.");
+					}
+
+					g_prefix_error(error,
+					               "Found at least one dependency with the id %s, "
+					               "but failed to load it: ", dependencies_v[i]);
+				}
+
+				g_object_unref(G_OBJECT(info));
+				g_strfreev(dependencies_v);
+
+				return FALSE;
+			}
 		}
 	}
 
 	g_object_unref(G_OBJECT(info));
+	g_strfreev(dependencies_v);
 
 	/* now load the actual plugin */
 	loader = gplugin_plugin_get_loader(plugin);
