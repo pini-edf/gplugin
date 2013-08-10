@@ -100,7 +100,7 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	query = gplugin_native_plugin_loader_lookup_symbol(module,
 	                                                   GPLUGIN_QUERY_SYMBOL,
 	                                                   error);
-	if(*error) {
+	if(error && *error) {
 		g_module_close(module);
 		return NULL;
 	}
@@ -109,7 +109,7 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	load = gplugin_native_plugin_loader_lookup_symbol(module,
 	                                                  GPLUGIN_LOAD_SYMBOL,
 	                                                  error);
-	if(*error) {
+	if(error && *error) {
 		g_module_close(module);
 		return NULL;
 	}
@@ -118,7 +118,7 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	unload = gplugin_native_plugin_loader_lookup_symbol(module,
 	                                                    GPLUGIN_UNLOAD_SYMBOL,
 	                                                    error);
-	if(*error) {
+	if(error && *error) {
 		g_module_close(module);
 		return NULL;
 	}
@@ -166,7 +166,6 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     "failed to create plugin instance");
 		}
-
 		return NULL;
 	}
 
@@ -208,9 +207,10 @@ gplugin_native_plugin_loader_load(GPluginPluginLoader *loader,
 	/* now call the load function and exit */
 	load = (GPluginNativePluginLoadFunc)func;
 	if(!load(GPLUGIN_NATIVE_PLUGIN(plugin), error)) {
-		*error = g_error_new(GPLUGIN_DOMAIN, 0,
-		                     "Plugin load function returned FALSE");
-
+		if (error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+				                 "Plugin load function returned FALSE");
+		}
 		return FALSE;
 	}
 
@@ -254,9 +254,10 @@ gplugin_native_plugin_loader_unload(GPluginPluginLoader *loader,
 	/* now call the unload function and exit */
 	unload = (GPluginNativePluginLoadFunc)func;
 	if(!unload(GPLUGIN_NATIVE_PLUGIN(plugin), error)) {
-		*error = g_error_new(GPLUGIN_DOMAIN, 0,
-		                     "Plugin unload function returned FALSE");
-
+		if (error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+				                 "Plugin unload function returned FALSE");
+		}
 		return FALSE;
 	}
 
