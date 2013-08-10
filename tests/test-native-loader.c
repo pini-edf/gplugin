@@ -132,12 +132,8 @@ test_dependent_plugin_load(void) {
 	g_assert_cmpint(state, !=, GPLUGIN_PLUGIN_STATE_LOADED);
 
 	/* now load the dependent plugin */
-	if(!gplugin_plugin_manager_load_plugin(dependent, &error)) {
-		if(error)
-			g_test_message("%s\n", error->message);
-		g_test_fail();
-		return;
-	}
+	g_assert(gplugin_plugin_manager_load_plugin(dependent, &error));
+	g_assert_no_error(error);
 
 	/* make sure the parent plugin got loaded too */
 	state = gplugin_plugin_get_state(parent);
