@@ -796,8 +796,8 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 				}
 
 				g_prefix_error(error,
-				               "Found at least one dependee plugin with the id "
-				               "%s, but failed to load it: ", dep_id);
+				               "Found at least one dependency with the id %s, "
+				               "but failed to load it: ", dep_id);
 			}
 			g_object_unref(G_OBJECT(info));
 
