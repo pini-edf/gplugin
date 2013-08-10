@@ -127,6 +127,12 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	 * valid GPluginPluginInfo structure
 	 */
 	info = ((GPluginNativePluginQueryFunc)(query))(error);
+	if(error && *error) {
+		g_module_close(module);
+
+		return NULL;
+	}
+
 	if(!GPLUGIN_IS_PLUGIN_INFO(info)) {
 		g_module_close(module);
 
