@@ -20,6 +20,9 @@
 
 #include <glib.h>
 
+/******************************************************************************
+ * Tests
+ *****************************************************************************/
 static void
 test_gplugin_plugin_info_construction(void) {
 	GPluginPluginInfo *info = NULL;
@@ -29,6 +32,18 @@ test_gplugin_plugin_info_construction(void) {
 	gchar *author = NULL, *website = NULL, *dependencies = NULL;
 	guint abi_version = 0;
 	GPluginPluginInfoFlags flags = 0;
+
+	#define test_string(var, value) G_STMT_START { \
+		g_assert_cmpstr((var), ==, (value)); \
+		g_assert_cmpstr((var), ==, gplugin_plugin_info_get_##var(info)); \
+		g_free((var)); \
+	} G_STMT_END
+
+	#define test_uint(var, value) G_STMT_START { \
+		g_assert_cmpuint((var), ==, (value)); \
+		g_assert_cmpuint((var), ==, gplugin_plugin_info_get_##var(info)); \
+	} G_STMT_END
+
 
 	info = g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
 		"id", "gplugin-test/plugin-info-test",
@@ -71,70 +86,25 @@ test_gplugin_plugin_info_construction(void) {
 		NULL
 	);
 
-	g_assert_cmpstr(id, ==, "gplugin-test/plugin-info-test");
-	g_assert_cmpstr(id, ==, gplugin_plugin_info_get_id(info));
+	test_string(id, "gplugin-test/plugin-info-test");
+	test_uint(abi_version, GPLUGIN_NATIVE_PLUGIN_ABI_VERSION);
+	test_uint(flags, GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY |
+	                 GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL);
+	test_string(name, "name");
+	test_string(version, "version");
+	test_string(license, "license");
+	test_string(license_text, "license-text");
+	test_string(license_url, "license-url");
+	test_string(icon, "icon");
+	test_string(summary, "summary");
+	test_string(description, "description");
+	test_string(category, "category");
+	test_string(author, "author");
+	test_string(website, "website");
+	test_string(dependencies, "dependencies");
 
-	g_assert_cmpuint(abi_version, ==, GPLUGIN_NATIVE_PLUGIN_ABI_VERSION);
-	g_assert_cmpuint(abi_version, ==,
-	                 gplugin_plugin_info_get_abi_version(info));
-
-	g_assert_cmpuint(flags, ==, GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY |
-	                            GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL);
-	g_assert_cmpuint(flags, ==, gplugin_plugin_info_get_flags(info));
-
-	g_assert_cmpstr(name, ==, "name");
-	g_assert_cmpstr(name, ==, gplugin_plugin_info_get_name(info));
-
-	g_assert_cmpstr(version, ==, "version");
-	g_assert_cmpstr(version, ==, gplugin_plugin_info_get_version(info));
-
-	g_assert_cmpstr(license, ==, "license");
-	g_assert_cmpstr(license, ==, gplugin_plugin_info_get_license(info));
-
-	g_assert_cmpstr(license_text, ==, "license-text");
-	g_assert_cmpstr(license_text, ==,
-	                gplugin_plugin_info_get_license_text(info));
-
-	g_assert_cmpstr(license_url, ==, "license-url");
-	g_assert_cmpstr(license_url, ==,
-	                gplugin_plugin_info_get_license_url(info));
-
-	g_assert_cmpstr(icon, ==, "icon");
-	g_assert_cmpstr(icon, ==, gplugin_plugin_info_get_icon(info));
-
-	g_assert_cmpstr(summary, ==, "summary");
-	g_assert_cmpstr(summary, ==, gplugin_plugin_info_get_summary(info));
-
-	g_assert_cmpstr(description, ==, "description");
-	g_assert_cmpstr(description, ==,
-	                gplugin_plugin_info_get_description(info));
-
-	g_assert_cmpstr(category, ==, "category");
-	g_assert_cmpstr(category, ==, gplugin_plugin_info_get_category(info));
-
-	g_assert_cmpstr(author, ==, "author");
-	g_assert_cmpstr(author, ==, gplugin_plugin_info_get_author(info));
-
-	g_assert_cmpstr(website, ==, "website");
-	g_assert_cmpstr(website, ==, gplugin_plugin_info_get_website(info));
-
-	g_assert_cmpstr(dependencies, ==, "dependencies");
-	g_assert_cmpstr(dependencies, ==,
-	                gplugin_plugin_info_get_dependencies(info));
-
-	g_free(id);
-	g_free(name);
-	g_free(version);
-	g_free(license);
-	g_free(license_text);
-	g_free(license_url);
-	g_free(icon);
-	g_free(summary);
-	g_free(description);
-	g_free(category);
-	g_free(author);
-	g_free(website);
-	g_free(dependencies);
+	#undef test_string
+	#undef test_uint
 }
 
 /******************************************************************************
