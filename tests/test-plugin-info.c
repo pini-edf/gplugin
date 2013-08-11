@@ -31,6 +31,26 @@
 	g_assert_cmpuint((var), ==, gplugin_plugin_info_get_##var(info)); \
 } G_STMT_END
 
+typedef gchar **(*TestStringVFunc)(GPluginPluginInfo *info);
+
+static void
+test_stringv(gchar **expected, gchar **got, TestStringVFunc func,
+             GPluginPluginInfo *info)
+{
+	gint i = 0;
+	gchar **tmp = NULL;
+
+	for(i = 0; expected[i]; i++)
+		g_assert_cmpstr(expected[i], ==, got[i]);
+
+	tmp = func(info);
+
+	for(i = 0; expected[i]; i++)
+		g_assert_cmpstr(expected[i], ==, tmp[i]);
+
+	g_strfreev(tmp);
+}
+
 /******************************************************************************
  * Tests
  *****************************************************************************/
@@ -40,9 +60,11 @@ test_gplugin_plugin_info_construction(void) {
 	gchar *id = NULL, *name = NULL, *version = NULL;
 	gchar *license = NULL, *license_text = NULL, *license_url = NULL;
 	gchar *icon = NULL, *summary = NULL, *description = NULL, *category = NULL;
-	gchar *author = NULL, *website = NULL, *dependencies = NULL;
+	gchar **authors = NULL, *website = NULL, **dependencies = NULL;
 	guint abi_version = 0;
 	GPluginPluginInfoFlags flags = 0;
+	gchar *r_authors[] = { "author", NULL };
+	gchar *r_dependencies[] = { "dependency", NULL };
 
 	info = g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
 		"id", "gplugin-test/plugin-info-test",
@@ -58,9 +80,9 @@ test_gplugin_plugin_info_construction(void) {
 		"summary", "summary",
 		"description", "description",
 		"category", "category",
-		"author", "author",
+		"authors", r_authors,
 		"website", "website",
-		"dependencies", "dependencies",
+		"dependencies", r_dependencies,
 		NULL
 	);
 
@@ -79,7 +101,7 @@ test_gplugin_plugin_info_construction(void) {
 		"summary", &summary,
 		"description", &description,
 		"category", &category,
-		"author", &author,
+		"authors", &authors,
 		"website", &website,
 		"dependencies", &dependencies,
 		NULL
@@ -98,9 +120,11 @@ test_gplugin_plugin_info_construction(void) {
 	test_string(summary, "summary");
 	test_string(description, "description");
 	test_string(category, "category");
-	test_string(author, "author");
+	test_stringv(authors, r_authors,
+	             (TestStringVFunc)gplugin_plugin_info_get_authors, info);
 	test_string(website, "website");
-	test_string(dependencies, "dependencies");
+	test_stringv(dependencies, r_dependencies,
+	             (TestStringVFunc)gplugin_plugin_info_get_dependencies, info);
 }
 
 static void
@@ -156,9 +180,11 @@ test_gplugin_plugin_info_new_full(void) {
 	gchar *id = NULL, *name = NULL, *version = NULL;
 	gchar *license = NULL, *license_text = NULL, *license_url = NULL;
 	gchar *icon = NULL, *summary = NULL, *description = NULL, *category = NULL;
-	gchar *author = NULL, *website = NULL, *dependencies = NULL;
+	gchar **authors = NULL, *website = NULL, **dependencies = NULL;
 	guint abi_version = 0;
 	GPluginPluginInfoFlags flags = 0;
+	gchar *r_authors[] = { "author", NULL };
+	gchar *r_dependencies[] = { "dependency", NULL };
 
 	info = gplugin_plugin_info_new(
 		"gplugin-test/plugin-info-test",
@@ -174,9 +200,9 @@ test_gplugin_plugin_info_new_full(void) {
 		"summary", "summary",
 		"description", "description",
 		"category", "category",
-		"author", "author",
+		"authors", r_authors,
 		"website", "website",
-		"dependencies", "dependencies",
+		"dependencies", r_dependencies,
 		NULL
 	);
 
@@ -195,7 +221,7 @@ test_gplugin_plugin_info_new_full(void) {
 		"summary", &summary,
 		"description", &description,
 		"category", &category,
-		"author", &author,
+		"authors", &authors,
 		"website", &website,
 		"dependencies", &dependencies,
 		NULL
@@ -214,9 +240,11 @@ test_gplugin_plugin_info_new_full(void) {
 	test_string(summary, "summary");
 	test_string(description, "description");
 	test_string(category, "category");
-	test_string(author, "author");
+	test_stringv(authors, r_authors,
+	             (TestStringVFunc)gplugin_plugin_info_get_authors, info);
 	test_string(website, "website");
-	test_string(dependencies, "dependencies");
+	test_stringv(dependencies, r_dependencies,
+	             (TestStringVFunc)gplugin_plugin_info_get_dependencies, info);
 }
 
 /******************************************************************************

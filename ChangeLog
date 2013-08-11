@@ -3,6 +3,10 @@
   * Changed GPluginPluginInfo:dependencies from a GSList to a gchar *
   * Implemented gplugin_plugin_info_new (again) this time with id and
     abi_version required
+  * Renamed GPluginPluginInfo:author to GPluginPluginInfo:authors
+  * Changed GPluginPluginInfo:authors and GPluginPluginInfo:dependencies from
+    gchar * to gchar **.  See the unittest plugins for an example of how they
+    work.
 
 0.0.4: 2013/08/10
   * Added the install path as a default for gplugin-query

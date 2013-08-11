@@ -19,6 +19,8 @@
 
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(GError **error) {
+	gchar *authors[] = { "author", NULL };
+
 	return gplugin_plugin_info_new(
 		"gplugin/basic-native-plugin",
 		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
@@ -26,7 +28,7 @@ gplugin_plugin_query(GError **error) {
 		"version", "version",
 		"summary", "summary",
 		"description", "description",
-		"author", "author",
+		"authors", authors,
 		"website", "website",
 		NULL
 	);

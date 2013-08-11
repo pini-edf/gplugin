@@ -106,6 +106,8 @@ output_plugin(const gchar *id) {
 		GPluginPlugin *plugin = GPLUGIN_PLUGIN(l->data);
 		const GPluginPluginInfo *info = gplugin_plugin_get_info(plugin);
 		GPluginPluginInfoFlags flags = gplugin_plugin_info_get_flags(info);
+		gchar **authors = NULL, **dependencies = NULL;
+		gint i = 0;
 
 		if(!internal && (flags & GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL))
 			continue;
@@ -116,7 +118,13 @@ output_plugin(const gchar *id) {
 		printf("  name:        %s\n", gplugin_plugin_info_get_name(info));
 		printf("  version:     %s\n", gplugin_plugin_info_get_version(info));
 		printf("  summary:     %s\n", gplugin_plugin_info_get_summary(info));
-		printf("  author:      %s\n", gplugin_plugin_info_get_author(info));
+		printf("  authors:\n");
+		authors = gplugin_plugin_info_get_authors(info);
+		if(authors) {
+			for(i = 0; authors[i]; i++)
+				printf("    %s\n", authors[i]);
+			g_strfreev(authors);
+		}
 		printf("  website:     %s\n", gplugin_plugin_info_get_website(info));
 		if(verbosity > 0)
 			printf("  filename:    %s\n", gplugin_plugin_get_filename(plugin));
@@ -134,6 +142,13 @@ output_plugin(const gchar *id) {
 		}
 		printf("  description: %s\n",
 		       gplugin_plugin_info_get_description(info));
+		printf("  dependencies:\n");
+		dependencies = gplugin_plugin_info_get_dependencies(info);
+		if(dependencies) {
+			for(i = 0; dependencies[i]; i++)
+				printf("    %s\n", dependencies[i]);
+			g_strfreev(dependencies);
+		}
 
 		g_object_unref(G_OBJECT(info));
 

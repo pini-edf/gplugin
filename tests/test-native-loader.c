@@ -50,6 +50,7 @@ static void
 test_basic_plugin_load(void) {
 	GSList *plugins = NULL, *l = NULL;
 	GError *error = NULL;
+	gchar **strv = NULL;
 
 	/* add the test directory to the plugin manager's search paths */
 	gplugin_plugin_manager_append_path(TEST_DIR);
@@ -85,7 +86,9 @@ test_basic_plugin_load(void) {
 		g_assert_cmpstr(gplugin_plugin_info_get_summary(info), ==, "summary");
 		g_assert_cmpstr(gplugin_plugin_info_get_description(info), ==,
 		                "description");
-		g_assert_cmpstr(gplugin_plugin_info_get_author(info), ==, "author");
+		strv = gplugin_plugin_info_get_authors(info);
+		g_assert_cmpstr(strv[0], ==, "author");
+		g_strfreev(strv);
 		g_assert_cmpstr(gplugin_plugin_info_get_website(info), ==, "website");
 
 		g_object_unref(G_OBJECT(info));

@@ -731,8 +731,7 @@ gboolean
 gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 	const GPluginPluginInfo *info = NULL;
 	GPluginPluginLoader *loader = NULL;
-	const gchar *dependencies = NULL;
-	gchar **dependencies_v = NULL;
+	gchar **dependencies = NULL;
 	gint i = 0;
 
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
@@ -758,13 +757,11 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 	 */
 	dependencies = gplugin_plugin_info_get_dependencies(info);
 	if(dependencies != NULL) {
-		dependencies_v = g_strsplit(dependencies, ",", 0);
-
-		for(i = 0; dependencies_v[i]; i++) {
+		for(i = 0; dependencies[i]; i++) {
 			GSList *matches = NULL, *m = NULL;
 			gboolean ret = FALSE;
 
-			matches = gplugin_plugin_manager_find_plugins(dependencies_v[i]);
+			matches = gplugin_plugin_manager_find_plugins(dependencies[i]);
 
 			/* make sure we got at least 1 match */
 			if(matches == NULL) {
@@ -772,12 +769,12 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 					*error = g_error_new(GPLUGIN_DOMAIN, 0,
 					                     "Failed to find plugin %s which %s "
 					                     "depends on",
-					                     dependencies_v[i],
+					                     dependencies[i],
 					                     gplugin_plugin_get_filename(plugin));
 				}
 
 				g_object_unref(G_OBJECT(info));
-				g_strfreev(dependencies_v);
+				g_strfreev(dependencies);
 
 				return FALSE;
 			}
@@ -802,11 +799,11 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 
 					g_prefix_error(error,
 					               "Found at least one dependency with the id %s, "
-					               "but failed to load it: ", dependencies_v[i]);
+					               "but failed to load it: ", dependencies[i]);
 				}
 
 				g_object_unref(G_OBJECT(info));
-				g_strfreev(dependencies_v);
+				g_strfreev(dependencies);
 
 				return FALSE;
 			}
@@ -814,7 +811,7 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 	}
 
 	g_object_unref(G_OBJECT(info));
-	g_strfreev(dependencies_v);
+	g_strfreev(dependencies);
 
 	/* now load the actual plugin */
 	loader = gplugin_plugin_get_loader(plugin);

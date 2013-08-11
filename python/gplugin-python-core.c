@@ -20,6 +20,8 @@
 
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(GError **error) {
+	gchar *authors[] = { "Gary Kramlich <grim@reaperworld.com>", NULL };
+
 	return gplugin_plugin_info_new(
 		"gplugin-python-loader",
 		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
@@ -30,7 +32,7 @@ gplugin_plugin_query(GError **error) {
 		"summary", "A plugin that can load python plugins",
 		"description", "This plugin allows the load of plugins written in "
 		               "the python programming language.",
-		"author", "Gary Kramlich <grim@reaperworld.com>",
+		"authors", authors,
 		"website", "http://bitbucket.org/rw_grim/gplugin",
 		NULL
 	);

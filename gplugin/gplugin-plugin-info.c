@@ -45,10 +45,10 @@ typedef struct {
 	gchar *summary;
 	gchar *description;
 	gchar *category;
-	gchar *author;
+	gchar **authors;
 	gchar *website;
 
-	gchar *dependencies;
+	gchar **dependencies;
 } GPluginPluginInfoPrivate;
 
 /******************************************************************************
@@ -68,7 +68,7 @@ enum {
 	PROP_SUMMARY,
 	PROP_DESCRIPTION,
 	PROP_CATEGORY,
-	PROP_AUTHOR,
+	PROP_AUTHORS,
 	PROP_WEBSITE,
 	PROP_DEPENDENCIES,
 	N_PROPERTIES,
@@ -197,11 +197,11 @@ gplugin_plugin_info_set_category(GPluginPluginInfo *info,
 }
 
 static void
-gplugin_plugin_info_set_author(GPluginPluginInfo *info, const gchar *author) {
+gplugin_plugin_info_set_authors(GPluginPluginInfo *info, gchar **authors) {
 	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
-	g_free(priv->author);
-	priv->author = (author) ? g_strdup(author) : NULL;
+	g_strfreev(priv->authors);
+	priv->authors = (authors) ? g_strdupv(authors) : NULL;
 }
 
 static void
@@ -216,12 +216,12 @@ gplugin_plugin_info_set_website(GPluginPluginInfo *info,
 
 static void
 gplugin_plugin_info_set_dependencies(GPluginPluginInfo *info,
-                                     const gchar *dependencies)
+                                     gchar **dependencies)
 {
 	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
-	g_free(priv->dependencies);
-	priv->dependencies = (dependencies) ? g_strdup(dependencies) : NULL;
+	g_strfreev(priv->dependencies);
+	priv->dependencies = (dependencies) ? g_strdupv(dependencies) : NULL;
 }
 
 /******************************************************************************
@@ -273,15 +273,15 @@ gplugin_plugin_info_get_property(GObject *obj, guint param_id, GValue *value,
 		case PROP_CATEGORY:
 			g_value_set_string(value, gplugin_plugin_info_get_category(info));
 			break;
-		case PROP_AUTHOR:
-			g_value_set_string(value, gplugin_plugin_info_get_author(info));
+		case PROP_AUTHORS:
+			g_value_set_boxed(value, gplugin_plugin_info_get_authors(info));
 			break;
 		case PROP_WEBSITE:
 			g_value_set_string(value, gplugin_plugin_info_get_website(info));
 			break;
 		case PROP_DEPENDENCIES:
-			g_value_set_string(value,
-			                   gplugin_plugin_info_get_dependencies(info));
+			g_value_set_boxed(value,
+			                  gplugin_plugin_info_get_dependencies(info));
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, param_id, pspec);
@@ -335,15 +335,15 @@ gplugin_plugin_info_set_property(GObject *obj, guint param_id,
 		case PROP_CATEGORY:
 			gplugin_plugin_info_set_category(info, g_value_get_string(value));
 			break;
-		case PROP_AUTHOR:
-			gplugin_plugin_info_set_author(info, g_value_get_string(value));
+		case PROP_AUTHORS:
+			gplugin_plugin_info_set_authors(info, g_value_get_boxed(value));
 			break;
 		case PROP_WEBSITE:
 			gplugin_plugin_info_set_website(info, g_value_get_string(value));
 			break;
 		case PROP_DEPENDENCIES:
 			gplugin_plugin_info_set_dependencies(info,
-			                                     g_value_get_string(value));
+			                                     g_value_get_boxed(value));
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, param_id, pspec);
@@ -364,9 +364,9 @@ gplugin_plugin_info_finalize(GObject *obj) {
     g_free(priv->icon);
     g_free(priv->summary);
     g_free(priv->description);
-    g_free(priv->author);
+    g_strfreev(priv->authors);
     g_free(priv->website);
-	g_free(priv->dependencies);
+	g_strfreev(priv->dependencies);
 
 	G_OBJECT_CLASS(parent_class)->finalize(obj);
 }
@@ -571,12 +571,12 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 	 * "First Last <user@domain.com>" with additional authors separated by a
 	 * comma.
 	 */
-	g_object_class_install_property(obj_class, PROP_AUTHOR,
-		g_param_spec_string("author", "author",
-		                    "The author of the plugin",
-		                    NULL,
-		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
-		                    G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property(obj_class, PROP_AUTHORS,
+		g_param_spec_boxed("authors", "authors",
+		                   "The authors of the plugin",
+		                   G_TYPE_STRV,
+		                   G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
+		                   G_PARAM_CONSTRUCT_ONLY));
 
 	/**
 	 * GPluginPluginInfo:website:
@@ -596,11 +596,11 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 	 * A comma separated list of plugin id's that this plugin depends on.
 	 */
 	g_object_class_install_property(obj_class, PROP_DEPENDENCIES,
-		g_param_spec_string("dependencies", "dependencies",
-		                     "The dependencies of the plugin",
-		                     NULL,
-		                     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
-		                     G_PARAM_CONSTRUCT_ONLY));
+		g_param_spec_boxed("dependencies", "dependencies",
+		                   "The dependencies of the plugin",
+		                   G_TYPE_STRV,
+		                   G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
+		                   G_PARAM_CONSTRUCT_ONLY));
 }
 
 /******************************************************************************
@@ -845,20 +845,20 @@ gplugin_plugin_info_get_category(const GPluginPluginInfo *info) {
 }
 
 /**
- * gplugin_plugin_info_get_author:
+ * gplugin_plugin_info_get_authors:
  * @info: #GPluginPluginInfo instance
  *
- * Return value: The author from @info.
+ * Return value: (transfer full): The authors from @info.
  */
-const gchar *
-gplugin_plugin_info_get_author(const GPluginPluginInfo *info) {
+gchar **
+gplugin_plugin_info_get_authors(const GPluginPluginInfo *info) {
 	GPluginPluginInfoPrivate *priv = NULL;
 
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_INFO(info), NULL);
 
 	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
-	return priv->author;
+	return (priv->authors) ? g_strdupv(priv->authors) : NULL;
 }
 
 /**
@@ -882,9 +882,9 @@ gplugin_plugin_info_get_website(const GPluginPluginInfo *info) {
  * gplugin_plugin_info_get_dependencies:
  * @info: #GPluginPluginInfo instance
  *
- * Return value: The command separate list of dependencies from @info.
+ * Return value: (transfer full): The list of dependencies from @info.
  */
-const gchar *
+gchar **
 gplugin_plugin_info_get_dependencies(const GPluginPluginInfo *info) {
 	GPluginPluginInfoPrivate *priv = NULL;
 
@@ -892,7 +892,6 @@ gplugin_plugin_info_get_dependencies(const GPluginPluginInfo *info) {
 
 	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
-	return priv->dependencies;
+	return (priv->dependencies) ? g_strdupv(priv->dependencies) : NULL;
 }
-
 
