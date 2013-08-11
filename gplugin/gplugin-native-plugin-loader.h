@@ -39,6 +39,8 @@ typedef struct _GPluginNativePluginLoaderClass       GPluginNativePluginLoaderCl
 
 #include <gplugin/gplugin-plugin-loader.h>
 
+#define GPLUGIN_NATIVE_PLUGIN_ABI_VERSION 0x01000000
+
 struct _GPluginNativePluginLoader {
 	GPluginPluginLoader parent;
 };

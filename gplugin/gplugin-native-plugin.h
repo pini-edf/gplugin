@@ -38,8 +38,6 @@ typedef struct _GPluginNativePluginClass      GPluginNativePluginClass;
 
 #include <gmodule.h>
 
-#define GPLUGIN_NATIVE_PLUGIN_ABI_VERSION     0x00000001
-
 struct _GPluginNativePlugin {
 	GPluginPlugin parent;
 
