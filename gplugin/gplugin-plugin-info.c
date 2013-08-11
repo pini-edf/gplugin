@@ -407,7 +407,17 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 	 *
 	 * The GPlugin ABI version that the plugin was compiled against.
 	 *
-	 * In most cases, this is defined by the loader.
+	 * GPlugin only uses the first byte (0xff000000) of this value.  The
+	 * remaining 3 bytes are available for the application to use.
+	 *
+	 * Take the following example from an application:
+	 *
+	 *  #define ABI_VERSION (GPLUGIN_NATIVE_ABI_VERSION |
+	 *                       (APPLICATION_MAJOR_VERSION << 8) |
+	 *                       (APPLICATION_MINOR_VERSION))
+	 *
+	 * The application here uses the thrid and fourth bytes, but could use
+	 * the second as well.
 	 */
 	g_object_class_install_property(obj_class, PROP_ABI_VERSION,
 		g_param_spec_uint("abi-version", "abi_version",
