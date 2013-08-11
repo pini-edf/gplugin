@@ -620,6 +620,17 @@ gplugin_plugin_info_get_type(void) {
 }
 
 /**
+ * gplugin_plugin_info_new: (skip)
+ * @id: The id of the plugin
+ * @abi_version: The GPlugin ABI version that the plugin uses
+ * @...: name/value pairs of properties to set, followed by %NULL.
+ *
+ * Creates a new GPluginPluginInfo instance.
+ *
+ * Returns: The new GPluginPluginInfo instance.
+ */
+
+/**
  * gplugin_plugin_info_get_id:
  * @info: #GPluginPluginInfo instance
  *

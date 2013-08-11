@@ -72,6 +72,13 @@ G_BEGIN_DECLS
 
 GType gplugin_plugin_info_get_type(void);
 
+#define gplugin_plugin_info_new(id, abi_version, ...) \
+	(GPluginPluginInfo *) \
+	g_object_new(GPLUGIN_TYPE_PLUGIN_INFO, \
+	             "id", (id), \
+	             "abi-version", (abi_version), \
+	             __VA_ARGS__);
+
 const gchar *gplugin_plugin_info_get_id(const GPluginPluginInfo *info);
 guint32 gplugin_plugin_info_get_abi_version(const GPluginPluginInfo *info);
 GPluginPluginInfoFlags gplugin_plugin_info_get_flags(const GPluginPluginInfo *info);

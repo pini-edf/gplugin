@@ -20,6 +20,17 @@
 
 #include <glib.h>
 
+#define test_string(var, value) G_STMT_START { \
+	g_assert_cmpstr((var), ==, (value)); \
+	g_assert_cmpstr((var), ==, gplugin_plugin_info_get_##var(info)); \
+	g_free((var)); \
+} G_STMT_END
+
+#define test_uint(var, value) G_STMT_START { \
+	g_assert_cmpuint((var), ==, (value)); \
+	g_assert_cmpuint((var), ==, gplugin_plugin_info_get_##var(info)); \
+} G_STMT_END
+
 /******************************************************************************
  * Tests
  *****************************************************************************/
@@ -32,18 +43,6 @@ test_gplugin_plugin_info_construction(void) {
 	gchar *author = NULL, *website = NULL, *dependencies = NULL;
 	guint abi_version = 0;
 	GPluginPluginInfoFlags flags = 0;
-
-	#define test_string(var, value) G_STMT_START { \
-		g_assert_cmpstr((var), ==, (value)); \
-		g_assert_cmpstr((var), ==, gplugin_plugin_info_get_##var(info)); \
-		g_free((var)); \
-	} G_STMT_END
-
-	#define test_uint(var, value) G_STMT_START { \
-		g_assert_cmpuint((var), ==, (value)); \
-		g_assert_cmpuint((var), ==, gplugin_plugin_info_get_##var(info)); \
-	} G_STMT_END
-
 
 	info = g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
 		"id", "gplugin-test/plugin-info-test",
@@ -102,9 +101,122 @@ test_gplugin_plugin_info_construction(void) {
 	test_string(author, "author");
 	test_string(website, "website");
 	test_string(dependencies, "dependencies");
+}
 
-	#undef test_string
-	#undef test_uint
+static void
+test_gplugin_plugin_info_new_empty(void) {
+	GPluginPluginInfo *info = NULL;
+	gchar *id = NULL;
+	guint32 abi_version = 0;
+
+	info = gplugin_plugin_info_new("empty", 1, NULL);
+
+	g_assert(GPLUGIN_IS_PLUGIN_INFO(info));
+
+	g_object_get(G_OBJECT(info),
+	             "id", &id,
+	             "abi-version", &abi_version,
+	             NULL);
+
+	test_string(id, "empty");
+	test_uint(abi_version, 1);
+
+	g_object_unref(G_OBJECT(info));
+}
+
+static void
+test_gplugin_plugin_info_new_flags(void) {
+	GPluginPluginInfo *info = NULL;
+	gchar *id = NULL;
+	guint32 abi_version = 0;
+	GPluginPluginInfoFlags flags = 0;
+
+	info = gplugin_plugin_info_new("flags", 2,
+	                               "flags", 1 << 1,
+	                               NULL);
+
+	g_assert(GPLUGIN_IS_PLUGIN_INFO(info));
+
+	g_object_get(G_OBJECT(info),
+	             "id", &id,
+	             "abi-version", &abi_version,
+	             "flags", &flags,
+	             NULL);
+
+	test_string(id, "flags");
+	test_uint(abi_version, 2);
+	test_uint(flags, 1 << 1);
+
+	g_object_unref(G_OBJECT(info));
+}
+
+static void
+test_gplugin_plugin_info_new_full(void) {
+	GPluginPluginInfo *info = NULL;
+	gchar *id = NULL, *name = NULL, *version = NULL;
+	gchar *license = NULL, *license_text = NULL, *license_url = NULL;
+	gchar *icon = NULL, *summary = NULL, *description = NULL, *category = NULL;
+	gchar *author = NULL, *website = NULL, *dependencies = NULL;
+	guint abi_version = 0;
+	GPluginPluginInfoFlags flags = 0;
+
+	info = gplugin_plugin_info_new(
+		"gplugin-test/plugin-info-test",
+		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
+		"flags", GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY |
+		         GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL,
+		"name", "name",
+		"version", "version",
+		"license", "license",
+		"license-text", "license-text",
+		"license-url", "license-url",
+		"icon", "icon",
+		"summary", "summary",
+		"description", "description",
+		"category", "category",
+		"author", "author",
+		"website", "website",
+		"dependencies", "dependencies",
+		NULL
+	);
+
+	g_assert(GPLUGIN_IS_PLUGIN_INFO(info));
+
+	g_object_get(G_OBJECT(info),
+		"id", &id,
+		"abi_version", &abi_version,
+		"flags", &flags,
+		"name", &name,
+		"version", &version,
+		"license", &license,
+		"license-text", &license_text,
+		"license-url", &license_url,
+		"icon", &icon,
+		"summary", &summary,
+		"description", &description,
+		"category", &category,
+		"author", &author,
+		"website", &website,
+		"dependencies", &dependencies,
+		NULL
+	);
+
+	test_string(id, "gplugin-test/plugin-info-test");
+	test_uint(abi_version, GPLUGIN_NATIVE_PLUGIN_ABI_VERSION);
+	test_uint(flags, GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY |
+	                 GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL);
+	test_string(name, "name");
+	test_string(version, "version");
+	test_string(license, "license");
+	test_string(license_text, "license-text");
+	test_string(license_url, "license-url");
+	test_string(icon, "icon");
+	test_string(summary, "summary");
+	test_string(description, "description");
+	test_string(category, "category");
+	test_string(author, "author");
+	test_string(website, "website");
+	test_string(dependencies, "dependencies");
 }
 
 /******************************************************************************
@@ -118,6 +230,13 @@ main(gint argc, gchar **argv) {
 
 	g_test_add_func("/plugin-info/construction",
 	                test_gplugin_plugin_info_construction);
+
+	g_test_add_func("/plugin-info/new/empty",
+	                test_gplugin_plugin_info_new_empty);
+	g_test_add_func("/plugin-info/new/flags",
+	                test_gplugin_plugin_info_new_flags);
+	g_test_add_func("/plugin-info/new/full",
+	                test_gplugin_plugin_info_new_full);
 
 	return g_test_run();
 }
