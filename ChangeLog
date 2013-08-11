@@ -7,6 +7,8 @@
   * Changed GPluginPluginInfo:authors and GPluginPluginInfo:dependencies from
     gchar * to gchar **.  See the unittest plugins for an example of how they
     work.
+  * Some more updates for gplugin-query.  This needs to be much easier to
+    maintain, but it's working a bit better.
 
 0.0.4: 2013/08/10
   * Added the install path as a default for gplugin-query

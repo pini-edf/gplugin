@@ -49,6 +49,13 @@ verbosity_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
 }
 
 static gboolean
+full_verbosity_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
+	verbosity = 1 << 11;
+
+	return TRUE;
+}
+
+static gboolean
 internal_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
 	internal = TRUE;
 
@@ -91,6 +98,10 @@ output_plugin(const gchar *id) {
 	GSList *plugins = NULL, *l = NULL;
 	gboolean first = TRUE;
 
+	#define FORMAT "%-13s"
+	#define MAIN_FORMAT_NEL "  " FORMAT ": "
+	#define MAIN_FORMAT MAIN_FORMAT_NEL "%s\n"
+
 	printf("%s", id);
 
 	plugins = gplugin_plugin_manager_find_plugins(id);
@@ -115,39 +126,59 @@ output_plugin(const gchar *id) {
 		if(!first)
 			printf("\n");
 
-		printf("  name:        %s\n", gplugin_plugin_info_get_name(info));
-		printf("  version:     %s\n", gplugin_plugin_info_get_version(info));
-		printf("  summary:     %s\n", gplugin_plugin_info_get_summary(info));
-		printf("  authors:\n");
-		authors = gplugin_plugin_info_get_authors(info);
-		if(authors) {
-			for(i = 0; authors[i]; i++)
-				printf("    %s\n", authors[i]);
-			g_strfreev(authors);
-		}
-		printf("  website:     %s\n", gplugin_plugin_info_get_website(info));
+		printf(MAIN_FORMAT, "name", gplugin_plugin_info_get_name(info));
 		if(verbosity > 0)
-			printf("  filename:    %s\n", gplugin_plugin_get_filename(plugin));
-		if(verbosity > 1) {
+			printf(MAIN_FORMAT, "category",
+			       gplugin_plugin_info_get_category(info));
+		printf(MAIN_FORMAT, "version", gplugin_plugin_info_get_version(info));
+		printf(MAIN_FORMAT, "summary", gplugin_plugin_info_get_summary(info));
+		if(verbosity > 0) {
+			printf(MAIN_FORMAT_NEL, "authors");
+			authors = gplugin_plugin_info_get_authors(info);
+			if(authors) {
+				for(i = 0; authors[i]; i++) {
+					if(i > 1)
+						printf("                ");
+					printf("%s\n", authors[i]);
+				}
+				g_strfreev(authors);
+			} else {
+				printf("\n");
+			}
+			printf(MAIN_FORMAT, "website", gplugin_plugin_info_get_website(info));
+		}
+		if(verbosity > 1)
+			printf(MAIN_FORMAT, "filename",
+			       gplugin_plugin_get_filename(plugin));
+		if(verbosity > 2) {
 			gchar *flags_str = flags_to_string(flags);
 
 			GPluginPluginLoader *loader = gplugin_plugin_get_loader(plugin);
 
-			printf("  abi version: %08x\n",
+			printf(MAIN_FORMAT_NEL "%08x\n", "abi version",
 			       gplugin_plugin_info_get_abi_version(info));
-			printf("  flags:       %s\n", flags_str);
-			printf("  loader:      %s\n", G_OBJECT_TYPE_NAME(loader));
+			printf(MAIN_FORMAT, "flags", flags_str);
+			printf(MAIN_FORMAT, "loader", G_OBJECT_TYPE_NAME(loader));
 
 			g_free(flags_str);
 		}
-		printf("  description: %s\n",
-		       gplugin_plugin_info_get_description(info));
-		printf("  dependencies:\n");
-		dependencies = gplugin_plugin_info_get_dependencies(info);
-		if(dependencies) {
-			for(i = 0; dependencies[i]; i++)
-				printf("    %s\n", dependencies[i]);
-			g_strfreev(dependencies);
+		if(verbosity > 0) {
+			printf(MAIN_FORMAT, "description",
+			       gplugin_plugin_info_get_description(info));
+		}
+		if(verbosity > 2) {
+			printf(MAIN_FORMAT_NEL, "dependencies");
+			dependencies = gplugin_plugin_info_get_dependencies(info);
+			if(dependencies) {
+				for(i = 0; dependencies[i]; i++) {
+					if(i > 1)
+						printf("                ");
+					printf("%s\n", dependencies[i]);
+				}
+				g_strfreev(dependencies);
+			} else {
+				printf("\n");
+			}
 		}
 
 		g_object_unref(G_OBJECT(info));
@@ -191,7 +222,7 @@ static GOptionEntry entries[] = {
 		NULL,
 	}, {
 		"internal", 'i', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
-		internal_cb, "Show internal plugins.",
+		internal_cb, "Show internal plugins",
 		NULL,
 	}, {
 		"path", 'p', 0, G_OPTION_ARG_STRING_ARRAY,
@@ -199,7 +230,11 @@ static GOptionEntry entries[] = {
 		"PATH",
 	}, {
 		"verbose", 'v', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
-		verbosity_cb, "Increase verbosity.",
+		verbosity_cb, "Increase verbosity",
+		NULL,
+	}, {
+		"full-verbose", 'V', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+		full_verbosity_cb, "Increase verbosity to eleven",
 		NULL,
 	}, {
 		NULL
