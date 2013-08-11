@@ -19,9 +19,9 @@
 
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(GError **error) {
-	return g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
-		"id",           "gplugin/test-load-error",
-		"abi_version",  GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
+	return gplugin_plugin_info_new(
+		"gplugin/test-load-error",
+		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
 		NULL
 	);
 }

@@ -19,16 +19,15 @@
 
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(GError **error) {
-	return g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
-		"id",           "gplugin/basic-native-plugin",
-		"abi_version",  GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-		"flags",        0,
-		"name",         "name",
-		"version",      "version",
-		"summary",      "summary",
-		"description",  "description",
-		"author",       "author",
-		"website",      "website",
+	return gplugin_plugin_info_new(
+		"gplugin/basic-native-plugin",
+		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
+		"name", "name",
+		"version", "version",
+		"summary", "summary",
+		"description", "description",
+		"author", "author",
+		"website", "website",
 		NULL
 	);
 }
