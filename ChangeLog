@@ -1,6 +1,8 @@
 0.0.5:
   * Added a "category" property to GPluginPluginInfo
   * Changed GPluginPluginInfo:dependencies from a GSList to a gchar *
+  * Implemented gplugin_plugin_info_new (again) this time with id and
+    abi_version required
 
 0.0.4: 2013/08/10
   * Added the install path as a default for gplugin-query
