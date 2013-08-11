@@ -125,7 +125,7 @@ output_plugin(const gchar *id) {
 
 			GPluginPluginLoader *loader = gplugin_plugin_get_loader(plugin);
 
-			printf("  abi version: %d\n",
+			printf("  abi version: %08x\n",
 			       gplugin_plugin_info_get_abi_version(info));
 			printf("  flags:       %s\n", flags_str);
 			printf("  loader:      %s\n", G_OBJECT_TYPE_NAME(loader));
