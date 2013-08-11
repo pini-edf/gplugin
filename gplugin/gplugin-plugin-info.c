@@ -563,9 +563,9 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_CONSTRUCT_ONLY));
 
 	/**
-	 * GPluginPluginInfo:author:
+	 * GPluginPluginInfo:authors:
 	 *
-	 * The name and email address of the author.
+	 * A gchar ** of the names and email addresses of the authors.
 	 *
 	 * It is recommended to use the RFC 822, 2822 format of:
 	 * "First Last <user@domain.com>" with additional authors separated by a
