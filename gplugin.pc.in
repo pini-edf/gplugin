@@ -2,6 +2,8 @@ prefix=@CMAKE_INSTALL_PREFIX@
 libdir=${prefix}/lib
 includedir=${prefix}/include/gplugin-1.0/
 
+plugindir=${libdir}
+
 Name: libgplugin
 Description: A fully featured GModule based plugin library
 Version: @GPLUGIN_VERSION@
