@@ -128,6 +128,7 @@ configure_file(gplugin-uninstalled.pc.in ${CMAKE_BINARY_DIR}/gplugin-uninstalled
 ###############################################################################
 add_subdirectory(gplugin)
 add_subdirectory(gplugin-gtk)
+add_subdirectory(plugins)
 add_subdirectory(python)
 add_subdirectory(tests)
 
