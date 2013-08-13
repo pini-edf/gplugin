@@ -137,7 +137,7 @@ output_plugin(const gchar *id) {
 			authors = gplugin_plugin_info_get_authors(info);
 			if(authors) {
 				for(i = 0; authors[i]; i++) {
-					if(i > 1)
+					if(i > 0)
 						printf("                ");
 					printf("%s\n", authors[i]);
 				}
@@ -171,7 +171,7 @@ output_plugin(const gchar *id) {
 			dependencies = gplugin_plugin_info_get_dependencies(info);
 			if(dependencies) {
 				for(i = 0; dependencies[i]; i++) {
-					if(i > 1)
+					if(i > 0)
 						printf("                ");
 					printf("%s\n", dependencies[i]);
 				}
