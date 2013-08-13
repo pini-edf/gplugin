@@ -85,7 +85,7 @@ guint32 gplugin_plugin_info_get_abi_version(const GPluginPluginInfo *info);
 GPluginPluginInfoFlags gplugin_plugin_info_get_flags(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_name(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_version(const GPluginPluginInfo *info);
-const gchar *gplugin_plugin_info_get_license(const GPluginPluginInfo *info);
+const gchar *gplugin_plugin_info_get_license_id(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_license_text(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_license_url(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_icon(const GPluginPluginInfo *info);

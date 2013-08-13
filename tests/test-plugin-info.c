@@ -58,7 +58,7 @@ static void
 test_gplugin_plugin_info_construction(void) {
 	GPluginPluginInfo *info = NULL;
 	gchar *id = NULL, *name = NULL, *version = NULL;
-	gchar *license = NULL, *license_text = NULL, *license_url = NULL;
+	gchar *license_id = NULL, *license_text = NULL, *license_url = NULL;
 	gchar *icon = NULL, *summary = NULL, *description = NULL, *category = NULL;
 	gchar **authors = NULL, *website = NULL, **dependencies = NULL;
 	guint abi_version = 0;
@@ -73,7 +73,7 @@ test_gplugin_plugin_info_construction(void) {
 		         GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL,
 		"name", "name",
 		"version", "version",
-		"license", "license",
+		"license-id", "license-id",
 		"license-text", "license-text",
 		"license-url", "license-url",
 		"icon", "icon",
@@ -94,7 +94,7 @@ test_gplugin_plugin_info_construction(void) {
 		"flags", &flags,
 		"name", &name,
 		"version", &version,
-		"license", &license,
+		"license-id", &license_id,
 		"license-text", &license_text,
 		"license-url", &license_url,
 		"icon", &icon,
@@ -113,7 +113,7 @@ test_gplugin_plugin_info_construction(void) {
 	                 GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL);
 	test_string(name, "name");
 	test_string(version, "version");
-	test_string(license, "license");
+	test_string(license_id, "license-id");
 	test_string(license_text, "license-text");
 	test_string(license_url, "license-url");
 	test_string(icon, "icon");
@@ -178,7 +178,7 @@ static void
 test_gplugin_plugin_info_new_full(void) {
 	GPluginPluginInfo *info = NULL;
 	gchar *id = NULL, *name = NULL, *version = NULL;
-	gchar *license = NULL, *license_text = NULL, *license_url = NULL;
+	gchar *license_id = NULL, *license_text = NULL, *license_url = NULL;
 	gchar *icon = NULL, *summary = NULL, *description = NULL, *category = NULL;
 	gchar **authors = NULL, *website = NULL, **dependencies = NULL;
 	guint abi_version = 0;
@@ -193,7 +193,7 @@ test_gplugin_plugin_info_new_full(void) {
 		         GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL,
 		"name", "name",
 		"version", "version",
-		"license", "license",
+		"license-id", "license-id",
 		"license-text", "license-text",
 		"license-url", "license-url",
 		"icon", "icon",
@@ -214,7 +214,7 @@ test_gplugin_plugin_info_new_full(void) {
 		"flags", &flags,
 		"name", &name,
 		"version", &version,
-		"license", &license,
+		"license-id", &license_id,
 		"license-text", &license_text,
 		"license-url", &license_url,
 		"icon", &icon,
@@ -233,7 +233,7 @@ test_gplugin_plugin_info_new_full(void) {
 	                 GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL);
 	test_string(name, "name");
 	test_string(version, "version");
-	test_string(license, "license");
+	test_string(license_id, "license-id");
 	test_string(license_text, "license-text");
 	test_string(license_url, "license-url");
 	test_string(icon, "icon");

@@ -36,7 +36,7 @@ typedef struct {
 	gchar *name;
 	gchar *version;
 
-	gchar *license;
+	gchar *license_id;
 	gchar *license_text;
 	gchar *license_url;
 
@@ -61,7 +61,7 @@ enum {
 	PROP_FLAGS,
 	PROP_NAME,
 	PROP_VERSION,
-	PROP_LICENSE,
+	PROP_LICENSE_ID,
 	PROP_LICENSE_TEXT,
 	PROP_LICENSE_URL,
 	PROP_ICON,
@@ -127,13 +127,13 @@ gplugin_plugin_info_set_version(GPluginPluginInfo *info,
 }
 
 static void
-gplugin_plugin_info_set_license(GPluginPluginInfo *info,
-                                const gchar *license)
+gplugin_plugin_info_set_license_id(GPluginPluginInfo *info,
+                                   const gchar *license_id)
 {
 	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
-	g_free(priv->license);
-	priv->license = (license) ? g_strdup(license) : NULL;
+	g_free(priv->license_id);
+	priv->license_id = (license_id) ? g_strdup(license_id) : NULL;
 }
 
 
@@ -249,8 +249,9 @@ gplugin_plugin_info_get_property(GObject *obj, guint param_id, GValue *value,
 		case PROP_VERSION:
 			g_value_set_string(value, gplugin_plugin_info_get_version(info));
 			break;
-		case PROP_LICENSE:
-			g_value_set_string(value, gplugin_plugin_info_get_license(info));
+		case PROP_LICENSE_ID:
+			g_value_set_string(value,
+			                   gplugin_plugin_info_get_license_id(info));
 			break;
 		case PROP_LICENSE_TEXT:
 			g_value_set_string(value,
@@ -311,8 +312,9 @@ gplugin_plugin_info_set_property(GObject *obj, guint param_id,
 		case PROP_VERSION:
 			gplugin_plugin_info_set_version(info, g_value_get_string(value));
 			break;
-		case PROP_LICENSE:
-			gplugin_plugin_info_set_license(info, g_value_get_string(value));
+		case PROP_LICENSE_ID:
+			gplugin_plugin_info_set_license_id(info,
+			                                   g_value_get_string(value));
 			break;
 		case PROP_LICENSE_TEXT:
 			gplugin_plugin_info_set_license_text(info,
@@ -358,7 +360,7 @@ gplugin_plugin_info_finalize(GObject *obj) {
     g_free(priv->id);
     g_free(priv->name);
     g_free(priv->version);
-    g_free(priv->license);
+    g_free(priv->license_id);
     g_free(priv->license_text);
     g_free(priv->license_url);
     g_free(priv->icon);
@@ -468,13 +470,15 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 	 * The short name of the license.
 	 *
 	 * It is recommended to use the identifier of the license from
-	 * http://spdx.org/licenses/ and should be "Other" for custom licenses
-	 * that are not on the SPDX list.
+	 * http://dep.debian.net/deps/dep5/#license-specification and should be
+	 * "Other" for licenses that are not mentioned in DEP5.
 	 *
-	 * If a plugin has multiple license, they should be separated by a comma.
+	 * If a plugin has multiple license, they should be separated by a pipe
+	 * (|). In the odd case that you have multiple licenses that are used at
+	 * the same time, they should be separated by an ampersand (&).
 	 */
-	g_object_class_install_property(obj_class, PROP_LICENSE,
-		g_param_spec_string("license", "license id",
+	g_object_class_install_property(obj_class, PROP_LICENSE_ID,
+		g_param_spec_string("license-id", "license-id",
 		                    "The license id of the plugin according to SPDX",
 		                    NULL,
 		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
@@ -726,20 +730,20 @@ gplugin_plugin_info_get_version(const GPluginPluginInfo *info) {
 }
 
 /**
- * gplugin_plugin_info_get_license:
+ * gplugin_plugin_info_get_license_id:
  * @info: #GPluginPluginInfo instance
  *
- * Return value: The license from @info.
+ * Return value: The license-id from @info.
  */
 const gchar *
-gplugin_plugin_info_get_license(const GPluginPluginInfo *info) {
+gplugin_plugin_info_get_license_id(const GPluginPluginInfo *info) {
 	GPluginPluginInfoPrivate *priv = NULL;
 
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_INFO(info), NULL);
 
 	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
-	return priv->license;
+	return priv->license_id;
 }
 
 /**

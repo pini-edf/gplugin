@@ -9,6 +9,7 @@
     work.
   * Some more updates for gplugin-query.  This needs to be much easier to
     maintain, but it's working a bit better.
+  * Changed GPluginPluginInfo:license to GPluginPluginInfo:license-id
 
 0.0.4: 2013/08/10
   * Added the install path as a default for gplugin-query
