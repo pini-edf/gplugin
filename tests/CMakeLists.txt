@@ -1,8 +1,8 @@
-macro(add_plugin plugin)
+macro(add_test_plugin plugin)
 	add_library(${plugin} MODULE ${plugin}.c)
 	set_target_properties(${plugin} PROPERTIES PREFIX "")
 	target_link_libraries(${plugin} ${GLIB_LIBRARIES} gplugin)
-endmacro(add_plugin)
+endmacro(add_test_plugin)
 
 add_subdirectory(plugins)
 add_subdirectory(bad-plugins)
