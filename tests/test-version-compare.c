@@ -20,6 +20,7 @@
 /******************************************************************************
  * Tests
  *****************************************************************************/
+/* bad versions */
 static void
 test_gplugin_version_null__null(void) {
 	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR))
@@ -46,6 +47,38 @@ test_gplugin_version_1_2_3__null(void) {
 
 	g_test_trap_assert_failed();
 	g_test_trap_assert_stderr("*gplugin_version_compare*assertion*");
+}
+
+static void
+test_gplugin_version_abc__1_2_3(void) {
+	GError *error = NULL;
+	gint t = 0;
+
+	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
+		t = gplugin_version_compare("abc", "1.2.3", &error);
+
+		g_assert(t == 1);
+		g_assert_no_error(error);
+	}
+
+	g_test_trap_assert_failed();
+	g_test_trap_assert_stderr("*assertion*");
+}
+
+static void
+test_gplugin_version_1_2_3__abc(void) {
+	GError *error = NULL;
+	gint t = 0;
+
+	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
+		t = gplugin_version_compare("1.2.3", "abc", &error);
+
+		g_assert(t == -1);
+		g_assert_no_error(error);
+	}
+
+	g_test_trap_assert_failed();
+	g_test_trap_assert_stderr("*assertion*");
 }
 
 /* major version tests */
@@ -105,12 +138,17 @@ main(gint argc, gchar **argv) {
 
 	gplugin_init();
 
+	/* bad versions */
 	g_test_add_func("/version-check/null__null",
 	                test_gplugin_version_null__null);
 	g_test_add_func("/version-check/null__1_2_3",
 	                test_gplugin_version_null__1_2_3);
 	g_test_add_func("/version-check/1_2_3__null",
 	                test_gplugin_version_1_2_3__null);
+	g_test_add_func("/version-check/abc__1_2_3",
+	                test_gplugin_version_abc__1_2_3);
+	g_test_add_func("/version-check/1_2_3__abc",
+	                test_gplugin_version_1_2_3__abc);
 
 	/* major version */
 	g_test_add_func("/version-check/1_0_0__0_0_0",
