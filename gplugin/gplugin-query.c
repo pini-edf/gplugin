@@ -117,7 +117,8 @@ output_plugin(const gchar *id) {
 		GPluginPlugin *plugin = GPLUGIN_PLUGIN(l->data);
 		const GPluginPluginInfo *info = gplugin_plugin_get_info(plugin);
 		GPluginPluginInfoFlags flags = gplugin_plugin_info_get_flags(info);
-		gchar **authors = NULL, **dependencies = NULL;
+		const gchar * const *authors = NULL;
+		const gchar * const *dependencies = NULL;
 		gint i = 0;
 
 		if(!internal && (flags & GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL))
@@ -135,13 +136,13 @@ output_plugin(const gchar *id) {
 		if(verbosity > 0) {
 			printf(MAIN_FORMAT_NEL, "authors");
 			authors = gplugin_plugin_info_get_authors(info);
+			printf("authors: %p\n", authors);
 			if(authors) {
 				for(i = 0; authors[i]; i++) {
 					if(i > 0)
 						printf("                ");
 					printf("%s\n", authors[i]);
 				}
-				g_strfreev(authors);
 			} else {
 				printf("\n");
 			}
@@ -175,7 +176,6 @@ output_plugin(const gchar *id) {
 						printf("                ");
 					printf("%s\n", dependencies[i]);
 				}
-				g_strfreev(dependencies);
 			} else {
 				printf("\n");
 			}

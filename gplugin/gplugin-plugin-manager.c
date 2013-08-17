@@ -731,7 +731,7 @@ gboolean
 gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 	const GPluginPluginInfo *info = NULL;
 	GPluginPluginLoader *loader = NULL;
-	gchar **dependencies = NULL;
+	const gchar * const *dependencies = NULL;
 	gint i = 0;
 
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
@@ -774,7 +774,6 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 				}
 
 				g_object_unref(G_OBJECT(info));
-				g_strfreev(dependencies);
 
 				return FALSE;
 			}
@@ -803,7 +802,6 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 				}
 
 				g_object_unref(G_OBJECT(info));
-				g_strfreev(dependencies);
 
 				return FALSE;
 			}
@@ -811,7 +809,6 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 	}
 
 	g_object_unref(G_OBJECT(info));
-	g_strfreev(dependencies);
 
 	/* now load the actual plugin */
 	loader = gplugin_plugin_get_loader(plugin);

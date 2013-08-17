@@ -28,6 +28,7 @@ add_dependencies(test-native-loader
 	basic-plugin
 	dependent-plugin
 	broken-dependent-plugin
+	multiple-authors
 	query-error
 	load-error
 	unload-error

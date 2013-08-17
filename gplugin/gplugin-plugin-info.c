@@ -201,7 +201,8 @@ gplugin_plugin_info_set_authors(GPluginPluginInfo *info, gchar **authors) {
 	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
 	g_strfreev(priv->authors);
-	priv->authors = (authors) ? g_strdupv(authors) : NULL;
+
+	priv->authors = g_strdupv(authors);
 }
 
 static void
@@ -221,7 +222,8 @@ gplugin_plugin_info_set_dependencies(GPluginPluginInfo *info,
 	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
 	g_strfreev(priv->dependencies);
-	priv->dependencies = (dependencies) ? g_strdupv(dependencies) : NULL;
+
+	priv->dependencies = g_strdupv(dependencies);
 }
 
 /******************************************************************************
@@ -852,9 +854,10 @@ gplugin_plugin_info_get_category(const GPluginPluginInfo *info) {
  * gplugin_plugin_info_get_authors:
  * @info: #GPluginPluginInfo instance
  *
- * Return value: (transfer full): The authors from @info.
+ * Return value: (array zero-terminated=1) (transfer none): The authors from
+ *  @info.
  */
-gchar **
+const gchar * const *
 gplugin_plugin_info_get_authors(const GPluginPluginInfo *info) {
 	GPluginPluginInfoPrivate *priv = NULL;
 
@@ -862,7 +865,7 @@ gplugin_plugin_info_get_authors(const GPluginPluginInfo *info) {
 
 	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
-	return (priv->authors) ? g_strdupv(priv->authors) : NULL;
+	return (const gchar * const *)priv->authors;
 }
 
 /**
@@ -888,7 +891,7 @@ gplugin_plugin_info_get_website(const GPluginPluginInfo *info) {
  *
  * Return value: (transfer full): The list of dependencies from @info.
  */
-gchar **
+const gchar * const *
 gplugin_plugin_info_get_dependencies(const GPluginPluginInfo *info) {
 	GPluginPluginInfoPrivate *priv = NULL;
 
@@ -896,6 +899,6 @@ gplugin_plugin_info_get_dependencies(const GPluginPluginInfo *info) {
 
 	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
-	return (priv->dependencies) ? g_strdupv(priv->dependencies) : NULL;
+	return (const gchar * const *)priv->dependencies;
 }
 

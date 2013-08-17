@@ -100,7 +100,7 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	query = gplugin_native_plugin_loader_lookup_symbol(module,
 	                                                   GPLUGIN_QUERY_SYMBOL,
 	                                                   error);
-	if(error && *error) {
+	if((query == NULL) || (error && *error)) {
 		g_module_close(module);
 		return NULL;
 	}

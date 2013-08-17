@@ -92,9 +92,9 @@ const gchar *gplugin_plugin_info_get_icon(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_summary(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_description(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_category(const GPluginPluginInfo *info);
-gchar **gplugin_plugin_info_get_authors(const GPluginPluginInfo *info);
+const gchar * const *gplugin_plugin_info_get_authors(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_website(const GPluginPluginInfo *info);
-gchar **gplugin_plugin_info_get_dependencies(const GPluginPluginInfo *info);
+const gchar * const *gplugin_plugin_info_get_dependencies(const GPluginPluginInfo *info);
 
 G_END_DECLS
 

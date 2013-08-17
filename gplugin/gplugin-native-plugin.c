@@ -439,6 +439,8 @@ gplugin_native_plugin_register_type(GPluginNativePlugin *plugin, GType parent,
 
 		/* The same plugin is reloading the type */
 		type_info = gplugin_native_plugin_find_type_info(plugin, type);
+		if(type_info == NULL)
+			return G_TYPE_INVALID;
 
 		if(type_info->parent != parent) {
 			/* eek, them bastards tried to reparent this type! */

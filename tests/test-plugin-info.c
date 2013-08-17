@@ -247,6 +247,50 @@ test_gplugin_plugin_info_new_full(void) {
 	             (TestStringVFunc)gplugin_plugin_info_get_dependencies, info);
 }
 
+static void
+test_gplugin_plugin_info_authors_single(void) {
+	GPluginPluginInfo *info = NULL;
+	gchar *authors[] = { "author", NULL };
+	const gchar * const *g_authors = NULL;
+	gint i;
+
+
+	info = gplugin_plugin_info_new(
+		"test/single-author",
+		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
+		"authors", authors,
+		NULL);
+
+	g_authors = gplugin_plugin_info_get_authors(info);
+
+	for(i = 0; authors[i]; i++)
+		g_assert_cmpstr(authors[i], ==, g_authors[i]);
+
+	g_object_unref(G_OBJECT(info));
+}
+
+static void
+test_gplugin_plugin_info_authors_multiple(void) {
+	GPluginPluginInfo *info = NULL;
+	gchar *authors[] = { "author1", "author2", NULL };
+	const gchar * const *g_authors = NULL;
+	gint i;
+
+
+	info = gplugin_plugin_info_new(
+		"test/single-author",
+		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
+		"authors", authors,
+		NULL);
+
+	g_authors = gplugin_plugin_info_get_authors(info);
+
+	for(i = 0; authors[i]; i++)
+		g_assert_cmpstr(authors[i], ==, g_authors[i]);
+
+	g_object_unref(G_OBJECT(info));
+}
+
 /******************************************************************************
  * Main
  *****************************************************************************/
@@ -265,6 +309,11 @@ main(gint argc, gchar **argv) {
 	                test_gplugin_plugin_info_new_flags);
 	g_test_add_func("/plugin-info/new/full",
 	                test_gplugin_plugin_info_new_full);
+
+	g_test_add_func("/plugin-info/authors/single",
+	                test_gplugin_plugin_info_authors_single);
+	g_test_add_func("/plugin-info/authors/multiple",
+	                test_gplugin_plugin_info_authors_multiple);
 
 	return g_test_run();
 }

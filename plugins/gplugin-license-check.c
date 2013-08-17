@@ -20,7 +20,7 @@
 
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(GError **error) {
-	gchar **authors = { "Gary Kramlich <grim@reaperworld.com>", NULL };
+	gchar *authors[] = { "Gary Kramlich <grim@reaperworld.com>", NULL };
 
 	return gplugin_plugin_info_new(
 		"gplugin/license-check",
@@ -29,6 +29,7 @@ gplugin_plugin_query(GError **error) {
 		"version", GPLUGIN_VERSION,
 		"summary", "Checks the license compatibility of plugins",
 		"license-id", "GPL3",
+		"authors", authors,
 		NULL);
 }
 
