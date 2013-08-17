@@ -334,6 +334,48 @@ test_gplugin_plugin_info_dependencies_multiple(void) {
 }
 
 /******************************************************************************
+ * version_func tests
+ *****************************************************************************/
+static void
+test_gplugin_plugin_info_version_func(GPluginVersionCompareFunc func) {
+	GPluginPluginInfo *info  = NULL;
+	GPluginVersionCompareFunc got = NULL;
+
+	info = gplugin_plugin_info_new(
+		"test/version-func",
+		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
+		"version-func", func,
+		NULL);
+
+	got = gplugin_plugin_info_get_version_func(info);
+	g_assert(func == got);
+}
+
+static gint
+test_gplugin_version_compare(const gchar *v1, const gchar *v2) {
+	return 0;
+}
+
+static void
+test_gplugin_plugin_info_version_func_null(void) {
+	test_gplugin_plugin_info_version_func(NULL);
+}
+
+static void
+test_gplugin_plugin_info_version_func_default(void) {
+	test_gplugin_plugin_info_version_func(
+		(GPluginVersionCompareFunc)gplugin_version_compare
+	);
+}
+
+static void
+test_gplugin_plugin_info_version_func_custom(void) {
+	test_gplugin_plugin_info_version_func(
+		(GPluginVersionCompareFunc)test_gplugin_version_compare
+	);
+}
+
+/******************************************************************************
  * Main
  *****************************************************************************/
 gint
@@ -361,6 +403,13 @@ main(gint argc, gchar **argv) {
 	                test_gplugin_plugin_info_dependencies_single);
 	g_test_add_func("/plugin-info/dependencies/multiple",
 	                test_gplugin_plugin_info_dependencies_multiple);
+
+	g_test_add_func("/plugin-info/version-func/null",
+	                test_gplugin_plugin_info_version_func_null);
+	g_test_add_func("/plugin-info/version-func/default",
+	                test_gplugin_plugin_info_version_func_default);
+	g_test_add_func("/plugin-info/version-func/custom",
+	                test_gplugin_plugin_info_version_func_custom);
 
 	return g_test_run();
 }
