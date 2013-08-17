@@ -54,6 +54,7 @@ typedef enum /*< prefix=GPLUGIN_PLUGIN_INFO_FLAGS,underscore_name=GPLUGIN_PLUGIN
 #include <glib-object.h>
 
 #include <gplugin/gplugin-plugin-loader.h>
+#include <gplugin/gplugin-version.h>
 
 struct _GPluginPluginInfo {
 	GInitiallyUnowned gparent;
@@ -95,6 +96,7 @@ const gchar *gplugin_plugin_info_get_category(const GPluginPluginInfo *info);
 const gchar * const *gplugin_plugin_info_get_authors(const GPluginPluginInfo *info);
 const gchar *gplugin_plugin_info_get_website(const GPluginPluginInfo *info);
 const gchar * const *gplugin_plugin_info_get_dependencies(const GPluginPluginInfo *info);
+GPluginVersionCompareFunc gplugin_plugin_info_get_version_func(const GPluginPluginInfo *info);
 
 G_END_DECLS
 

@@ -34,7 +34,9 @@ typedef struct {
 	GPluginPluginInfoFlags flags;
 
 	gchar *name;
+
 	gchar *version;
+	GPluginVersionCompareFunc version_func;
 
 	gchar *license_id;
 	gchar *license_text;
@@ -61,6 +63,7 @@ enum {
 	PROP_FLAGS,
 	PROP_NAME,
 	PROP_VERSION,
+	PROP_VERSION_FUNC,
 	PROP_LICENSE_ID,
 	PROP_LICENSE_TEXT,
 	PROP_LICENSE_URL,
@@ -124,6 +127,15 @@ gplugin_plugin_info_set_version(GPluginPluginInfo *info,
 
 	g_free(priv->version);
 	priv->version = (version) ? g_strdup(version) : NULL;
+}
+
+static void
+gplugin_plugin_info_set_version_func(GPluginPluginInfo *info,
+                                     GPluginVersionCompareFunc func)
+{
+	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	priv->version_func = func;
 }
 
 static void
@@ -252,6 +264,10 @@ gplugin_plugin_info_get_property(GObject *obj, guint param_id, GValue *value,
 		case PROP_VERSION:
 			g_value_set_string(value, gplugin_plugin_info_get_version(info));
 			break;
+		case PROP_VERSION_FUNC:
+			g_value_set_pointer(value,
+			                    gplugin_plugin_info_get_version_func(info));
+			break;
 		case PROP_LICENSE_ID:
 			g_value_set_string(value,
 			                   gplugin_plugin_info_get_license_id(info));
@@ -314,6 +330,10 @@ gplugin_plugin_info_set_property(GObject *obj, guint param_id,
 			break;
 		case PROP_VERSION:
 			gplugin_plugin_info_set_version(info, g_value_get_string(value));
+			break;
+		case PROP_VERSION_FUNC:
+			gplugin_plugin_info_set_version_func(info,
+			                                     g_value_get_pointer(value));
 			break;
 		case PROP_LICENSE_ID:
 			gplugin_plugin_info_set_license_id(info,
@@ -468,7 +488,19 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                    G_PARAM_CONSTRUCT_ONLY));
 
 	/**
-	 * GPluginPluginInfo:license:
+	 * GPluginPluginInfo:version-func:
+	 *
+	 * The function to use to compare versions of this plugin.
+	 */
+	g_object_class_install_property(obj_class, PROP_VERSION_FUNC,
+		g_param_spec_pointer("version-func", "version-func",
+		                     "The function that can compare versions of " \
+		                     "this plugin",
+		                     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
+		                     G_PARAM_CONSTRUCT_ONLY));
+
+	/**
+	 * GPluginPluginInfo:license-id:
 	 *
 	 * The short name of the license.
 	 *
@@ -730,6 +762,24 @@ gplugin_plugin_info_get_version(const GPluginPluginInfo *info) {
 	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
 	return priv->version;
+}
+
+/**
+ * gplugin_plugin_info_get_version_func:
+ * @info: #GPluginPluginInfo instance
+ *
+ * Returns: The #GPluginVersionCompareFunc that can compare versions of this
+ *          plugins.
+ */
+GPluginVersionCompareFunc
+gplugin_plugin_info_get_version_func(const GPluginPluginInfo *info) {
+	GPluginPluginInfoPrivate *priv = NULL;
+
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_INFO(info), NULL);
+
+	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	return priv->version_func;
 }
 
 /**
