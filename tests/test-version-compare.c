@@ -136,10 +136,6 @@ main(gint argc, gchar **argv) {
 	g_test_add_func("/version-check/0_0_0__0_0_1",
 	                test_gplugin_version_0_0_0__0_0_1);
 
-
-	g_test_add_func("/version-check/1_2_3__1_2_3",
-	                test_gplugin_version_1_2_3__1_2_3);
-
 	return g_test_run();
 }
 
