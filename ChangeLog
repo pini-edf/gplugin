@@ -1,4 +1,4 @@
-0.0.5:
+0.0.5 2013/08/16:
   * Added a "category" property to GPluginPluginInfo
   * Changed GPluginPluginInfo:dependencies from a GSList to a gchar *
   * Implemented gplugin_plugin_info_new (again) this time with id and
