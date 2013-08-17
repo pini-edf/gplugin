@@ -103,6 +103,32 @@ gplugin_version_parser(const gchar *v, gint *major, gint *minor, gint *micro,
 /******************************************************************************
  * GPluginVersion API
  *****************************************************************************/
+/**
+ * GPluginVersionCompareFunc:
+ * @v1: The first version to compare
+ * @v2: The second version to compare
+ * @error: A #GError return address if there are any errors.
+ *
+ * #GPluginVersionCompareFunc is used to compare two versions of a plugin.  It
+ * should return -1 if @v1 is greater than @v2, 0 if @v1 is equal to @v2, and
+ * 1 if @v1 is less than @v2.
+ *
+ * Returns: -1 if @v1 is greater than @v2, 0 if @v1 is equal to @v1, and 1 if
+ *          @v1 is less than @v2.
+ */
+
+/**
+ * gplugin_version_compare:
+ * @v1: The first version to compare
+ * @v2: The second version to compare
+ * @error: A #GError return address if there are any errors.
+ *
+ * The default #GPluginVersionCompareFunc.  It handles the typical
+ * MAJOR.MINOR.MICRO format and ignore any characters after the micro version.
+ *
+ * Returns: -1 if @v1 is greater than @v2, 0 if @v1 is equal to @v1, and 1 if
+ *          @v1 is less than @v2.
+ */
 gint
 gplugin_version_compare(const gchar *v1, const gchar *v2, GError **error) {
 	gint v1_maj = 0, v1_min = 0, v1_mic = 0;
