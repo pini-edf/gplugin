@@ -11,7 +11,7 @@ After trying to fix this numerous times in the Guifications 3 tree, I decided
 I should really do this the UNIX way and write it as a stand alone library.
 
 During this time, I also got the idea that there was a good chance that someone
-probably beat me to this...  So I started search and came across libpeas.
+probably beat me to this...  So I started searching and came across libpeas.
 
 Libpeas looked promising, but there was a few things about it that I really
 didn't care for.  First of all, the plugin information (id, name, author, etc)
