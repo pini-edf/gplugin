@@ -69,7 +69,7 @@ configure_file(gplugin-version.h.in gplugin-version.h @ONLY)
 # build gplugin.h
 set(GPLUGIN_H_INCLUDES "")
 
-foreach(HEADER ${PUBLIC_HEADERS} ${PUBLIC_BUILT_HEADERS})
+foreach(HEADER ${PUBLIC_HEADERS})
 	set(GPLUGIN_H_INCLUDES "${GPLUGIN_H_INCLUDES}\n#include <gplugin/${HEADER}>")
 endforeach(HEADER)
 
