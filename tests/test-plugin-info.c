@@ -254,7 +254,6 @@ test_gplugin_plugin_info_authors_single(void) {
 	const gchar * const *g_authors = NULL;
 	gint i;
 
-
 	info = gplugin_plugin_info_new(
 		"test/single-author",
 		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
@@ -276,7 +275,6 @@ test_gplugin_plugin_info_authors_multiple(void) {
 	const gchar * const *g_authors = NULL;
 	gint i;
 
-
 	info = gplugin_plugin_info_new(
 		"test/single-author",
 		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
@@ -287,6 +285,50 @@ test_gplugin_plugin_info_authors_multiple(void) {
 
 	for(i = 0; authors[i]; i++)
 		g_assert_cmpstr(authors[i], ==, g_authors[i]);
+
+	g_object_unref(G_OBJECT(info));
+}
+
+
+static void
+test_gplugin_plugin_info_dependencies_single(void) {
+	GPluginPluginInfo *info = NULL;
+	gchar *dependencies[] = { "dependency1", NULL };
+	const gchar * const *g_dependencies = NULL;
+	gint i;
+
+	info = gplugin_plugin_info_new(
+		"test/single-dependency",
+		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
+		"dependencies", dependencies,
+		NULL);
+
+	g_dependencies = gplugin_plugin_info_get_dependencies(info);
+
+	for(i = 0; dependencies[i]; i++)
+		g_assert_cmpstr(dependencies[i], ==, g_dependencies[i]);
+
+	g_object_unref(G_OBJECT(info));
+}
+
+static void
+test_gplugin_plugin_info_dependencies_multiple(void) {
+	GPluginPluginInfo *info = NULL;
+	gchar *dependencies[] = { "dependencie1", "dependencie2", NULL };
+	const gchar * const *g_dependencies = NULL;
+	gint i;
+
+
+	info = gplugin_plugin_info_new(
+		"test/single-dependencie",
+		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
+		"dependencies", dependencies,
+		NULL);
+
+	g_dependencies = gplugin_plugin_info_get_dependencies(info);
+
+	for(i = 0; dependencies[i]; i++)
+		g_assert_cmpstr(dependencies[i], ==, g_dependencies[i]);
 
 	g_object_unref(G_OBJECT(info));
 }
@@ -314,6 +356,11 @@ main(gint argc, gchar **argv) {
 	                test_gplugin_plugin_info_authors_single);
 	g_test_add_func("/plugin-info/authors/multiple",
 	                test_gplugin_plugin_info_authors_multiple);
+
+	g_test_add_func("/plugin-info/dependencies/single",
+	                test_gplugin_plugin_info_dependencies_single);
+	g_test_add_func("/plugin-info/dependencies/multiple",
+	                test_gplugin_plugin_info_dependencies_multiple);
 
 	return g_test_run();
 }
