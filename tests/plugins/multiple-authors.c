@@ -22,7 +22,7 @@ gplugin_plugin_query(GError **error) {
 	gchar *authors[] = { "author1", "author2", "author3", "author4", NULL };
 
 	return g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
-		"id", "gplugin/basic-native-plugin",
+		"id", "gplugin/multiple-authors",
 		"abi-version", GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
 		"authors", authors,
 		NULL
