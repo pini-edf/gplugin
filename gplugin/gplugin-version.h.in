@@ -35,5 +35,15 @@
 	 ((y) < GPLUGIN_MINOR_VERSION || \
 	  ((y) == GPLUGIN_MINOR_VERSION && (z) <= GPLUGIN_MICRO_VERSION)))
 
+#include <glib.h>
+
+G_BEGIN_DECLS
+
+typedef gint (*GPluginVersionCompareFunc)(const gchar *v1, const gchar *v2, GError **error);
+
+gint gplugin_version_compare(const gchar *v1, const gchar *v2, GError **error);
+
+G_END_DECLS
+
 #endif /* GPLUGIN_VERSION_H */
 

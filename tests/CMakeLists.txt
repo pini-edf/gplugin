@@ -34,6 +34,8 @@ add_dependencies(test-native-loader
 	unload-error
 )
 
+add_gtest(test-version-compare)
+
 add_definitions(-DTEST_DIR="${CMAKE_CURRENT_BINARY_DIR}/plugins/")
 add_definitions(-DTEST_BAD_DIR="${CMAKE_CURRENT_BINARY_DIR}/bad-plugins/")
 
