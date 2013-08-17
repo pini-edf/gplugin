@@ -38,10 +38,27 @@ add_definitions(-DTEST_DIR="${CMAKE_CURRENT_BINARY_DIR}/plugins/")
 add_definitions(-DTEST_BAD_DIR="${CMAKE_CURRENT_BINARY_DIR}/bad-plugins/")
 
 set(GTESTER_TESTS "${TESTS}")
-set(GTESTER_LOG "testgplugin.log")
+set(GTESTER_LOG "testgplugin.xml")
+set(GTESTER_JUNIT "testgplugin-junit.xml")
+
+add_custom_command(
+	COMMAND ${GTESTER} -k --verbose -o ${GTESTER_LOG} ${GTESTER_TESTS}
+	OUTPUT ${GTESTER_LOG}
+	DEPENDS ${GTESTER_TESTS}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+add_custom_command(
+	COMMAND ${XSLTPROC} -o ${GTESTER_JUNIT} --nonet
+			${CMAKE_CURRENT_SOURCE_DIR}/gtester-junit.xsl
+			${GTESTER_LOG}
+	OUTPUT ${GTESTER_JUNIT}
+	DEPENDS ${GTESTER_LOG}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 add_custom_target(tests ALL
-	COMMAND ${GTESTER} -k --verbose -o ${GTESTER_LOG} ${GTESTER_TESTS}
-	DEPENDS ${GTESTER_TESTS}
+	DEPENDS ${GTESTER_LOG} ${GTESTER_JUNIT}
 )
+
 

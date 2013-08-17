@@ -96,6 +96,12 @@ find_program(GTESTER
 )
 mark_as_advanced(GTESTER)
 
+find_program(XSLTPROC
+	NAMES xsltproc
+	DOC "xsltproc executable"
+)
+mark_as_advanced(XSLTPROC)
+
 ###############################################################################
 # Build Info
 ###############################################################################
