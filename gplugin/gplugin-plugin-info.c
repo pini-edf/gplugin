@@ -359,17 +359,17 @@ static void
 gplugin_plugin_info_finalize(GObject *obj) {
 	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(obj);
 
-    g_free(priv->id);
-    g_free(priv->name);
-    g_free(priv->version);
-    g_free(priv->license_id);
-    g_free(priv->license_text);
-    g_free(priv->license_url);
-    g_free(priv->icon);
-    g_free(priv->summary);
-    g_free(priv->description);
-    g_strfreev(priv->authors);
-    g_free(priv->website);
+	g_free(priv->id);
+	g_free(priv->name);
+	g_free(priv->version);
+	g_free(priv->license_id);
+	g_free(priv->license_text);
+	g_free(priv->license_url);
+	g_free(priv->icon);
+	g_free(priv->summary);
+	g_free(priv->description);
+	g_strfreev(priv->authors);
+	g_free(priv->website);
 	g_strfreev(priv->dependencies);
 
 	G_OBJECT_CLASS(parent_class)->finalize(obj);

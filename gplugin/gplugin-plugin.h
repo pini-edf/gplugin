@@ -24,7 +24,7 @@
 #ifndef GPLUGIN_PLUGIN_H
 #define GPLUGIN_PLUGIN_H
 
-#define GPLUGIN_TYPE_PLUGIN		       (gplugin_plugin_get_type())
+#define GPLUGIN_TYPE_PLUGIN            (gplugin_plugin_get_type())
 #define GPLUGIN_PLUGIN(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GPLUGIN_TYPE_PLUGIN, GPluginPlugin))
 #define GPLUGIN_PLUGIN_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), GPLUGIN_TYPE_PLUGIN, GPluginPluginClass))
 #define GPLUGIN_IS_PLUGIN(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), GPLUGIN_TYPE_PLUGIN))

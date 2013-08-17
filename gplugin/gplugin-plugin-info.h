@@ -76,8 +76,8 @@ GType gplugin_plugin_info_get_type(void);
 	GPLUGIN_PLUGIN_INFO( \
 		g_object_new(GPLUGIN_TYPE_PLUGIN_INFO, \
 		             "id", (id), \
-			         "abi-version", (abi_version), \
-				     __VA_ARGS__) \
+		             "abi-version", (abi_version), \
+		             __VA_ARGS__) \
 	)
 
 const gchar *gplugin_plugin_info_get_id(const GPluginPluginInfo *info);
