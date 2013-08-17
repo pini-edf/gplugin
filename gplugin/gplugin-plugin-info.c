@@ -197,12 +197,13 @@ gplugin_plugin_info_set_category(GPluginPluginInfo *info,
 }
 
 static void
-gplugin_plugin_info_set_authors(GPluginPluginInfo *info, gchar **authors) {
+gplugin_plugin_info_set_authors(GPluginPluginInfo *info,
+                                const gchar * const *authors) {
 	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
 	g_strfreev(priv->authors);
 
-	priv->authors = g_strdupv(authors);
+	priv->authors = g_strdupv((gchar **)authors);
 }
 
 static void
@@ -217,13 +218,13 @@ gplugin_plugin_info_set_website(GPluginPluginInfo *info,
 
 static void
 gplugin_plugin_info_set_dependencies(GPluginPluginInfo *info,
-                                     gchar **dependencies)
+                                     const gchar * const *dependencies)
 {
 	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
 	g_strfreev(priv->dependencies);
 
-	priv->dependencies = g_strdupv(dependencies);
+	priv->dependencies = g_strdupv((gchar **)dependencies);
 }
 
 /******************************************************************************

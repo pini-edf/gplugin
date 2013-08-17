@@ -19,7 +19,10 @@
 
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(GError **error) {
-	gchar *dependencies[] = { "gplugin/does-not-exist", NULL };
+	const gchar * const dependencies[] = {
+		"gplugin/does-not-exist",
+		NULL
+	};
 
 	return gplugin_plugin_info_new(
 		"gplugin/broken-dependent-native-plugin",

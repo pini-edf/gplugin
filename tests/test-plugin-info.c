@@ -34,7 +34,7 @@
 typedef gchar **(*TestStringVFunc)(GPluginPluginInfo *info);
 
 static void
-test_stringv(gchar **got, gchar **expected,
+test_stringv(gchar **got, const gchar * const * const expected,
              TestStringVFunc func, GPluginPluginInfo *info)
 {
         gint i = 0;
@@ -63,8 +63,8 @@ test_gplugin_plugin_info_construction(void) {
 	gchar **authors = NULL, *website = NULL, **dependencies = NULL;
 	guint abi_version = 0;
 	GPluginPluginInfoFlags flags = 0;
-	gchar *r_authors[] = { "author", NULL };
-	gchar *r_dependencies[] = { "dependency", NULL };
+	const gchar * const r_authors[] = { "author", NULL };
+	const gchar * const r_dependencies[] = { "dependency", NULL };
 
 	info = g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
 		"id", "gplugin-test/plugin-info-test",
@@ -183,8 +183,8 @@ test_gplugin_plugin_info_new_full(void) {
 	gchar **authors = NULL, *website = NULL, **dependencies = NULL;
 	guint abi_version = 0;
 	GPluginPluginInfoFlags flags = 0;
-	gchar *r_authors[] = { "author", NULL };
-	gchar *r_dependencies[] = { "dependency", NULL };
+	const gchar * const r_authors[] = { "author", NULL };
+	const gchar * const r_dependencies[] = { "dependency", NULL };
 
 	info = gplugin_plugin_info_new(
 		"gplugin-test/plugin-info-test",
@@ -250,7 +250,7 @@ test_gplugin_plugin_info_new_full(void) {
 static void
 test_gplugin_plugin_info_authors_single(void) {
 	GPluginPluginInfo *info = NULL;
-	gchar *authors[] = { "author", NULL };
+	const gchar * const authors[] = { "author", NULL };
 	const gchar * const *g_authors = NULL;
 	gint i;
 
@@ -271,7 +271,7 @@ test_gplugin_plugin_info_authors_single(void) {
 static void
 test_gplugin_plugin_info_authors_multiple(void) {
 	GPluginPluginInfo *info = NULL;
-	gchar *authors[] = { "author1", "author2", NULL };
+	const gchar * const authors[] = { "author1", "author2", NULL };
 	const gchar * const *g_authors = NULL;
 	gint i;
 

@@ -19,7 +19,13 @@
 
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(GError **error) {
-	gchar *authors[] = { "author1", "author2", "author3", "author4", NULL };
+	const gchar * const authors[] = {
+		"author1",
+		"author2",
+		"author3",
+		"author4",
+		NULL
+	};
 
 	return g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
 		"id", "gplugin/multiple-authors",

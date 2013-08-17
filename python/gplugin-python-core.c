@@ -20,7 +20,10 @@
 
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(GError **error) {
-	gchar *authors[] = { "Gary Kramlich <grim@reaperworld.com>", NULL };
+	const gchar * const authors[] = {
+		"Gary Kramlich <grim@reaperworld.com>",
+		NULL
+	};
 
 	return gplugin_plugin_info_new(
 		"gplugin-python-loader",
