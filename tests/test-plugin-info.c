@@ -34,21 +34,21 @@
 typedef gchar **(*TestStringVFunc)(GPluginPluginInfo *info);
 
 static void
-test_stringv(gchar **expected, gchar **got, TestStringVFunc func,
-             GPluginPluginInfo *info)
+test_stringv(gchar **got, gchar **expected,
+             TestStringVFunc func, GPluginPluginInfo *info)
 {
-	gint i = 0;
-	gchar **tmp = NULL;
+        gint i = 0;
+        gchar **tmp = NULL;
 
-	for(i = 0; expected[i]; i++)
-		g_assert_cmpstr(expected[i], ==, got[i]);
+        for(i = 0; got[i]; i++)
+                g_assert_cmpstr(got[i], ==, expected[i]);
 
-	tmp = func(info);
+        tmp = func(info);
 
-	for(i = 0; expected[i]; i++)
-		g_assert_cmpstr(expected[i], ==, tmp[i]);
+        for(i = 0; got[i]; i++)
+                g_assert_cmpstr(got[i], ==, tmp[i]);
 
-	g_strfreev(tmp);
+        g_strfreev(tmp);
 }
 
 /******************************************************************************
