@@ -1,9 +1,15 @@
 Dependencies
 ============
-GPlugin depends on the following:
-	glib-2.0 >= 2.16.0
+GPlugin depends on the following at a bare minimum:
+	glib-2.0 >= 2.20.0
+	gobject-introspection
 	cmake >= 2.8
 	a C compiler
+
+A full build (enabled by default) depends on the following:
+	gtk-3
+	python-dev
+	xsltproc
 
 All of these packages and their development headers need to be installed
 prior to building GPlugin.
