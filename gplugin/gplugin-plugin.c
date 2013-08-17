@@ -24,6 +24,19 @@
 #define GPLUGIN_PLUGIN_GET_PRIVATE(obj) \
 	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_PLUGIN, GPluginPluginPrivate))
 
+/**
+ * GPluginPluginState:
+ * @GPLUGIN_PLUGIN_STATE_UNKNOWN: The state of the plugin is unknown
+ * @GPLUGIN_PLUGIN_STATE_ERROR: There was an error loading or unloading the
+ *  plugin
+ * @GPLUGIN_PLUGIN_STATE_QUERIED: The plugin has been queried but not loaded
+ * @GPLUGIN_PLUGIN_STATE_REQUERY: The plugin should be requeried
+ * @GPLUGIN_PLUGIN_STATE_LOADED: The plugin is loaded
+ * @GPLUGIN_PLUGIN_STATE_LOAD_FAILED: The plugin failed to load
+ *
+ * The expected states of a plugin.
+ */
+
 /******************************************************************************
  * Structs
  *****************************************************************************/
