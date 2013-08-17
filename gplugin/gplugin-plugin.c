@@ -181,24 +181,44 @@ gplugin_plugin_class_init(GPluginPluginClass *klass) {
 	obj_class->set_property = gplugin_plugin_set_property;
 	obj_class->finalize = gplugin_plugin_finalize;
 
+	/**
+	 * GPluginPlugin:filename:
+	 *
+	 * The absolute path to the plugin on disk.
+	 */
 	g_object_class_install_property(obj_class, PROP_FILENAME,
 		g_param_spec_string("filename", "filename",
 		                    "The filename of the plugin",
 		                    NULL,
 		                    G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPlugin:loader:
+	 *
+	 * The #GPluginPluginLoader that loaded this plugin.
+	 */
 	g_object_class_install_property(obj_class, PROP_LOADER,
 		g_param_spec_object("loader", "loader",
 		                    "The loader for this plugin",
 		                    GPLUGIN_TYPE_PLUGIN_LOADER,
 		                    G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPlugin:info:
+	 *
+	 * The #GPluginPluginInfo from this plugin.
+	 */
 	g_object_class_install_property(obj_class, PROP_INFO,
 		g_param_spec_object("info", "info",
 		                   "The information for the plugin",
 		                   GPLUGIN_TYPE_PLUGIN_INFO,
 		                   G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
 
+	/**
+	 * GPluginPlugin:state:
+	 *
+	 * The #GPluginPluginState that this plugin is in.
+	 */
 	g_object_class_install_property(obj_class, PROP_STATE,
 		g_param_spec_enum("state", "state",
 		                  "The state of the plugin",
