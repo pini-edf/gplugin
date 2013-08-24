@@ -317,6 +317,16 @@ gplugin_native_plugin_get_type(void) {
 	return type_volatile;
 }
 
+/**
+ * gplugin_native_plugin_use:
+ * @plugin: a #GPluginNativePlugin
+ *
+ * Increments the ref count of @plugin by one.
+ *
+ * See: g_type_module_use
+ *
+ * Returns: FALSE if @plugin needed to be loaded and loading failed.
+ */
 gboolean
 gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
 	GPluginNativePluginPrivate *priv = NULL;
@@ -368,6 +378,17 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
 	return TRUE;
 }
 
+/**
+ * gplugin_native_plugin_unuse:
+ * @plugin: a #GPluginNativePlugin
+ *
+ * Decreases the ref count of @plugin by one.  If the result is zero, @plugin
+ * is unloaded.
+ *
+ * See: g_type_module_unuse
+ *
+ * Returns: TRUE if successful, FALSE otherwise.
+ */
 gboolean
 gplugin_native_plugin_unuse(GPluginNativePlugin *plugin) {
 	GPluginNativePluginPrivate *priv = NULL;
@@ -407,6 +428,20 @@ gplugin_native_plugin_unuse(GPluginNativePlugin *plugin) {
 	return TRUE;
 }
 
+/**
+ * gplugin_native_plugin_register_type:
+ * @plugin: a #GPluginNativePlugin
+ * @parent: the type for the parent class
+ * @name: name for the type
+ * @info: type information structure
+ * @flags: flags field providing details about the type.
+ *
+ * Looks up or registers a type that is implemented in @plugin.
+ *
+ * See: g_type_module_register_type
+ *
+ * Returns: the new or existing type ID
+ */
 GType
 gplugin_native_plugin_register_type(GPluginNativePlugin *plugin, GType parent,
                                     const gchar *name, const GTypeInfo *info,
@@ -488,6 +523,17 @@ gplugin_native_plugin_register_type(GPluginNativePlugin *plugin, GType parent,
 	return type_info->type;
 }
 
+/**
+ * gplugin_native_plugin_add_interface:
+ * @plugin: a #GPluginNativePlugin
+ * @instance_type: type to which to add the interface
+ * @interface_type: interface type to add
+ * @interface_info: type information structure
+ *
+ * Registers an additional interface for a type that lives in @plugin.
+ *
+ * See: g_type_module_add_interface
+ */
 void
 gplugin_native_plugin_add_interface(GPluginNativePlugin *plugin,
                                     GType instance_type, GType interface_type,
@@ -541,6 +587,21 @@ gplugin_native_plugin_add_interface(GPluginNativePlugin *plugin,
 	iface_info->info = *interface_info;
 }
 
+/**
+ * gplugin_native_plugin_register_enum:
+ * @plugin: a #GPluginNativePlugin
+ * @name: a name for the type
+ * @values: an array of %GEnumValue structs for the possible enumeration
+ *          values.  The array is terminated by a struct with all members being
+ *          0.
+ *
+ * Looks up or registers a new enumeration named @name with the given @values,
+ * and associates it with @plugin.
+ *
+ * See: g_type_module_register_enum
+ *
+ * Returns: the new or existing type ID.
+ */
 GType
 gplugin_native_plugin_register_enum(GPluginNativePlugin *plugin,
                                     const gchar *name,
@@ -558,6 +619,17 @@ gplugin_native_plugin_register_enum(GPluginNativePlugin *plugin,
 	                                           &enum_info, 0);
 }
 
+/**
+ * gplugin_native_plugin_register_flags:
+ * @plugin: a #GPluginNativePlugin
+ * @name: name for the type
+ * @values: an array of %GFlagValue structs for the possible flags values.  The
+ *          array is terminated by a struct with all members being 0.
+ *
+ * See: g_type_module_register_flags
+ *
+ * Returns: the new or existing type ID.
+ */
 GType
 gplugin_native_plugin_register_flags(GPluginNativePlugin *plugin,
                                      const gchar *name,
@@ -575,6 +647,15 @@ gplugin_native_plugin_register_flags(GPluginNativePlugin *plugin,
 	                                           &flags_info, 0);
 }
 
+/**
+ * gplugin_native_plugin_get_module: (skip)
+ * @plugin: #GPluginNativePlugin instance
+ *
+ * Returns the %GModule associated with this plugin.  This should really only
+ * be used if you need to make your plugin resident.
+ *
+ * Returns: The %GModule associated with this plugin.
+ */
 GModule *
 gplugin_native_plugin_get_module(GPluginNativePlugin *plugin) {
 	GPluginNativePluginPrivate *priv = NULL;

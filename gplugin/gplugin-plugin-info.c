@@ -765,7 +765,7 @@ gplugin_plugin_info_get_version(const GPluginPluginInfo *info) {
 }
 
 /**
- * gplugin_plugin_info_get_version_func:
+ * gplugin_plugin_info_get_version_func: (skip)
  * @info: #GPluginPluginInfo instance
  *
  * Returns: The #GPluginVersionCompareFunc that can compare versions of this
