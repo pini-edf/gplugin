@@ -172,6 +172,7 @@ if(BUILD_GIR)
 			LIBRARY gplugin
 			QUIET
 			SCANNER_ARGS --add-include-path=${CMAKE_CURRENT_SOURCE_DIR} --warn-all
+			             --include=GModule-2.0 --include=GObject-2.0
 			COMPILER_ARGS --includedir=${CMAKE_CURRENT_SOURCE_DIR}
 			SYMBOL_PREFIXES gplugin
 			SOURCES ${GPLUGIN_SOURCES} ${GPLUGIN_HEADERS}
