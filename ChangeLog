@@ -1,6 +1,7 @@
 0.0.6:
   * Added GPluginPluginInfo:version-func which can hold a
     GPluginVersionCompareFunc that's used to compare versions of the plugin.
+  * Fixed the multiple id crash issue
 
 0.0.5 2013/08/16:
   * Added a "category" property to GPluginPluginInfo
