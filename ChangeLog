@@ -1,3 +1,5 @@
+0.0.7:
+
 0.0.6: 2013/08/25
   * Added GPluginPluginInfo:version-func which can hold a
     GPluginVersionCompareFunc that's used to compare versions of the plugin.
