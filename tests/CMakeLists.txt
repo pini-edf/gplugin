@@ -6,6 +6,7 @@ endmacro(add_test_plugin)
 
 add_subdirectory(plugins)
 add_subdirectory(bad-plugins)
+add_subdirectory(id-collision)
 
 macro(add_gtest target)
 	add_executable(${target} ${target}.c)
@@ -20,6 +21,7 @@ macro(add_gtest target)
 	list(APPEND TESTS ${_output_name})
 endmacro(add_gtest)
 
+add_gtest(test-core)
 add_gtest(test-plugin-manager-paths)
 add_gtest(test-plugin-info)
 
@@ -32,12 +34,15 @@ add_dependencies(test-native-loader
 	query-error
 	load-error
 	unload-error
+	id-collision1
+	id-collision2
 )
 
 add_gtest(test-version-compare)
 
 add_definitions(-DTEST_DIR="${CMAKE_CURRENT_BINARY_DIR}/plugins/")
 add_definitions(-DTEST_BAD_DIR="${CMAKE_CURRENT_BINARY_DIR}/bad-plugins/")
+add_definitions(-DTEST_ID_DIR="${CMAKE_CURRENT_BINARY_DIR}/id-collision/")
 
 set(GTESTER_TESTS "${TESTS}")
 set(GTESTER_LOG "testgplugin.xml")
@@ -46,7 +51,7 @@ set(GTESTER_JUNIT "testgplugin-junit.xml")
 add_custom_command(
 	COMMAND ${GTESTER} -k --verbose -o ${GTESTER_LOG} ${GTESTER_TESTS}
 	OUTPUT ${GTESTER_LOG}
-	DEPENDS ${GTESTER_TESTS}
+	DEPENDS ${TESTS}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 

@@ -237,6 +237,18 @@ test_unload_error(void) {
 	g_test_trap_assert_failed();
 }
 
+/* id collisions */
+static void
+test_id_collision(void) {
+	GSList *plugins = NULL, *l = NULL;
+
+	gplugin_plugin_manager_append_path(TEST_ID_DIR);
+	gplugin_plugin_manager_refresh();
+
+	plugins = gplugin_plugin_manager_find_plugins("gplugin/id-collision");
+	g_assert(plugins);
+}
+
 /******************************************************************************
  * Main
  *****************************************************************************/
@@ -262,6 +274,10 @@ main(gint argc, gchar **argv) {
 	                test_load_error);
 	g_test_add_func("/loaders/native/unload-error",
 	                test_unload_error);
+
+	/* test plugins with id collisions */
+	g_test_add_func("/loaders/native/id-collision",
+	                test_id_collision);
 
 	return g_test_run();
 }

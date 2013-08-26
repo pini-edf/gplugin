@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 #include <string.h>
 
 #include <glib.h>
@@ -175,14 +176,19 @@ gplugin_plugin_manager_file_tree_free(GNode *root) {
 	g_node_destroy(root);
 }
 
-static void
-gplugin_plugin_manager_remove_list_value(gpointer data) {
+/* unrefs everything in a list */
+static gboolean
+gplugin_plugin_manager_remove_list_value(gpointer k, gpointer v, gpointer d) {
 	GSList *l = NULL;
 
-	for(l = (GSList *)data; l; l = l->next)
-		g_object_unref(G_OBJECT(l->data));
+	for(l = (GSList *)v; l; l = l->next) {
+		if(l->data && G_IS_OBJECT(l->data))
+			g_object_unref(G_OBJECT(l->data));
+	}
 
-	g_slist_free((GSList *)data);
+	g_slist_free((GSList *)v);
+
+	return TRUE;
 }
 
 /******************************************************************************
@@ -192,9 +198,14 @@ void
 gplugin_plugin_manager_init(void) {
 	paths = g_queue_new();
 
-	plugins = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
-	                                gplugin_plugin_manager_remove_list_value);
+	/* the plugins hashtable is keyed on a plugin id and holds a GSList of all
+	 * plugins that share that id.
+	 */
+	plugins = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 
+	/* the filename view is hash table keyed on the filename of the plugin with
+	 * a value of the plugin itself.
+	 */
 	plugins_filename_view = g_hash_table_new_full(g_str_hash, g_str_equal,
 	                                              NULL, g_object_unref);
 
@@ -210,8 +221,7 @@ gplugin_plugin_manager_init(void) {
 	 * again and again.
 	 */
 	loaders = g_hash_table_new_full(gplugin_plugin_manager_str_hash,
-	                                g_str_equal, g_free,
-	                                gplugin_plugin_manager_remove_list_value);
+	                                g_str_equal, g_free, NULL);
 
 	gplugin_plugin_manager_register_loader(GPLUGIN_TYPE_NATIVE_PLUGIN_LOADER);
 }
@@ -222,14 +232,26 @@ gplugin_plugin_manager_uninit(void) {
 	g_queue_free_full(paths, g_free);
 #else
 	GList *iter = NULL;
+	GSList *l = NULL;
 
 	for(iter = paths->head; iter; iter = iter->next)
 		g_free(iter->data);
 	g_queue_free(paths);
 #endif /* GLIB_CHECK_VERSION(2,32,0) */
 
+	/* free all the data in the plugins hash table and destroy it */
+	g_hash_table_foreach_remove(plugins,
+	                            gplugin_plugin_manager_remove_list_value,
+	                            NULL);
 	g_hash_table_destroy(plugins);
+
+	/* destroy the filename view */
 	g_hash_table_destroy(plugins_filename_view);
+
+	/* free all the data in the loaders hash table and destroy it */
+	g_hash_table_foreach_remove(loaders,
+	                            gplugin_plugin_manager_remove_list_value,
+	                            NULL);
 	g_hash_table_destroy(loaders);
 }
 
@@ -552,7 +574,7 @@ gplugin_plugin_manager_refresh(void) {
 					/* Check the GError, if it's set, output it's message and
 					 * try the next loader.
 					 */
-					if(error) {
+					if(plugin == NULL || error) {
 						g_warning("failed to query '%s' with loader '%s': %s",
 					              filename, G_OBJECT_TYPE_NAME(loader),
 						          error->message ? error->message : "Unknown");
