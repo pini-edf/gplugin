@@ -33,6 +33,7 @@ gplugin_plugin_query(GError **error) {
 		"summary", "Checks the license compatibility of plugins",
 		"license-id", "GPL3",
 		"authors", authors,
+		"website", "http://bitbucket.org/rw_grim/gplugin",
 		NULL);
 }
 
