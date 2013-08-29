@@ -338,13 +338,18 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
 	priv->use_count++;
 	if(priv->use_count == 1) {
 		GPluginPluginLoader *loader = NULL;
+		GError *error = NULL;
 		GSList *l = NULL;
 
 		loader = gplugin_plugin_get_loader(GPLUGIN_PLUGIN(plugin));
 
 		if(!gplugin_plugin_loader_load_plugin(loader, GPLUGIN_PLUGIN(plugin),
-		                                      NULL))
+		                                      &error))
 		{
+			g_warning("Failed to use plugin : %s\n",
+			          (error) ? error->message : "unknown");
+			g_error_free(error);
+
 			priv->use_count--;
 
 			return FALSE;
