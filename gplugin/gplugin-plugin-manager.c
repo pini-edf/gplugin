@@ -653,10 +653,13 @@ gplugin_plugin_manager_refresh(void) {
 						                                           plugin,
 						                                           &error);
 
-						if(!loaded)
+						if(!loaded) {
 							g_warning("failed to load %s during query: %s",
 							          filename,
 							          (error) ? error->message : "unknown");
+
+							g_error_free(error);
+						}
 					} else {
 						/* finally set the plugin state queried */
 						gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_QUERIED);
