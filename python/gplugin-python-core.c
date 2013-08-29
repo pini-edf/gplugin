@@ -34,7 +34,7 @@ gplugin_plugin_query(GError **error) {
 		"version", GPLUGIN_VERSION,
 		"license-id", "GPL3",
 		"summary", "A plugin that can load python plugins",
-		"description", "This plugin allows the load of plugins written in "
+		"description", "This plugin allows the loading of plugins written in "
 		               "the python programming language.",
 		"authors", authors,
 		"website", "http://bitbucket.org/rw_grim/gplugin",
