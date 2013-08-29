@@ -47,10 +47,15 @@ gplugin_plugin_query(GError **error) {
 
 G_MODULE_EXPORT gboolean
 gplugin_plugin_load(GPluginNativePlugin *plugin, GError **error) {
+	static gboolean loader_registered = FALSE;
+
 	gplugin_python_plugin_register(plugin);
 	gplugin_python_plugin_loader_register(plugin);
 
-	gplugin_plugin_manager_register_loader(GPLUGIN_TYPE_PYTHON_PLUGIN_LOADER);
+	if(!loader_registered) {
+		gplugin_plugin_manager_register_loader(GPLUGIN_TYPE_PYTHON_PLUGIN_LOADER);
+		loader_registered = TRUE;
+	}
 
 	return TRUE;
 }

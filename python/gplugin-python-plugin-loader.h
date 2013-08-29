@@ -32,6 +32,11 @@ typedef struct _GPluginPythonPluginLoaderClass       GPluginPythonPluginLoaderCl
 
 struct _GPluginPythonPluginLoader {
 	GPluginPluginLoader parent;
+
+	void (*_gplugin_reserved_1)(void);
+	void (*_gplugin_reserved_2)(void);
+	void (*_gplugin_reserved_3)(void);
+	void (*_gplugin_reserved_4)(void);
 };
 
 struct _GPluginPythonPluginLoaderClass {

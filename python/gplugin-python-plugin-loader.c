@@ -25,7 +25,7 @@
 #include <Python.h>
 
 #define GPLUGIN_PYTHON_PLUGIN_LOADER_GET_PRIVATE(obj) \
-	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_PLUGIN_LOADER, GPluginPythonPluginLoaderPrivate))
+	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_PYTHON_PLUGIN_LOADER, GPluginPythonPluginLoaderPrivate))
 
 /******************************************************************************
  * Typedefs
