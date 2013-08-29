@@ -31,11 +31,11 @@ typedef struct _GPluginPythonPluginClass       GPluginPythonPluginClass;
 #include <gplugin-native.h>
 
 struct _GPluginPythonPlugin {
-	GObject parent;
+	GPluginPlugin parent;
 };
 
 struct _GPluginPythonPluginClass {
-	GObjectClass parent;
+	GPluginPluginClass parent;
 
 	void (*_gplugin_reserved_1)(void);
 	void (*_gplugin_reserved_2)(void);
