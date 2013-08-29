@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2012 Gary Kramlich <grim@reaperworld.com>
+ * Copyright (C) 2011-2013 Gary Kramlich <grim@reaperworld.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,91 +96,122 @@ flags_to_string(GPluginPluginInfoFlags flags) {
 static gboolean
 output_plugin(const gchar *id) {
 	GSList *plugins = NULL, *l = NULL;
-	gboolean first = TRUE;
+	gboolean first = TRUE, header_output = FALSE;
 
 	#define FORMAT "%-13s"
 	#define MAIN_FORMAT_NEL "  " FORMAT ": "
 	#define MAIN_FORMAT MAIN_FORMAT_NEL "%s\n"
-
-	printf("%s", id);
+	#define STR_OR_EMPTY(str) ((str) ? (str) : "")
 
 	plugins = gplugin_plugin_manager_find_plugins(id);
 	if(plugins == NULL) {
-		printf(": not found\n");
+		printf("%s not found\n", id);
 
 		return FALSE;
-	} else {
-		printf("\n");
 	}
 
 	for(l = plugins; l; l = l->next) {
 		GPluginPlugin *plugin = GPLUGIN_PLUGIN(l->data);
 		const GPluginPluginInfo *info = gplugin_plugin_get_info(plugin);
 		GPluginPluginInfoFlags flags = gplugin_plugin_info_get_flags(info);
-		const gchar * const *authors = NULL;
-		const gchar * const *dependencies = NULL;
+		guint32 abi_version;
+		gchar *name, *version;
+		gchar *license_id, *license_text, *license_url;
+		gchar *icon, *summary, *description, *category, *website;
+		gchar **authors, **dependencies;
 		gint i = 0;
 
 		if(!internal && (flags & GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL))
 			continue;
 
+		if(!header_output) {
+			printf("%s:\n", id);
+			header_output = TRUE;
+		}
+
+		g_object_get(G_OBJECT(info),
+		             "abi-version", &abi_version,
+		             "name", &name,
+		             "version", &version,
+		             "license-id", &license_id,
+		             "license-text", &license_text,
+		             "license-url", &license_url,
+		             "icon", &icon,
+		             "summary", &summary,
+		             "description", &description,
+		             "category", &category,
+		             "authors", &authors,
+		             "website", &website,
+		             "dependencies", &dependencies,
+		             NULL);
+
 		if(!first)
 			printf("\n");
 
-		printf(MAIN_FORMAT, "name", gplugin_plugin_info_get_name(info));
+		printf(MAIN_FORMAT, "name", STR_OR_EMPTY(name));
 		if(verbosity > 0)
-			printf(MAIN_FORMAT, "category",
-			       gplugin_plugin_info_get_category(info));
-		printf(MAIN_FORMAT, "version", gplugin_plugin_info_get_version(info));
-		printf(MAIN_FORMAT, "summary", gplugin_plugin_info_get_summary(info));
+			printf(MAIN_FORMAT, "category", STR_OR_EMPTY(category));
+		printf(MAIN_FORMAT, "version", STR_OR_EMPTY(version));
+		if(verbosity > 0) {
+			printf(MAIN_FORMAT, "license", STR_OR_EMPTY(license_id));
+			printf(MAIN_FORMAT, "license url", STR_OR_EMPTY(license_url));
+		}
+		printf(MAIN_FORMAT, "summary", STR_OR_EMPTY(summary));
 		if(verbosity > 0) {
 			printf(MAIN_FORMAT_NEL, "authors");
-			authors = gplugin_plugin_info_get_authors(info);
-			printf("authors: %p\n", authors);
 			if(authors) {
 				for(i = 0; authors[i]; i++) {
 					if(i > 0)
-						printf("                ");
-					printf("%s\n", authors[i]);
+						printf("                 ");
+					printf("%s\n", STR_OR_EMPTY(authors[i]));
 				}
 			} else {
 				printf("\n");
 			}
-			printf(MAIN_FORMAT, "website", gplugin_plugin_info_get_website(info));
+			printf(MAIN_FORMAT, "website", STR_OR_EMPTY(website));
 		}
-		if(verbosity > 1)
+		if(verbosity > 1) {
 			printf(MAIN_FORMAT, "filename",
-			       gplugin_plugin_get_filename(plugin));
+			       STR_OR_EMPTY(gplugin_plugin_get_filename(plugin)));
+		}
 		if(verbosity > 2) {
+			GPluginPluginLoader *loader = gplugin_plugin_get_loader(plugin);
 			gchar *flags_str = flags_to_string(flags);
 
-			GPluginPluginLoader *loader = gplugin_plugin_get_loader(plugin);
-
-			printf(MAIN_FORMAT_NEL "%08x\n", "abi version",
-			       gplugin_plugin_info_get_abi_version(info));
+			printf(MAIN_FORMAT_NEL "%08x\n", "abi version", abi_version);
 			printf(MAIN_FORMAT, "flags", flags_str);
 			printf(MAIN_FORMAT, "loader", G_OBJECT_TYPE_NAME(loader));
 
+			g_object_unref(G_OBJECT(loader));
 			g_free(flags_str);
 		}
-		if(verbosity > 0) {
-			printf(MAIN_FORMAT, "description",
-			       gplugin_plugin_info_get_description(info));
-		}
+		if(verbosity > 0)
+			printf(MAIN_FORMAT, "description", STR_OR_EMPTY(description));
 		if(verbosity > 2) {
 			printf(MAIN_FORMAT_NEL, "dependencies");
-			dependencies = gplugin_plugin_info_get_dependencies(info);
 			if(dependencies) {
 				for(i = 0; dependencies[i]; i++) {
 					if(i > 0)
-						printf("                ");
-					printf("%s\n", dependencies[i]);
+						printf("                 ");
+					printf("%s\n", STR_OR_EMPTY(dependencies[i]));
 				}
 			} else {
 				printf("\n");
 			}
 		}
 
+		g_free(name);
+		g_free(version);
+		g_free(license_id);
+		g_free(license_text);
+		g_free(license_url);
+		g_free(icon);
+		g_free(summary);
+		g_free(description);
+		g_free(category);
+		g_strfreev(authors);
+		g_free(website);
+		g_strfreev(dependencies);
 		g_object_unref(G_OBJECT(info));
 
 		if(first)
@@ -195,12 +226,11 @@ output_plugin(const gchar *id) {
 static gboolean
 output_plugins(GList *plugins) {
 	GList *l = NULL;
-	gboolean ret = TRUE;
-	gboolean first = TRUE;
+	gboolean ret = TRUE, first = TRUE;
 
 	for(l = plugins; l; l = l->next) {
 		if(!first)
-			printf("----------------------------------------\n");
+			printf("\n");
 
 		if(!output_plugin(l->data))
 			ret = FALSE;
