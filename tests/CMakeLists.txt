@@ -7,6 +7,7 @@ endmacro(add_test_plugin)
 add_subdirectory(plugins)
 add_subdirectory(bad-plugins)
 add_subdirectory(id-collision)
+add_subdirectory(load-fail)
 
 macro(add_gtest target)
 	add_executable(${target} ${target}.c)
@@ -36,6 +37,8 @@ add_dependencies(test-native-loader
 	unload-error
 	id-collision1
 	id-collision2
+	load-on-query
+	load-on-query-fail
 )
 
 add_gtest(test-version-compare)
@@ -43,6 +46,7 @@ add_gtest(test-version-compare)
 add_definitions(-DTEST_DIR="${CMAKE_CURRENT_BINARY_DIR}/plugins/")
 add_definitions(-DTEST_BAD_DIR="${CMAKE_CURRENT_BINARY_DIR}/bad-plugins/")
 add_definitions(-DTEST_ID_DIR="${CMAKE_CURRENT_BINARY_DIR}/id-collision/")
+add_definitions(-DTEST_LOAD_DIR="${CMAKE_CURRENT_BINARY_DIR}/load-fail/")
 
 set(GTESTER_TESTS "${TESTS}")
 set(GTESTER_LOG "testgplugin.xml")

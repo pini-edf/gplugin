@@ -407,6 +407,7 @@ gplugin_plugin_manager_register_loader(GType type) {
 	/* grab the class of the loader */
 	lo_class = GPLUGIN_PLUGIN_LOADER_GET_CLASS(loader);
 	if(!lo_class) {
+		g_warning("failed to get the loader class for %s", g_type_name(type));
 		g_object_unref(G_OBJECT(loader));
 
 		return;
@@ -527,6 +528,7 @@ gplugin_plugin_manager_refresh(void) {
 
 			for(file = dir->children; file; file = file->next) {
 				GPluginPlugin *plugin = NULL;
+				GPluginPluginLoader *loader = NULL;
 				GPluginPluginManagerTreeEntry *e = NULL;
 				GError *error = NULL;
 				GSList *l = NULL;
@@ -557,14 +559,14 @@ gplugin_plugin_manager_refresh(void) {
 				for(l = g_hash_table_lookup(loaders, e->extension); l;
 				    l = l->next)
 				{
-					GPluginPluginLoader *loader = NULL;
-
 					if(!l->data)
 						continue;
 
 					loader = GPLUGIN_PLUGIN_LOADER(l->data);
-					if(!GPLUGIN_IS_PLUGIN_LOADER(loader))
+					if(!GPLUGIN_IS_PLUGIN_LOADER(loader)) {
+						loader = NULL;
 						continue;
+					}
 
 					/* Try to probe the plugin with the current loader */
 					plugin = gplugin_plugin_loader_query_plugin(loader,
@@ -581,6 +583,7 @@ gplugin_plugin_manager_refresh(void) {
 
 						g_error_free(error);
 						error = NULL;
+						loader = NULL;
 
 						continue;
 					}
@@ -592,6 +595,8 @@ gplugin_plugin_manager_refresh(void) {
 						break;
 
 					g_object_unref(G_OBJECT(plugin));
+
+					loader = NULL;
 				}
 
 				/* check if our plugin instance is good.  If it's not good we
@@ -635,8 +640,27 @@ gplugin_plugin_manager_refresh(void) {
 
 					g_object_unref(G_OBJECT(info));
 
-					/* finally set the plugin state queried */
-					gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_QUERIED);
+					/* check if the plugin is supposed to be loaded on query,
+					 * and if so, load it.
+					 */
+					if(gplugin_plugin_info_get_flags(info) &
+					   GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY)
+					{
+						GError *error = NULL;
+						gboolean loaded;
+
+						loaded = gplugin_plugin_loader_load_plugin(loader,
+						                                           plugin,
+						                                           &error);
+
+						if(!loaded)
+							g_warning("failed to load %s during query: %s",
+							          filename,
+							          (error) ? error->message : "unknown");
+					} else {
+						/* finally set the plugin state queried */
+						gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_QUERIED);
+					}
 				}
 
 				g_free(filename);

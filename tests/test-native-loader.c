@@ -249,6 +249,39 @@ test_id_collision(void) {
 	g_assert(plugins);
 }
 
+/* load on query */
+static void
+test_load_on_query(void) {
+	GPluginPlugin *plugin = NULL;
+
+	gplugin_plugin_manager_append_path(TEST_DIR);
+	gplugin_plugin_manager_refresh();
+
+	plugin = gplugin_plugin_manager_find_plugin("gplugin/load-on-query");
+	g_assert(plugin);
+
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOADED);
+}
+
+static void
+test_load_on_query_fail(void) {
+	GPluginPlugin *plugin = NULL;
+
+	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
+		gplugin_plugin_manager_append_path(TEST_LOAD_DIR);
+		gplugin_plugin_manager_refresh();
+
+		plugin = gplugin_plugin_manager_find_plugin("gplugin/load-on-query-fail");
+		g_assert(plugin);
+
+		g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+		                GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
+	}
+
+	g_test_trap_assert_failed();
+}
+
 /******************************************************************************
  * Main
  *****************************************************************************/
@@ -278,6 +311,12 @@ main(gint argc, gchar **argv) {
 	/* test plugins with id collisions */
 	g_test_add_func("/loaders/native/id-collision",
 	                test_id_collision);
+
+	/* test the load on query flag */
+	g_test_add_func("/loaders/native/load-on-query",
+	                test_load_on_query);
+	g_test_add_func("/loaders/native/load-on-query-fail",
+	                test_load_on_query_fail);
 
 	return g_test_run();
 }
