@@ -49,6 +49,7 @@ gplugin_python_plugin_loader_query(GPluginPluginLoader *loader,
                                    const gchar *filename,
                                    GError **error)
 {
+	g_warning("querying: %s", filename);
 	return NULL;
 }
 

@@ -18,6 +18,9 @@
 #include <gplugin.h>
 #include <gplugin-native.h>
 
+#include "gplugin-python-plugin.h"
+#include "gplugin-python-plugin-loader.h"
+
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(GError **error) {
 	const gchar * const authors[] = {
@@ -44,7 +47,12 @@ gplugin_plugin_query(GError **error) {
 
 G_MODULE_EXPORT gboolean
 gplugin_plugin_load(GPluginNativePlugin *plugin, GError **error) {
-	return FALSE;
+	gplugin_python_plugin_register(plugin);
+	gplugin_python_plugin_loader_register(plugin);
+
+	gplugin_plugin_manager_register_loader(GPLUGIN_TYPE_PYTHON_PLUGIN_LOADER);
+
+	return TRUE;
 }
 
 G_MODULE_EXPORT gboolean
