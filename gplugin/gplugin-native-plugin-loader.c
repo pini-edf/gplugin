@@ -182,46 +182,10 @@ gplugin_native_plugin_loader_unload(GPluginPluginLoader *loader,
                                     GPluginPlugin *plugin,
                                     GError **error)
 {
-	GPluginNativePluginUnloadFunc unload = NULL;
-	const GPluginPluginInfo *info = NULL;
-	gpointer func = NULL;
-
 	g_return_val_if_fail(plugin != NULL, FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), FALSE);
 
-	/* grab the info from the plugin for error reporting */
-	info = gplugin_plugin_get_info(plugin);
-
-	/* grab the load function from the plugin */
-	g_object_get(G_OBJECT(plugin), "unload-func", &func, NULL);
-
-	/* if the unload function is null, we need to bail */
-	if(func == NULL) {
-		if(error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "unload function for %s is NULL",
-			                     gplugin_plugin_info_get_name(info));
-		}
-		g_object_unref(G_OBJECT(info));
-
-		return FALSE;
-	}
-
-	g_object_unref(G_OBJECT(info));
-
-	/* now call the unload function and exit */
-	unload = (GPluginNativePluginLoadFunc)func;
-	if(!unload(GPLUGIN_NATIVE_PLUGIN(plugin), error)) {
-		if (error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-				                 "Plugin unload function returned FALSE");
-		}
-		return FALSE;
-	}
-
-	gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_QUERIED);
-
-	return TRUE;
+	return gplugin_native_plugin_unuse(GPLUGIN_NATIVE_PLUGIN(plugin));
 }
 
 static void

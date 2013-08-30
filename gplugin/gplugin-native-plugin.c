@@ -352,11 +352,11 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
 
 		func = (GPluginNativePluginLoadFunc)priv->load_func;
 		if(!func(plugin, &error)) {
-			if(error) {
-				g_warning("Plugin load function return FALSE : %s",
-				          (error) ? error->message : "unknown");
+			g_warning("Plugin load function return FALSE : %s",
+			          (error) ? error->message : "unknown");
+
+			if(error)
 				g_error_free(error);
-			}
 
 			priv->use_count--;
 
@@ -418,14 +418,20 @@ gplugin_native_plugin_unuse(GPluginNativePlugin *plugin) {
 	priv->use_count--;
 
 	if(priv->use_count == 0) {
-		GPluginPluginLoader *loader = NULL;
+		GPluginNativePluginUnloadFunc func = NULL;
+		GError *error = NULL;
 		GSList *l = NULL;
 
-		loader = gplugin_plugin_get_loader(GPLUGIN_PLUGIN(plugin));
 
-		if(!gplugin_plugin_loader_unload_plugin(loader, GPLUGIN_PLUGIN(plugin),
-		                                        NULL))
-		{
+		func = (GPluginNativePluginUnloadFunc)priv->unload_func;
+
+		if(!func(plugin, &error)) {
+			g_warning("Plugin unload function returned FALSE : %s",
+			          (error) ? error->message : "unknown");
+
+			if(error)
+				g_error_free(error);
+
 			priv->use_count++;
 
 			return FALSE;
@@ -440,6 +446,9 @@ gplugin_native_plugin_unuse(GPluginNativePlugin *plugin) {
 			return FALSE;
 		}
 	}
+
+	gplugin_plugin_set_state(GPLUGIN_PLUGIN(plugin),
+	                         GPLUGIN_PLUGIN_STATE_QUERIED);
 
 	return TRUE;
 }

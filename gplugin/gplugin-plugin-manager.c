@@ -581,7 +581,9 @@ gplugin_plugin_manager_refresh(void) {
 					              filename, G_OBJECT_TYPE_NAME(loader),
 						          (error) ? error->message : "Unknown");
 
-						g_error_free(error);
+						if(error)
+							g_error_free(error);
+
 						error = NULL;
 						loader = NULL;
 
