@@ -19,19 +19,13 @@
 
 #include <gplugin/gplugin-native-plugin-loader.h>
 #include <gplugin/gplugin-native-plugin.h>
+#include <gplugin/gplugin-native-private.h>
 
 #include <gmodule.h>
 
 #define GPLUGIN_QUERY_SYMBOL "gplugin_plugin_query"
 #define GPLUGIN_LOAD_SYMBOL "gplugin_plugin_load"
 #define GPLUGIN_UNLOAD_SYMBOL "gplugin_plugin_unload"
-
-/******************************************************************************
- * Typedefs
- *****************************************************************************/
-typedef const GPluginPluginInfo *(*GPluginNativePluginQueryFunc)(GError **error);
-typedef gboolean (*GPluginNativePluginLoadFunc)(GPluginNativePlugin *plugin, GError **error);
-typedef gboolean (*GPluginNativePluginUnloadFunc)(GPluginNativePlugin *plugin, GError **error);
 
 /******************************************************************************
  * Helpers
@@ -177,46 +171,10 @@ gplugin_native_plugin_loader_load(GPluginPluginLoader *loader,
                                   GPluginPlugin *plugin,
                                   GError **error)
 {
-	GPluginNativePluginLoadFunc load = NULL;
-	const GPluginPluginInfo *info = NULL;
-	gpointer func = NULL;
-
 	g_return_val_if_fail(plugin != NULL, FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), FALSE);
 
-	/* grab the info from the plugin for error reporting */
-	info = gplugin_plugin_get_info(plugin);
-
-	/* grab the load function from the plugin */
-	g_object_get(G_OBJECT(plugin), "load-func", &func, NULL);
-
-	/* if the load function is null, we need to bail */
-	if(func == NULL) {
-		if(error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "load function for %s is NULL",
-			                     gplugin_plugin_info_get_name(info));
-		}
-		g_object_unref(G_OBJECT(info));
-
-		return FALSE;
-	}
-
-	g_object_unref(G_OBJECT(info));
-
-	/* now call the load function and exit */
-	load = (GPluginNativePluginLoadFunc)func;
-	if(!load(GPLUGIN_NATIVE_PLUGIN(plugin), error)) {
-		if (error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-				                 "Plugin load function returned FALSE");
-		}
-		return FALSE;
-	}
-
-	gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOADED);
-
-	return TRUE;
+	return gplugin_native_plugin_use(GPLUGIN_NATIVE_PLUGIN(plugin));
 }
 
 static gboolean

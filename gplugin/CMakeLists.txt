@@ -59,7 +59,11 @@ list(APPEND PUBLIC_HEADERS
 )
 list(SORT PUBLIC_HEADERS)
 
-list(APPEND PRIVATE_HEADERS ${GPLUGIN_PRIVATE_BUILT_HEADERS} gplugin-private.h)
+list(APPEND PRIVATE_HEADERS
+	${GPLUGIN_PRIVATE_BUILT_HEADERS}
+	gplugin-private.h
+	gplugin-native-private.h
+)
 
 ###############################################################################
 # Configure Files

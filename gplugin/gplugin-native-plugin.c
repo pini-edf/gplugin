@@ -16,6 +16,8 @@
  */
 #include <gplugin/gplugin-native-plugin.h>
 
+#include <gplugin/gplugin-native-private.h>
+
 #include <gplugin/gplugin-plugin-loader.h>
 #include <gplugin/gplugin-plugin-manager.h>
 
@@ -65,13 +67,6 @@ enum {
 	PROP_UNLOAD_FUNC,
 	PROP_LAST,
 };
-
-/******************************************************************************
- * Functions
- *****************************************************************************/
-typedef GPluginPluginInfo *(*GPluginNativePluginQueryFunc)(void);
-typedef gboolean (*GPluginNativePluginLoadFunc)(GPluginNativePlugin *plugin);
-typedef gboolean (*GPluginNativePluginUnloadFunc)(GPluginNativePlugin *plugin);
 
 /******************************************************************************
  * Globals
@@ -337,18 +332,31 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
 
 	priv->use_count++;
 	if(priv->use_count == 1) {
-		GPluginPluginLoader *loader = NULL;
+		GPluginNativePluginLoadFunc func;
 		GError *error = NULL;
 		GSList *l = NULL;
 
-		loader = gplugin_plugin_get_loader(GPLUGIN_PLUGIN(plugin));
+		if(priv->load_func == NULL) {
+			GPluginPluginInfo *info = NULL;
+			priv->use_count--;
 
-		if(!gplugin_plugin_loader_load_plugin(loader, GPLUGIN_PLUGIN(plugin),
-		                                      &error))
-		{
-			g_warning("Failed to use plugin : %s\n",
-			          (error) ? error->message : "unknown");
-			g_error_free(error);
+			info = gplugin_plugin_get_info(GPLUGIN_PLUGIN(plugin));
+
+			g_warning("load function for %s is NULL",
+			          gplugin_plugin_info_get_name(info));
+
+			g_object_unref(G_OBJECT(info));
+
+			return FALSE;
+		}
+
+		func = (GPluginNativePluginLoadFunc)priv->load_func;
+		if(!func(plugin, &error)) {
+			if(error) {
+				g_warning("Plugin load function return FALSE : %s",
+				          (error) ? error->message : "unknown");
+				g_error_free(error);
+			}
 
 			priv->use_count--;
 
@@ -378,6 +386,9 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
 				return FALSE;
 			}
 		}
+
+		gplugin_plugin_set_state(GPLUGIN_PLUGIN(plugin),
+		                         GPLUGIN_PLUGIN_STATE_LOADED);
 	}
 
 	return TRUE;

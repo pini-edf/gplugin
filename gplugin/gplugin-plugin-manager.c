@@ -418,8 +418,8 @@ gplugin_plugin_manager_register_loader(GType type) {
 		const gchar *ext = (const gchar *)l->data;
 
 		/* grab any existing loaders that are registered for this type so that
-		 * we can prepend our loader.  But before we add our, we remove any old
-		 * copies we might have our ours.
+		 * we can prepend our loader.  But before we add ours, we remove any
+		 * old copies we might have of ours.
 		 */
 		existing = g_hash_table_lookup(loaders, ext);
 		for(ll = existing; ll; ll = ll->next) {
@@ -579,7 +579,7 @@ gplugin_plugin_manager_refresh(void) {
 					if(plugin == NULL || error) {
 						g_warning("failed to query '%s' with loader '%s': %s",
 					              filename, G_OBJECT_TYPE_NAME(loader),
-						          error->message ? error->message : "Unknown");
+						          (error) ? error->message : "Unknown");
 
 						g_error_free(error);
 						error = NULL;
@@ -659,6 +659,9 @@ gplugin_plugin_manager_refresh(void) {
 							          (error) ? error->message : "unknown");
 
 							g_error_free(error);
+						} else {
+							refresh_needed = TRUE;
+							gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOADED);
 						}
 					} else {
 						/* finally set the plugin state queried */

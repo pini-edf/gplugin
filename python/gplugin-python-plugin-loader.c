@@ -39,7 +39,7 @@ typedef struct {
  * Globals
  *****************************************************************************/
 static GObjectClass *parent_class = NULL;
-static GType type = G_TYPE_INVALID;
+static GType type_real = 0;
 
 /******************************************************************************
  * GPluginPluginLoaderInterface API
@@ -49,7 +49,6 @@ gplugin_python_plugin_loader_query(GPluginPluginLoader *loader,
                                    const gchar *filename,
                                    GError **error)
 {
-	g_warning("querying: %s", filename);
 	return NULL;
 }
 
@@ -96,6 +95,7 @@ gplugin_python_plugin_loader_class_init(GPluginPythonPluginLoaderClass *klass) {
 	exts = g_slist_append(NULL, "py");
 	exts = g_slist_append(exts, "pyc");
 	loader_class->supported_extensions = exts;
+
 	loader_class->query = gplugin_python_plugin_loader_query;
 	loader_class->load = gplugin_python_plugin_loader_load;
 	loader_class->unload = gplugin_python_plugin_loader_unload;
@@ -106,7 +106,9 @@ gplugin_python_plugin_loader_class_init(GPluginPythonPluginLoaderClass *klass) {
  *****************************************************************************/
 void
 gplugin_python_plugin_loader_register(GPluginNativePlugin *plugin) {
-	if(G_UNLIKELY(type == 0)) {
+	if(g_once_init_enter(&type_real)) {
+		GType type = 0;
+
 		static const GTypeInfo info = {
 			.class_size = sizeof(GPluginPythonPluginLoaderClass),
 			.class_init = (GClassInitFunc)gplugin_python_plugin_loader_class_init,
@@ -118,16 +120,18 @@ gplugin_python_plugin_loader_register(GPluginNativePlugin *plugin) {
 		                                           "GPluginPythonPluginLoader",
 		                                           &info,
 		                                           0);
+
+		g_once_init_leave(&type_real, type);
 	}
 }
 
 GType
 gplugin_python_plugin_loader_get_type(void) {
-	if(G_UNLIKELY(type == 0)) {
+	if(G_UNLIKELY(type_real == 0)) {
 		g_warning("gplugin_python_plugin_loader_get_type was called before "
 		          "the type was registered!\n");
 	}
 
-	return type;
+	return type_real;
 }
 
