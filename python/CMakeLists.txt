@@ -1,10 +1,12 @@
 option(
 	BUILD_PYTHON
 	"Whether or not to build the Python plugin loader"
-	"On"
+	"Off"
 )
 
 if(BUILD_PYTHON)
+	set(Python_ADDITIONAL_VERSIONS "2.7")
+
 	find_package(PythonLibs)
 
 	if(PYTHONLIBS_FOUND)
@@ -26,6 +28,8 @@ if(BUILD_PYTHON)
 			${GPLUGIN_PYTHON_HEADERS}
 		)
 
+		add_definitions(-DGPLUGIN_PYTHON_LIBRARY="${PYTHON_LIBRARY}")
+
 		set_target_properties(gplugin-python PROPERTIES PREFIX "")
 
 		include_directories(
@@ -34,7 +38,7 @@ if(BUILD_PYTHON)
 		)
 
 		target_link_libraries(gplugin-python
-			${PYTHON_LIBS}
+			${PYTHON_LIBRARIES}
 			${PYGOBJECT_LIBS}
 			gplugin
 		)
