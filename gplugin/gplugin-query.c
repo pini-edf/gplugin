@@ -281,6 +281,7 @@ main(gint argc, gchar **argv) {
 	gplugin_init();
 
 	ctx = g_option_context_new("PLUGIN-ID...");
+	g_option_context_set_translation_domain(ctx, GETTEXT_PACKAGE);
 	g_option_context_add_main_entries(ctx, entries, NULL);
 	g_option_context_parse(ctx, &argc, &argv, &error);
 	g_option_context_free(ctx);
