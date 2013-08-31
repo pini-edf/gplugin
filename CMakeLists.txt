@@ -5,7 +5,11 @@ set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
 cmake_minimum_required(VERSION 2.8.0)
 
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
+
+if(${CMAKE_VERSION} VERSION_LESS "2.8.3")
+	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Compatibility)
+endif(${CMAKE_VERSION} VERSION_LESS "2.8.3")
 
 ###############################################################################
 # Project Info
