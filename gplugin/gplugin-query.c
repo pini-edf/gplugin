@@ -16,6 +16,7 @@
  */
 
 #include <glib.h>
+#include <glib/gi18n.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -248,23 +249,23 @@ output_plugins(GList *plugins) {
 static GOptionEntry entries[] = {
 	{
 		"no-default-paths", 'D', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
-		no_default_cb, "Do not search the default plugin paths",
+		no_default_cb, N_("Do not search the default plugin paths"),
 		NULL,
 	}, {
 		"internal", 'i', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
-		internal_cb, "Show internal plugins",
+		internal_cb, N_("Show internal plugins"),
 		NULL,
 	}, {
 		"path", 'p', 0, G_OPTION_ARG_STRING_ARRAY,
-		&paths, "Additional path to look for plugins",
+		&paths, N_("Additional path to look for plugins"),
 		"PATH",
 	}, {
 		"verbose", 'v', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
-		verbosity_cb, "Increase verbosity",
+		verbosity_cb, N_("Increase verbosity"),
 		NULL,
 	}, {
 		"full-verbose", 'V', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
-		full_verbosity_cb, "Increase verbosity to eleven",
+		full_verbosity_cb, N_("Increase verbosity to eleven"),
 		NULL,
 	}, {
 		NULL

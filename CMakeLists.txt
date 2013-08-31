@@ -19,12 +19,20 @@ set(GPLUGIN_EXTRA_VERSION dev)
 
 set(GPLUGIN_VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.${GPLUGIN_MICRO_VERSION}${GPLUGIN_EXTRA_VERSION})
 
+set(LOCALE_DIR ${CMAKE_INSTALL_PREFIX}/locale)
+
 ###############################################################################
 # Options
 ###############################################################################
 option(
 	BUILD_GIR
 	"Whether or not to build a GObject Introspection type library"
+	"On"
+)
+
+option(
+	NLS
+	"Install translation files"
 	"On"
 )
 
@@ -103,6 +111,17 @@ find_program(XSLTPROC
 mark_as_advanced(XSLTPROC)
 
 ###############################################################################
+# NLS
+###############################################################################
+set(GETTEXT_PACKAGE gplugin)
+
+add_definitions(-DGETTEXT_PACKAGE="${GETTEXT_PACKAGE}")
+
+if(NLS)
+	include(Gettextize)
+endif(NLS)
+
+###############################################################################
 # Build Info
 ###############################################################################
 add_definitions(
@@ -136,6 +155,7 @@ add_subdirectory(gplugin)
 add_subdirectory(gplugin-gtk)
 add_subdirectory(plugins)
 add_subdirectory(python)
+add_subdirectory(po)
 add_subdirectory(tests)
 
 ###############################################################################
