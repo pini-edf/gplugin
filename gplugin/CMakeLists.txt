@@ -152,8 +152,6 @@ target_link_libraries(gplugin
 	${GMODULE_LIBRARIES}
 )
 
-message(${GPLUGIN_PUBLIC_BUILT_SOURCES})
-
 # nls
 gettextize_pot_file(
 	SORT
