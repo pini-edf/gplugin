@@ -47,7 +47,7 @@ enum {
  * Globals
  *****************************************************************************/
 static GObjectClass *parent_class = NULL;
-static GType type = G_TYPE_INVALID;
+static GType type_real = 0;
 
 /******************************************************************************
  * Private Stuff
@@ -156,7 +156,9 @@ gplugin_python_plugin_class_init(GPluginPythonPluginClass *klass) {
  *****************************************************************************/
 void
 gplugin_python_plugin_register(GPluginNativePlugin *plugin) {
-	if(G_UNLIKELY(type == 0)) {
+	if(g_once_init_enter(&type_real)) {
+		GType type = 0;
+
 		static const GTypeInfo info = {
 			.class_size = sizeof(GPluginPythonPluginClass),
 			.class_init = (GClassInitFunc)gplugin_python_plugin_class_init,
@@ -168,16 +170,18 @@ gplugin_python_plugin_register(GPluginNativePlugin *plugin) {
 		                                           "GPluginPythonPlugin",
 		                                           &info,
 		                                           0);
+
+		g_once_init_leave(&type_real, type);
 	}
 }
 
 GType
 gplugin_python_plugin_get_type(void) {
-	if(G_UNLIKELY(type == 0)) {
+	if(G_UNLIKELY(type_real == 0)) {
 		g_warning("gplugin_python_plugin_get_type was called before "
 		          "the type was registered!\n");
 	}
 
-	return type;
+	return type_real;
 }
 
