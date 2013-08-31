@@ -1,7 +1,7 @@
 option(
 	BUILD_PYTHON
 	"Whether or not to build the Python plugin loader"
-	"Off"
+	"On"
 )
 
 if(BUILD_PYTHON)
