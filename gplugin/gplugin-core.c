@@ -16,6 +16,7 @@
  */
 
 #include <glib.h>
+#include <glib/gi18n.h>
 #include <glib-object.h>
 
 #include <gplugin/gplugin-core.h>
@@ -34,6 +35,9 @@
  */
 void
 gplugin_init(void) {
+	bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
+	bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+
 #if !GLIB_CHECK_VERSION(2, 36, 0)
 	g_type_init();
 #endif /* !GLIB_CHECK_VERSION(2, 36, 0) */

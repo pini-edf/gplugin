@@ -24,6 +24,7 @@ set(GPLUGIN_EXTRA_VERSION dev)
 set(GPLUGIN_VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.${GPLUGIN_MICRO_VERSION}${GPLUGIN_EXTRA_VERSION})
 
 set(LOCALE_DIR ${CMAKE_INSTALL_PREFIX}/locale)
+add_definitions(-DLOCALEDIR="${LOCALE_DIR}")
 
 ###############################################################################
 # Options
