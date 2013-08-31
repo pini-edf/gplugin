@@ -4,6 +4,7 @@
   * More work on the Python loader that ended up finding an issue with type
     registration
   * Fixed GObjectIntrospection.cmake to correctly handle CMAKE_INSTALL_PREFIX
+  * Added internationalization support
 
 0.0.6: 2013/08/25
   * Added GPluginPluginInfo:version-func which can hold a
