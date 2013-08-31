@@ -21,6 +21,8 @@
 #include <gplugin/gplugin-plugin-loader.h>
 #include <gplugin/gplugin-plugin-manager.h>
 
+#include <glib/gi18n.h>
+
 #define GPLUGIN_NATIVE_PLUGIN_GET_PRIVATE(obj) \
 	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_NATIVE_PLUGIN, GPluginNativePluginPrivate))
 
@@ -132,9 +134,9 @@ gplugin_native_plugin_priv_use(GTypePlugin *plugin) {
 			name = gplugin_plugin_info_get_name(info);
 
 		if(name == NULL)
-			name = "(unknown)";
+			name = _("(unknown)");
 
-		g_warning("Could not reload previously loaded plugin '%s'\n", name);
+		g_warning(_("Could not reload previously loaded plugin '%s'\n"), name);
 
 		g_object_unref(G_OBJECT(info));
 	}
@@ -342,7 +344,7 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
 
 			info = gplugin_plugin_get_info(GPLUGIN_PLUGIN(plugin));
 
-			g_warning("load function for %s is NULL",
+			g_warning(_("load function for %s is NULL"),
 			          gplugin_plugin_info_get_name(info));
 
 			g_object_unref(G_OBJECT(info));
@@ -352,8 +354,8 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
 
 		func = (GPluginNativePluginLoadFunc)priv->load_func;
 		if(!func(plugin, &error)) {
-			g_warning("Plugin load function return FALSE : %s",
-			          (error) ? error->message : "unknown");
+			g_warning(_("Plugin load function return FALSE : %s"),
+			          (error) ? error->message : _("unknown"));
 
 			if(error)
 				g_error_free(error);
@@ -376,9 +378,9 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
 					name = gplugin_plugin_info_get_name(plugin_info);
 
 				if(name == NULL)
-					name = "(unknown)";
+					name = _("(unknown)");
 
-				g_warning("plugin '%s' failed to register type '%s'\n",
+				g_warning(_("plugin '%s' failed to register type '%s'\n"),
 				          name, g_type_name(info->type));
 
 				g_object_unref(G_OBJECT(plugin_info));
@@ -426,8 +428,8 @@ gplugin_native_plugin_unuse(GPluginNativePlugin *plugin) {
 		func = (GPluginNativePluginUnloadFunc)priv->unload_func;
 
 		if(!func(plugin, &error)) {
-			g_warning("Plugin unload function returned FALSE : %s",
-			          (error) ? error->message : "unknown");
+			g_warning(_("Plugin unload function returned FALSE : %s"),
+			          (error) ? error->message : _("unknown"));
 
 			if(error)
 				g_error_free(error);
@@ -491,7 +493,7 @@ gplugin_native_plugin_register_type(GPluginNativePlugin *plugin, GType parent,
 		GTypePlugin *old = g_type_get_plugin(type);
 
 		if(old != G_TYPE_PLUGIN(plugin)) {
-			g_warning("Two different plugins tried to register '%s'\n",
+			g_warning(_("Two different plugins tried to register '%s'"),
 			          name);
 
 			return G_TYPE_INVALID;
@@ -507,10 +509,10 @@ gplugin_native_plugin_register_type(GPluginNativePlugin *plugin, GType parent,
 
 			const gchar *parent_name = g_type_name(parent);
 
-			g_warning("Type '%s' was recreated with a different parent type.\n"
-			          "(was '%s', now '%s')\n",
+			g_warning(_("Type '%s' was recreated with a different parent type."
+			          "(was '%s', now '%s')"),
 			          name, g_type_name(type_info->parent),
-			          (parent_name) ? parent_name : "(unknown)");
+			          (parent_name) ? parent_name : _("unknown"));
 
 			return G_TYPE_INVALID;
 		}
@@ -577,14 +579,14 @@ gplugin_native_plugin_add_interface(GPluginNativePlugin *plugin,
 		                                               interface_type);
 
 		if(!old) {
-			g_warning("Interface '%s' for '%s' was previously registered "
-			          "statically or for a parent type.",
+			g_warning(_("Interface '%s' for '%s' was previously registered "
+			          "statically or for a parent type."),
 			          g_type_name(interface_type),
 			          g_type_name(instance_type));
 			return;
 		} else if(old != G_TYPE_PLUGIN(plugin)) {
-			g_warning("Two different plugins tried to register interface "
-			          "'%s' for '%s'\n",
+			g_warning(_("Two different plugins tried to register interface "
+			          "'%s' for '%s')"),
 			          g_type_name(interface_type),
 			          g_type_name(instance_type));
 			return;

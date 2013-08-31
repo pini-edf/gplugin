@@ -21,6 +21,8 @@
 #include <gplugin/gplugin-native-plugin.h>
 #include <gplugin/gplugin-native-private.h>
 
+#include <glib/gi18n.h>
+
 #include <gmodule.h>
 
 #define GPLUGIN_QUERY_SYMBOL "gplugin_plugin_query"
@@ -41,7 +43,7 @@ gplugin_native_plugin_loader_lookup_symbol(GModule *module,
 	if(!g_module_symbol(module, name, &symbol)) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "symbol %s was not found", name);
+			                     _("symbol %s was not found"), name);
 
 		}
 
@@ -63,8 +65,8 @@ gplugin_native_plugin_loader_open(const gchar *filename, GError **error) {
 		const gchar *msg = g_module_error();
 
 		*error = g_error_new(GPLUGIN_DOMAIN, 0,
-		                     "Failed to open plugin '%s': %s\n",
-		                     filename, (msg) ? msg : "Unknown error");
+		                     _("Failed to open plugin '%s': %s"),
+		                     filename, (msg) ? msg : _("Unknown error"));
 	}
 
 	return NULL;
@@ -132,8 +134,8 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "the query function did not return a "
-			                     "GPluginPluginInfo instance");
+			                     _("the query function did not return a "
+			                       "GPluginPluginInfo instance"));
 		}
 
 		return NULL;
@@ -158,7 +160,7 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	if(!GPLUGIN_IS_NATIVE_PLUGIN(plugin)) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "failed to create plugin instance");
+			                     _("failed to create plugin instance"));
 		}
 		return NULL;
 	}

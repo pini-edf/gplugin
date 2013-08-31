@@ -19,6 +19,7 @@
 #include <string.h>
 
 #include <glib.h>
+#include <glib/gi18n.h>
 
 #include <gplugin/gplugin-plugin-manager.h>
 #include <gplugin/gplugin-core.h>
@@ -114,9 +115,9 @@ gplugin_plugin_manager_file_tree_new(void) {
 
 		d = g_dir_open(path, 0, &error);
 		if(error) {
-			g_debug("Failed to open %s: %s\n",
+			g_debug(_("Failed to open %s: %s"),
 			        path,
-			        (error->message) ? error->message : "unknown failure");
+			        (error->message) ? error->message : _("unknown failure"));
 
 			g_error_free(error);
 			error = NULL;
@@ -398,7 +399,7 @@ gplugin_plugin_manager_register_loader(GType type) {
 	/* Create the loader instance first.  If we can't create it, we bail */
 	loader = g_object_new(type, NULL);
 	if(!GPLUGIN_IS_PLUGIN_LOADER(loader)) {
-		g_warning("failed to create loader instance for %s",
+		g_warning(_("failed to create loader instance for %s"),
 		          g_type_name(type));
 
 		return;
@@ -407,7 +408,7 @@ gplugin_plugin_manager_register_loader(GType type) {
 	/* grab the class of the loader */
 	lo_class = GPLUGIN_PLUGIN_LOADER_GET_CLASS(loader);
 	if(!lo_class) {
-		g_warning("failed to get the loader class for %s", g_type_name(type));
+		g_warning(_("failed to get the loader class for %s"), g_type_name(type));
 		g_object_unref(G_OBJECT(loader));
 
 		return;
@@ -577,9 +578,9 @@ gplugin_plugin_manager_refresh(void) {
 					 * try the next loader.
 					 */
 					if(plugin == NULL || error) {
-						g_warning("failed to query '%s' with loader '%s': %s",
+						g_warning(_("failed to query '%s' with loader '%s': %s"),
 					              filename, G_OBJECT_TYPE_NAME(loader),
-						          (error) ? error->message : "Unknown");
+						          (error) ? error->message : _("Unknown"));
 
 						if(error)
 							g_error_free(error);
@@ -627,7 +628,7 @@ gplugin_plugin_manager_refresh(void) {
 
 					/* throw a warning if the info->id is NULL */
 					if(id == NULL)
-						g_warning("Plugin %s has a NULL id.",  real_filename);
+						g_warning(_("Plugin %s has a NULL id."),  real_filename);
 
 					/* now insert into our view */
 					g_hash_table_insert(plugins_filename_view, real_filename,
@@ -656,9 +657,9 @@ gplugin_plugin_manager_refresh(void) {
 						                                           &error);
 
 						if(!loaded) {
-							g_warning("failed to load %s during query: %s",
+							g_warning(_("failed to load %s during query: %s"),
 							          filename,
-							          (error) ? error->message : "unknown");
+							          (error) ? error->message : _("unknown"));
 
 							g_error_free(error);
 						} else {
@@ -799,7 +800,7 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 	if(info == NULL) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "Plugin %s did not return value plugin info",
+			                     _("Plugin %s did not return value plugin info"),
 			                     gplugin_plugin_get_filename(plugin));
 		}
 
@@ -821,8 +822,8 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 			if(matches == NULL) {
 				if(error) {
 					*error = g_error_new(GPLUGIN_DOMAIN, 0,
-					                     "Failed to find plugin %s which %s "
-					                     "depends on",
+					                     _("Failed to find plugin %s which %s "
+					                     "depends on"),
 					                     dependencies[i],
 					                     gplugin_plugin_get_filename(plugin));
 				}
@@ -847,12 +848,12 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 				if(error) {
 					if (*error == NULL) {
 						*error = g_error_new(GPLUGIN_DOMAIN, 0,
-							                 "Plugin did not give a reason.");
+							                 _("Plugin did not give a reason."));
 					}
 
 					g_prefix_error(error,
-					               "Found at least one dependency with the id %s, "
-					               "but failed to load it: ", dependencies[i]);
+					               _("Found at least one dependency with the id %s, "
+					               "but failed to load it: "), dependencies[i]);
 				}
 
 				g_object_unref(G_OBJECT(info));
@@ -870,8 +871,8 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 	if(!GPLUGIN_IS_PLUGIN_LOADER(loader)) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "The loader for %s is not a loader.  This "
-			                     "should not happend!",
+			                     _("The loader for %s is not a loader.  This "
+			                     "should not happend!"),
 			                     gplugin_plugin_get_filename(plugin));
 		}
 
@@ -904,7 +905,7 @@ gplugin_plugin_manager_unload_plugin(GPluginPlugin *plugin, GError **error) {
 	if(!GPLUGIN_IS_PLUGIN_LOADER(loader)) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "Plugin loader is not a loader");
+			                     _("Plugin loader is not a loader"));
 		}
 
 		return FALSE;

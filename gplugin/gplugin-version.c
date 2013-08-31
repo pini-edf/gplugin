@@ -20,6 +20,8 @@
 
 #include <stdlib.h>
 
+#include <glib/gi18n.h>
+
 /******************************************************************************
  * Globals
  *****************************************************************************/
@@ -44,9 +46,9 @@ gplugin_version_lazy_init(void) {
 		                    0, &error);
 
 		if(error) {
-			g_warning("Failed to initialize the version regex: %s",
+			g_warning(_("Failed to initialize the version regex: %s"),
 			          (error->message) ? error->message :
-			                             "unknown");
+			                             _("unknown"));
 			g_error_free(error);
 		}
 
@@ -66,7 +68,7 @@ gplugin_version_parser(const gchar *v, gint *major, gint *minor, gint *micro,
 	if(!matches) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "%s does not match the version regex", v);
+			                     _("%s does not match the version regex"), v);
 		}
 
 		return FALSE;
