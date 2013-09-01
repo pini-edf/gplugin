@@ -51,6 +51,8 @@ main(gint argc, gchar **argv) {
 
 	gplugin_init();
 
+	g_setenv("GI_TYPELIB_PATH", GI_TYPELIB_PATH, TRUE);
+
 	gplugin_plugin_manager_append_path(PYTHON_LOADER_DIR);
 	gplugin_plugin_manager_append_path(PYTHON_PLUGIN_DIR);
 

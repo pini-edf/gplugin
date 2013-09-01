@@ -16,9 +16,8 @@ endmacro(add_python_gtest)
 add_definitions(
 	-DPYTHON_LOADER_DIR="${CMAKE_BINARY_DIR}/python"
 	-DPYTHON_PLUGIN_DIR="${CMAKE_CURRENT_SOURCE_DIR}/plugins"
+	-DGI_TYPELIB_PATH="${CMAKE_BINARY_DIR}/gplugin"
 )
-
-set($ENV{GI_TYPELIB_PATH} ${CMAKE_BINARY_DIR}/gplugin)
 
 add_python_gtest(test-python-loader)
 
