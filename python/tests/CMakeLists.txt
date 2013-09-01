@@ -8,7 +8,7 @@ macro(add_python_gtest target)
 		get_target_property(_output_name ${target} LOCATION)
 	endif(NOT ${_output_name})
 
-	list(APPEND TESTS ${_OUTPUT_NAME})
+	list(APPEND PYTHON_TESTS ${_output_name})
 endmacro(add_python_gtest)
 
 add_definitions(
@@ -17,4 +17,28 @@ add_definitions(
 )
 
 add_python_gtest(test-python-loader)
+
+set(GTESTER_PYTHON_TESTS "${PYTHON_TESTS}")
+set(GTESTER_PYTHON_LOG "test-gplugin-python.xml")
+set(GTESTER_PYTHON_JUNIT "test-gplugin-python-junit.xml")
+
+add_custom_command(
+	COMMAND ${GTESTER} -k --verbose -o ${GTESTER_PYTHON_LOG} ${PYTHON_TESTS}
+	OUTPUT ${GTESTER_PYTHON_LOG}
+	DEPENDS ${PYTHON_TESTS}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+add_custom_command(
+	COMMAND ${XSLTPROC} -o ${GTESTER_JUNIT} --nonet
+	        ${CMAKE_SOURCE_DIR}/tests/gtester-junit.xsl
+	        ${GTESTER_PYTHON_LOG}
+	OUTPUT ${GTESTER_PYTHON_JUNIT}
+	DEPENDS ${GTESTER_PYTHON_LOG}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+add_custom_target(python-tests ALL
+	DEPENDS ${GTESTER_PYTHON_LOG} ${GTESTER_PYTHON_JUNIT}
+)
 
