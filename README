@@ -18,7 +18,7 @@ didn't care for.  First of all, the plugin information (id, name, author, etc)
 are in a separate data file that gets stored in a separate location on disk.
 
 Getting people to write good plugins is difficult enough as it is, why bother
-throwing more obsticles in their way?  This data file is a essentially a
+throwing more obstacles in their way?  This data file is a essentially a
 GKeyFile, which means you can store the translations of all the fields right in
 it.  Now this is great if your plugin doesn't have any strings to display at
 runtime, but if it does, you still need to install the translation file itself.
