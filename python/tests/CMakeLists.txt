@@ -18,6 +18,8 @@ add_definitions(
 	-DPYTHON_PLUGIN_DIR="${CMAKE_CURRENT_SOURCE_DIR}/plugins"
 )
 
+set($ENV{GI_TYPELIB_PATH} ${CMAKE_BINARY_DIR}/gplugin)
+
 add_python_gtest(test-python-loader)
 
 set(GTESTER_PYTHON_TESTS "${PYTHON_TESTS}")
