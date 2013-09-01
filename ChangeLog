@@ -1,4 +1,4 @@
-0.0.7:
+0.0.7: 2013/09/01
   * Cleaned up the output of gplugin-query considerably
   * Fixed the load on query flag so that it actually works
   * Finding and fixed an issue with type registration
