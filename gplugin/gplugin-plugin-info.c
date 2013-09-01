@@ -523,7 +523,7 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 	 * GPluginPluginInfo:license-text:
 	 *
 	 * The text of the license for this plugin.  This should only be used when
-	 * the plugin is licensed under a license that is not listed on SPDX.
+	 * the plugin is licensed under a license that is not listed in DEP5.
 	 */
 	g_object_class_install_property(obj_class, PROP_LICENSE_TEXT,
 		g_param_spec_string("license-text", "license text",
@@ -536,7 +536,7 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 	 * GPluginPluginInfo:license-url:
 	 *
 	 * The url to the text of the license.  This should primarily only be used
-	 * for licenses not listed on SPDX.
+	 * for licenses not listed in DEP5.
 	 */
 	g_object_class_install_property(obj_class, PROP_LICENSE_URL,
 		g_param_spec_string("license-url", "license url",
