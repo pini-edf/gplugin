@@ -16,11 +16,13 @@ if(BUILD_PYTHON)
 			gplugin-python-core.c
 			gplugin-python-plugin.c
 			gplugin-python-plugin-loader.c
+			gplugin-python-utils.c
 		)
 
 		set(GPLUGIN_PYTHON_HEADERS
 			gplugin-python-plugin.h
 			gplugin-python-plugin-loader.h
+			gplugin-python-utils.h
 		)
 
 		add_library(gplugin-python MODULE
