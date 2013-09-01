@@ -1,6 +1,7 @@
 syntax: glob
 .*.swp
 *.orig
+*.pyc
 
 syntax: regexp
 ^build.*\/
