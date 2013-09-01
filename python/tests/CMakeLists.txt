@@ -30,7 +30,7 @@ add_custom_command(
 )
 
 add_custom_command(
-	COMMAND ${XSLTPROC} -o ${GTESTER_JUNIT} --nonet
+	COMMAND ${XSLTPROC} -o ${GTESTER_PYTHON_JUNIT} --nonet
 	        ${CMAKE_SOURCE_DIR}/tests/gtester-junit.xsl
 	        ${GTESTER_PYTHON_LOG}
 	OUTPUT ${GTESTER_PYTHON_JUNIT}
