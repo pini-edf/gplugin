@@ -940,7 +940,8 @@ gplugin_plugin_info_get_website(const GPluginPluginInfo *info) {
  * gplugin_plugin_info_get_dependencies:
  * @info: #GPluginPluginInfo instance
  *
- * Return value: (transfer full): The list of dependencies from @info.
+ * Return value:  (array zero-terminated=1) (transfer none): The list of
+ *  dependencies from @info.
  */
 const gchar * const *
 gplugin_plugin_info_get_dependencies(const GPluginPluginInfo *info) {
