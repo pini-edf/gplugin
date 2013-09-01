@@ -28,6 +28,8 @@ test_full(void) {
 	                gplugin_plugin_info_get_description(info));
 	g_assert_cmpstr("website", ==, gplugin_plugin_info_get_website(info));
 
+	g_object_unref(G_OBJECT(info));
+
 	g_assert_cmpint(GPLUGIN_PLUGIN_STATE_QUERIED, ==,
 	                gplugin_plugin_get_state(plugin));
 
@@ -40,6 +42,44 @@ test_full(void) {
 	g_assert_no_error(error);
 	g_assert_cmpint(GPLUGIN_PLUGIN_STATE_QUERIED, ==,
 	                gplugin_plugin_get_state(plugin));
+
+	g_object_unref(G_OBJECT(plugin));
+}
+
+static void
+test_load_failed(void) {
+	GPluginPlugin *plugin = NULL;
+	GError *error = NULL;
+	gboolean ret = FALSE;
+
+	plugin = gplugin_plugin_manager_find_plugin("gplugin-python/load-failed");
+	g_assert(plugin != NULL);
+
+	ret = gplugin_plugin_manager_load_plugin(plugin, &error);
+	g_assert(ret == FALSE);
+	g_assert_error(error, GPLUGIN_DOMAIN, 0);
+
+	g_object_unref(G_OBJECT(plugin));
+}
+
+static void
+test_unload_failed(void) {
+	GPluginPlugin *plugin = NULL;
+	GError *error = NULL;
+	gboolean ret = FALSE;
+
+	plugin = gplugin_plugin_manager_find_plugin("gplugin-python/unload-failed");
+	g_assert(plugin != NULL);
+
+	ret = gplugin_plugin_manager_load_plugin(plugin, &error);
+	g_assert(ret == TRUE);
+	g_assert_no_error(error);
+
+	ret = gplugin_plugin_manager_unload_plugin(plugin, &error);
+	g_assert(ret == FALSE);
+	g_assert_error(error, GPLUGIN_DOMAIN, 0);
+
+	g_object_unref(G_OBJECT(plugin));
 }
 
 /******************************************************************************
@@ -59,6 +99,8 @@ main(gint argc, gchar **argv) {
 	gplugin_plugin_manager_refresh();
 
 	g_test_add_func("/loaders/python/full", test_full);
+	g_test_add_func("/loaders/python/load-failed", test_load_failed);
+	g_test_add_func("/loaders/python/unload-failed", test_unload_failed);
 
 	return g_test_run();
 }
