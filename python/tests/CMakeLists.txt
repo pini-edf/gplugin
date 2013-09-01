@@ -1,3 +1,5 @@
+if(BUILD_PYTHON)
+
 macro(add_python_gtest target)
 	add_executable(${target} ${target}.c)
 	target_link_libraries(${target} ${GLIB_LIBRARIES} gplugin)
@@ -41,4 +43,6 @@ add_custom_command(
 add_custom_target(python-tests ALL
 	DEPENDS ${GTESTER_PYTHON_LOG} ${GTESTER_PYTHON_JUNIT}
 )
+
+endif(BUILD_PYTHON)
 
