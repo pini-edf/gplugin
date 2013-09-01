@@ -82,6 +82,8 @@ gplugin_python_plugin_loader_query(GPluginPluginLoader *loader,
 		g_warning(_("Failed to query %s"), filename);
 		PyErr_Print();
 
+		pyg_gil_state_release(state);
+
 		return NULL;
 	}
 
@@ -99,12 +101,16 @@ gplugin_python_plugin_loader_query(GPluginPluginLoader *loader,
 		g_warning(_("Failed to find the gplugin_plugin_query function in %s"),
 		          filename);
 
+		pyg_gil_state_release(state);
+
 		return NULL;
 	}
 	if(!PyCallable_Check(query)) {
 		g_warning(_("Found gplugin_plugin_query in %s but it is not a "
 		            "function"),
 		          filename);
+
+		pyg_gil_state_release(state);
 
 		return NULL;
 	}
@@ -114,12 +120,16 @@ gplugin_python_plugin_loader_query(GPluginPluginLoader *loader,
 		g_warning(_("Failed to find the gplugin_plugin_load function in %s"),
 		          filename);
 
+		pyg_gil_state_release(state);
+
 		return NULL;
 	}
 	if(!PyCallable_Check(load)) {
 		g_warning(_("Found gplugin_plugin_load in %s but it is not a "
 		            "function"),
 		          filename);
+
+		pyg_gil_state_release(state);
 
 		return NULL;
 	}
@@ -129,12 +139,16 @@ gplugin_python_plugin_loader_query(GPluginPluginLoader *loader,
 		g_warning(_("Failed to find the gplugin_plugin_unload function in %s"),
 		          filename);
 
+		pyg_gil_state_release(state);
+
 		return NULL;
 	}
 	if(!PyCallable_Check(unload)) {
 		g_warning(_("Found gplugin_plugin_unload in %s but it is not a "
 		            "function"),
 		          filename);
+
+		pyg_gil_state_release(state);
 
 		return NULL;
 	}
