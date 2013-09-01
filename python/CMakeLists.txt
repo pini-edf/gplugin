@@ -46,6 +46,8 @@ if(BUILD_PYTHON)
 		)
 
 		install(TARGETS gplugin-python DESTINATION lib/gplugin)
+
+		add_subdirectory(tests)
 	endif(PYTHONLIBS_FOUND)
 endif(BUILD_PYTHON)
 

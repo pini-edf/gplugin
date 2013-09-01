@@ -22,10 +22,6 @@
 
 #include <glib/gi18n.h>
 
-/* _POSIX_C_SOURCE get's redefined in Python.h so we undef it to avoid the
- * compiler warning...
- */
-#undef _POSIX_C_SOURCE
 #include <pygobject.h>
 #include <Python.h>
 
@@ -183,7 +179,31 @@ gplugin_python_plugin_loader_load(GPluginPluginLoader *loader,
                                   GPluginPlugin *plugin,
                                   GError **error)
 {
-	return FALSE;
+	PyObject *load = NULL, *pyplugin = NULL, *result = NULL;
+	gboolean ret = FALSE;
+
+	g_object_get(G_OBJECT(plugin), "load-func", &load, NULL);
+
+	pyplugin = pygobject_new(G_OBJECT(plugin));
+
+	result = PyObject_CallFunctionObjArgs(load, pyplugin, NULL);
+	Py_DECREF(pyplugin);
+
+	if(PyErr_Occurred()) {
+		PyErr_Print();
+
+		Py_DECREF(result);
+
+		return FALSE;
+	}
+
+	ret = PyBool_Check(result);
+	Py_DECREF(result);
+
+	if(ret)
+		gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOADED);
+
+	return ret;
 }
 
 static gboolean
@@ -191,7 +211,31 @@ gplugin_python_plugin_loader_unload(GPluginPluginLoader *loader,
                                     GPluginPlugin *plugin,
                                     GError **error)
 {
-	return FALSE;
+	PyObject *unload = NULL, *pyplugin = NULL, *result = NULL;
+	gboolean ret = FALSE;
+
+	g_object_get(G_OBJECT(plugin), "unload-func", &unload, NULL);
+
+	pyplugin = pygobject_new(G_OBJECT(plugin));
+
+	result = PyObject_CallFunctionObjArgs(unload, pyplugin, NULL);
+	Py_DECREF(pyplugin);
+
+	if(PyErr_Occurred()) {
+		PyErr_Print();
+
+		Py_DECREF(result);
+
+		return FALSE;
+	}
+
+	ret = PyBool_Check(result);
+	Py_DECREF(result);
+
+	if(ret)
+		gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_QUERIED);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -238,7 +282,7 @@ gplugin_python_plugin_loader_init_gettext(void) {
 }
 
 static gboolean
-gplugin_python_plugin_loader_init_python() {
+gplugin_python_plugin_loader_init_python(void) {
 	const gchar *program = NULL;
 	const gchar *argv[] = { "", NULL };
 

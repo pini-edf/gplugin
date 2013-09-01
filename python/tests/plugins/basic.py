@@ -5,19 +5,20 @@ from gi.repository import GPlugin
 def gplugin_plugin_query():
     return GPlugin.PluginInfo(
         id='gplugin-python/basic-plugin',
-        version='1.2.3',
-        name='holy shit this is from python!!',
-        summary='this first python gplugin plugin',
+        abi_version=0x01020304,
+        name='basic plugin',
+        category='test',
+        version='version',
+        license_id='license',
+        summary='summary',
+        website='website',
+        description='description',
     )
 
 def gplugin_plugin_load(plugin):
-    print('loading')
-
     return True
 
 
 def gplugin_plugin_unload(plugin):
-    print('unloading')
-
     return True
 
