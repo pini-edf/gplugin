@@ -42,7 +42,7 @@ add_custom_command(
 )
 
 add_custom_target(python-tests ALL
-	DEPENDS ${GTESTER_PYTHON_LOG} ${GTESTER_PYTHON_JUNIT}
+	DEPENDS ${GTESTER_PYTHON_LOG} ${GTESTER_PYTHON_JUNIT} ${PYTHON_TESTS}
 )
 
 endif(BUILD_PYTHON)
