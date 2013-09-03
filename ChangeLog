@@ -1,4 +1,5 @@
 0.0.8:
+  * Fixed some issues with loading Python plugins
 
 0.0.7: 2013/09/01
   * Cleaned up the output of gplugin-query considerably
