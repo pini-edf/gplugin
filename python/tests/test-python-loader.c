@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2011-2013 Gary Kramlich <grim@reaperworld.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <glib.h>
 #include <gplugin.h>
 
@@ -63,6 +80,22 @@ test_load_failed(void) {
 }
 
 static void
+test_load_exception(void) {
+	GPluginPlugin *plugin = NULL;
+	GError *error = NULL;
+	gboolean ret = FALSE;
+
+	plugin = gplugin_plugin_manager_find_plugin("gplugin-python/load-exception");
+	g_assert(plugin != NULL);
+
+	ret = gplugin_plugin_manager_load_plugin(plugin, &error);
+	g_assert(ret == FALSE);
+	g_assert_error(error, GPLUGIN_DOMAIN, 0);
+
+	g_object_unref(G_OBJECT(plugin));
+}
+
+static void
 test_unload_failed(void) {
 	GPluginPlugin *plugin = NULL;
 	GError *error = NULL;
@@ -72,8 +105,10 @@ test_unload_failed(void) {
 	g_assert(plugin != NULL);
 
 	ret = gplugin_plugin_manager_load_plugin(plugin, &error);
-	g_assert(ret == TRUE);
+	if(error)
+		printf("error: %s\n", error->message);
 	g_assert_no_error(error);
+	g_assert(ret == TRUE);
 
 	ret = gplugin_plugin_manager_unload_plugin(plugin, &error);
 	g_assert(ret == FALSE);
@@ -100,6 +135,7 @@ main(gint argc, gchar **argv) {
 
 	g_test_add_func("/loaders/python/full", test_full);
 	g_test_add_func("/loaders/python/load-failed", test_load_failed);
+	g_test_add_func("/loaders/python/load-exception", test_load_exception);
 	g_test_add_func("/loaders/python/unload-failed", test_unload_failed);
 
 	return g_test_run();

@@ -19,11 +19,15 @@
 
 #include <glib.h>
 
+#define GPLUGIN_PYTHON_DOMAIN (g_quark_from_static_string("gplugin-python"))
+
 G_BEGIN_DECLS
 
 gchar *gplugin_python_filename_to_module(const gchar *filename);
 
 gboolean gplugin_python_add_module_path(const gchar *module_path);
+
+GError *gplugin_python_exception_to_gerror(void);
 
 G_END_DECLS
 

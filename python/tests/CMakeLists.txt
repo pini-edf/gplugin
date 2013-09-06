@@ -2,7 +2,8 @@ if(BUILD_PYTHON)
 
 macro(add_python_gtest target)
 	add_executable(${target} ${target}.c)
-	target_link_libraries(${target} ${GLIB_LIBRARIES} gplugin)
+	target_link_libraries(${target}
+		${GLIB_LIBRARIES} ${PYTHON_LIBRARIES} ${PYGOBJECT_LIBS} gplugin)
 	add_dependencies(${target} gplugin-python)
 
 	get_target_property(_output_name ${target} RUNTIME_OUTPUT_NAME)
@@ -19,7 +20,19 @@ add_definitions(
 	-DGI_TYPELIB_PATH="${CMAKE_BINARY_DIR}/gplugin"
 )
 
+include_directories(
+	"${CMAKE_SOURCE_DIR}/python"
+	${PYTHON_INCLUED_DIR}
+	${PYGOBJECT_INCLUDE_DIRS}
+)
+
 add_python_gtest(test-python-loader)
+
+# we can't see the symbols in gplugin-python externally, so use the static
+# version for testing
+add_python_gtest(test-python-utils)
+add_dependencies(test-python-utils gplugin-python-static)
+target_link_libraries(test-python-utils gplugin-python-static)
 
 set(GTESTER_PYTHON_TESTS "${PYTHON_TESTS}")
 set(GTESTER_PYTHON_LOG "test-gplugin-python.xml")

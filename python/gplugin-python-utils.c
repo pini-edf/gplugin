@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <gplugin/gplugin.h>
+
 #include "gplugin-python-utils.h"
 
 #include <string.h>
@@ -32,7 +34,10 @@ gplugin_python_filename_to_module(const gchar *filename) {
 	base = g_path_get_basename(filename);
 
 	/* now find the last . for the extension */
-	e = g_utf8_strrchr(base, -1, g_utf8_get_char("."));
+	e = g_utf8_strrchr(base, g_utf8_strlen(base, -1), g_utf8_get_char("."));
+	if(e == NULL) {
+		return base;
+	}
 
 	/* now copy the module name into r */
 	r = g_malloc(e - base + 1);
@@ -62,5 +67,31 @@ gplugin_python_add_module_path(const gchar *module_path) {
 	Py_DECREF(path);
 
 	return ret;
+}
+
+GError *
+gplugin_python_exception_to_gerror(void) {
+	GError *error = NULL;
+	PyObject *type = NULL, *value = NULL, *trace = NULL;
+
+	if(!PyErr_Occurred())
+		return NULL;
+
+	PyErr_Fetch(&type, &value, &trace);
+	PyErr_NormalizeException(&type, &value, &trace);
+
+	if(type != NULL) {
+		PyObject *type_name = PyObject_GetAttrString(type, "__name__");
+		PyObject *value_str = PyObject_Str(value);
+
+		error = g_error_new(GPLUGIN_DOMAIN, 0, "%s: %s",
+		                    PyString_AsString(type_name),
+		                    PyString_AsString(value_str));
+
+		Py_DECREF(type_name);
+		Py_DECREF(value_str);
+	}
+
+	return error;
 }
 

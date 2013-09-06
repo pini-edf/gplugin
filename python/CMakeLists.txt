@@ -30,6 +30,11 @@ if(BUILD_PYTHON)
 			${GPLUGIN_PYTHON_HEADERS}
 		)
 
+		add_library(gplugin-python-static STATIC
+			${GPLUGIN_PYTHON_SOURCES}
+			${GPLUGIN_PYTHON_HEADERS}
+		)
+
 		add_definitions(-DGPLUGIN_PYTHON_LIBRARY="${PYTHON_LIBRARY}")
 
 		set_target_properties(gplugin-python PROPERTIES PREFIX "")
@@ -42,6 +47,12 @@ if(BUILD_PYTHON)
 		target_link_libraries(gplugin-python
 			${PYTHON_LIBRARIES}
 			${PYGOBJECT_LIBS}
+			gplugin
+		)
+
+		target_link_libraries(gplugin-python-static
+			${PYTHON_LIBRARIES}
+			${PYTHON_GOBJECT_LIBS}
 			gplugin
 		)
 
