@@ -1,19 +1,35 @@
 include(CMakeParseArguments)
 
 ###############################################################################
+# homebrew hackery
+###############################################################################
+# homebrew's gettext is keyonly, so we need to append it's path
+if(APPLE)
+	find_program(BREW brew)
+	if(BREW)
+		execute_process(COMMAND ${BREW} --prefix gettext
+		                OUTPUT_VARIABLE GETTEXT_PREFIX
+		                OUTPUT_STRIP_TRAILING_WHITESPACE)
+		if(GETTEXT_PREFIX)
+			set(GETTEXT_PATH "${GETTEXT_PREFIX}/bin")
+		endif(GETTEXT_PREFIX)
+	endif(BREW)
+endif(APPLE)
+
+###############################################################################
 # Dependencies
 ###############################################################################
-find_program(XGETTEXT_EXECUTABLE xgettext)
+find_program(XGETTEXT_EXECUTABLE xgettext ${GETTEXT_PATH})
 if(NOT XGETTEXT_EXECUTABLE)
 	message(FATAL_ERROR "Failed to find xgettext")
 endif(NOT XGETTEXT_EXECUTABLE)
 
-find_program(GETTEXT_MSGFMT_EXECUTABLE msgfmt)
+find_program(GETTEXT_MSGFMT_EXECUTABLE msgfmt ${GETTEXT_PATH})
 if(NOT GETTEXT_MSGFMT_EXECUTABLE)
 	message(FATAL_ERROR "Failed to find msgfmt")
 endif(NOT GETTEXT_MSGFMT_EXECUTABLE)
 
-find_program(GETTEXT_MSGMERGE_EXECUTABLE msgmerge)
+find_program(GETTEXT_MSGMERGE_EXECUTABLE msgmerge ${GETTEXT_PATH})
 if(NOT GETTEXT_MSGMERGE_EXECUTABLE)
 	message(FATAL_ERROR "Failed to find msgmerge")
 endif(NOT GETTEXT_MSGMERGE_EXECUTABLE)
