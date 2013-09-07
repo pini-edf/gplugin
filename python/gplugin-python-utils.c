@@ -73,24 +73,30 @@ GError *
 gplugin_python_exception_to_gerror(void) {
 	GError *error = NULL;
 	PyObject *type = NULL, *value = NULL, *trace = NULL;
+	PyObject *type_name = NULL, *value_str = NULL;
 
 	if(!PyErr_Occurred())
 		return NULL;
 
 	PyErr_Fetch(&type, &value, &trace);
+	if(type == NULL)
+		return NULL;
+
 	PyErr_NormalizeException(&type, &value, &trace);
+	Py_XDECREF(trace);
 
-	if(type != NULL) {
-		PyObject *type_name = PyObject_GetAttrString(type, "__name__");
-		PyObject *value_str = PyObject_Str(value);
+	type_name = PyObject_GetAttrString(type, "__name__");
+	Py_DECREF(type);
 
-		error = g_error_new(GPLUGIN_DOMAIN, 0, "%s: %s",
-		                    PyString_AsString(type_name),
-		                    PyString_AsString(value_str));
+	value_str = PyObject_Str(value);
+	Py_DECREF(value);
 
-		Py_DECREF(type_name);
-		Py_DECREF(value_str);
-	}
+	error = g_error_new(GPLUGIN_DOMAIN, 0, "%s: %s",
+	                    PyString_AsString(type_name),
+	                    PyString_AsString(value_str));
+
+	Py_DECREF(type_name);
+	Py_DECREF(value_str);
 
 	return error;
 }
