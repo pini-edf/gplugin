@@ -41,7 +41,7 @@ test_full(void) {
 	                 gplugin_plugin_info_get_abi_version(info));
 	g_assert_cmpstr("basic plugin", ==, gplugin_plugin_info_get_name(info));
 
-	authors = gplugin_plugin_info_get_authors(info);
+	authors = (gchar **)gplugin_plugin_info_get_authors(info);
 	for(i = 0; r_authors[i]; i++)
 		g_assert_cmpstr(authors[i], ==, r_authors[i]);
 
@@ -129,7 +129,6 @@ static void
 test_dependencies(void) {
 	GPluginPlugin *plugin = NULL;
 	GPluginPluginInfo *info = NULL;
-	GError *error = NULL;
 	const gchar *id = "gplugin-python/dependent-plugin";
 	gchar **deps = NULL;
 	const gchar * const r_deps[] = { "dep1", "dep2", NULL };
@@ -146,7 +145,7 @@ test_dependencies(void) {
 	                 gplugin_plugin_info_get_abi_version(info));
 	g_assert_cmpstr("dependent plugin", ==, gplugin_plugin_info_get_name(info));
 
-	deps = gplugin_plugin_info_get_dependencies(info);
+	deps = (gchar **)gplugin_plugin_info_get_dependencies(info);
 	for(i = 0; r_deps[i]; i++)
 		g_assert_cmpstr(deps[i], ==, r_deps[i]);
 }
