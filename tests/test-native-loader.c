@@ -241,13 +241,17 @@ test_unload_error(void) {
 /* id collisions */
 static void
 test_id_collision(void) {
-	GSList *plugins = NULL, *l = NULL;
+	GSList *plugins = NULL;
 
 	gplugin_plugin_manager_append_path(TEST_ID_DIR);
 	gplugin_plugin_manager_refresh();
 
 	plugins = gplugin_plugin_manager_find_plugins("gplugin/id-collision");
 	g_assert(plugins);
+
+	g_assert(g_slist_length(plugins) == 2);
+
+	gplugin_plugin_manager_free_plugin_list(plugins);
 }
 
 /* load on query */
