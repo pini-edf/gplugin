@@ -22,7 +22,7 @@ gplugin_plugin_query(GError **error) {
 	return gplugin_plugin_info_new(
 		"gplugin/load-on-query-fail",
 		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-		"flags", GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY,
+		"load-on-query", TRUE,
 		NULL
 	);
 }

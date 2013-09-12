@@ -646,9 +646,7 @@ gplugin_plugin_manager_refresh(void) {
 					/* check if the plugin is supposed to be loaded on query,
 					 * and if so, load it.
 					 */
-					if(gplugin_plugin_info_get_flags(info) &
-					   GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY)
-					{
+					if(gplugin_plugin_info_get_load_on_query(info)) {
 						GError *error = NULL;
 						gboolean loaded;
 

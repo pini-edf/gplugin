@@ -28,7 +28,7 @@
  * Globals
  *****************************************************************************/
 static gint verbosity = 0;
-static gboolean internal = FALSE;
+static gboolean show_internal = FALSE;
 static gchar **paths = NULL;
 static gboolean add_default_paths = TRUE;
 
@@ -58,40 +58,9 @@ full_verbosity_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
 
 static gboolean
 internal_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
-	internal = TRUE;
+	show_internal = TRUE;
 
 	return TRUE;
-}
-
-static gchar *
-flags_to_string(GPluginPluginInfoFlags flags) {
-	GString *str = g_string_new("");
-	gchar *ret = NULL;
-	GFlagsValue *value = NULL;
-	GFlagsClass *klass = NULL;
-	gboolean first = TRUE;
-
-	klass = g_type_class_ref(GPLUGIN_TYPE_PLUGIN_INFO_FLAGS);
-
-	while((value = g_flags_get_first_value(klass, flags))) {
-		if(!first)
-			str = g_string_append(str, ",");
-		else
-			first = FALSE;
-
-		str = g_string_append(str, value->value_nick);
-
-		flags ^= value->value;
-	}
-
-	g_type_class_unref(klass);
-
-	/* hold on to the final string then free the gstring */
-	ret = str->str;
-	g_string_free(str, FALSE);
-
-	return ret;
-
 }
 
 static gboolean
@@ -114,7 +83,7 @@ output_plugin(const gchar *id) {
 	for(l = plugins; l; l = l->next) {
 		GPluginPlugin *plugin = GPLUGIN_PLUGIN(l->data);
 		const GPluginPluginInfo *info = gplugin_plugin_get_info(plugin);
-		GPluginPluginInfoFlags flags = gplugin_plugin_info_get_flags(info);
+		gboolean internal, loq;
 		guint32 abi_version;
 		gchar *name, *version;
 		gchar *license_id, *license_text, *license_url;
@@ -122,7 +91,9 @@ output_plugin(const gchar *id) {
 		gchar **authors, **dependencies;
 		gint i = 0;
 
-		if(!internal && (flags & GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL))
+		internal = gplugin_plugin_info_get_internal(info);
+
+		if(!show_internal && internal)
 			continue;
 
 		if(!header_output) {
@@ -132,6 +103,7 @@ output_plugin(const gchar *id) {
 
 		g_object_get(G_OBJECT(info),
 		             "abi-version", &abi_version,
+		             "load-on-query", &loq,
 		             "name", &name,
 		             "version", &version,
 		             "license-id", &license_id,
@@ -177,14 +149,13 @@ output_plugin(const gchar *id) {
 		}
 		if(verbosity > 2) {
 			GPluginPluginLoader *loader = gplugin_plugin_get_loader(plugin);
-			gchar *flags_str = flags_to_string(flags);
 
 			printf(MAIN_FORMAT_NEL "%08x\n", "abi version", abi_version);
-			printf(MAIN_FORMAT, "flags", flags_str);
+			printf(MAIN_FORMAT, "internal", (internal) ? "yes" : "no");
+			printf(MAIN_FORMAT, "load on query", (loq) ? "yes" : "no");
 			printf(MAIN_FORMAT, "loader", G_OBJECT_TYPE_NAME(loader));
 
 			g_object_unref(G_OBJECT(loader));
-			g_free(flags_str);
 		}
 		if(verbosity > 0)
 			printf(MAIN_FORMAT, "description", STR_OR_EMPTY(description));

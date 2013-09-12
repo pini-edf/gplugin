@@ -31,7 +31,8 @@ typedef struct {
 	gchar *id;
 
 	guint32 abi_version;
-	GPluginPluginInfoFlags flags;
+	gboolean internal;
+	gboolean load_on_query;
 
 	gchar *name;
 
@@ -60,7 +61,8 @@ enum {
 	PROP_ZERO = 0,
 	PROP_ID,
 	PROP_ABI_VERSION,
-	PROP_FLAGS,
+	PROP_INTERNAL,
+	PROP_LOQ,
 	PROP_NAME,
 	PROP_VERSION,
 	PROP_VERSION_FUNC,
@@ -103,12 +105,17 @@ gplugin_plugin_info_set_abi_version(GPluginPluginInfo *info,
 }
 
 static void
-gplugin_plugin_info_set_flags(GPluginPluginInfo *info,
-                              GPluginPluginInfoFlags flags)
-{
+gplugin_plugin_info_set_internal(GPluginPluginInfo *info, gboolean internal) {
 	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
-	priv->flags = flags;
+	priv->internal = internal;
+}
+
+static void
+gplugin_plugin_info_set_load_on_query(GPluginPluginInfo *info, gboolean loq) {
+	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	priv->load_on_query = loq;
 }
 
 static void
@@ -255,8 +262,12 @@ gplugin_plugin_info_get_property(GObject *obj, guint param_id, GValue *value,
 		case PROP_ABI_VERSION:
 			g_value_set_uint(value, gplugin_plugin_info_get_abi_version(info));
 			break;
-		case PROP_FLAGS:
-			g_value_set_flags(value, gplugin_plugin_info_get_flags(info));
+		case PROP_INTERNAL:
+			g_value_set_boolean(value, gplugin_plugin_info_get_internal(info));
+			break;
+		case PROP_LOQ:
+			g_value_set_boolean(value,
+			                    gplugin_plugin_info_get_load_on_query(info));
 			break;
 		case PROP_NAME:
 			g_value_set_string(value, gplugin_plugin_info_get_name(info));
@@ -322,8 +333,12 @@ gplugin_plugin_info_set_property(GObject *obj, guint param_id,
 		case PROP_ABI_VERSION:
 			gplugin_plugin_info_set_abi_version(info, g_value_get_uint(value));
 			break;
-		case PROP_FLAGS:
-			gplugin_plugin_info_set_flags(info, g_value_get_flags(value));
+		case PROP_INTERNAL:
+			gplugin_plugin_info_set_internal(info, g_value_get_boolean(value));
+			break;
+		case PROP_LOQ:
+			gplugin_plugin_info_set_load_on_query(info,
+			                                      g_value_get_boolean(value));
 			break;
 		case PROP_NAME:
 			gplugin_plugin_info_set_name(info, g_value_get_string(value));
@@ -452,16 +467,36 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                  G_PARAM_CONSTRUCT_ONLY));
 
 	/**
-	 * GPluginPluginInfo:flags:
+	 * GPluginPluginInfo:internal:
 	 *
-	 * The #GPluginPluginInfoFlags for the plugin.
+	 * Whether or not the plugin is considered an "internal" plugin.
+	 *
+	 * Defaults to FALSE.
 	 */
-	g_object_class_install_property(obj_class, PROP_FLAGS,
-		g_param_spec_flags("flags", "flags",
-		                   "The flags for the plugin",
-		                   GPLUGIN_TYPE_PLUGIN_INFO_FLAGS, 0,
-		                   G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
-		                   G_PARAM_CONSTRUCT_ONLY));
+	g_object_class_install_property(obj_class, PROP_INTERNAL,
+		g_param_spec_boolean("internal", "internal",
+		                     "Whether or not the plugin is an internal plugin",
+		                     FALSE,
+		                     G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
+		                     G_PARAM_STATIC_STRINGS));
+
+	/**
+	 * GPluginPluginInfo:load-on-query:
+	 *
+	 * Whether or not the plugin should be loaded when it's queried.
+	 *
+	 * This is used by the loaders and may be useful to your application as
+	 * well.
+	 *
+	 * Defaults to FALSE.
+	 */
+	g_object_class_install_property(obj_class, PROP_LOQ,
+		g_param_spec_boolean("load-on-query", "load-on-query",
+		                     "Whether or not the plugin should be loaded when "
+		                     "queried",
+		                     FALSE,
+		                     G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
+		                     G_PARAM_STATIC_STRINGS));
 
 	/**
 	 * GPluginPluginInfo:name:
@@ -714,20 +749,37 @@ gplugin_plugin_info_get_abi_version(const GPluginPluginInfo *info) {
 }
 
 /**
- * gplugin_plugin_info_get_flags:
+ * gplugin_plugin_info_get_internal:
  * @info: #GPluginPluginInfo instance
  *
- * Return value: The flags from @info.
+ * Return value: Whether or not this plugin is considered an internal plugin
  */
-GPluginPluginInfoFlags
-gplugin_plugin_info_get_flags(const GPluginPluginInfo *info) {
+gboolean
+gplugin_plugin_info_get_internal(const GPluginPluginInfo *info) {
 	GPluginPluginInfoPrivate *priv = NULL;
 
-	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_INFO(info), 0);
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_INFO(info), FALSE);
 
 	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
-	return priv->flags;
+	return priv->internal;
+}
+
+/**
+ * gplugin_plugin_info_get_load_on_query:
+ * @info: #GPluginPluginInfo instance
+ *
+ * Return value: Whether or not this plugin should be loaded when queried
+ */
+gboolean
+gplugin_plugin_info_get_load_on_query(const GPluginPluginInfo *info) {
+	GPluginPluginInfoPrivate *priv = NULL;
+
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_INFO(info), FALSE);
+
+	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	return priv->load_on_query;
 }
 
 /**

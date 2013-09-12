@@ -1,5 +1,7 @@
 0.0.8:
   * Fixed some issues with loading Python plugins
+  * Removed the flags property and replaced it with an internal and
+    load-on-query properties.  Both of which default to FALSE.  Closes #15
 
 0.0.7: 2013/09/01
   * Cleaned up the output of gplugin-query considerably

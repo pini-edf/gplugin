@@ -31,6 +31,11 @@
 	g_assert_cmpuint((var), ==, gplugin_plugin_info_get_##var(info)); \
 } G_STMT_END
 
+#define test_bool(var, value) G_STMT_START { \
+	g_assert((var) == (value)); \
+	g_assert((var) == gplugin_plugin_info_get_##var(info)); \
+} G_STMT_END
+
 typedef gchar **(*TestStringVFunc)(GPluginPluginInfo *info);
 
 static void
@@ -62,15 +67,15 @@ test_gplugin_plugin_info_construction(void) {
 	gchar *icon = NULL, *summary = NULL, *description = NULL, *category = NULL;
 	gchar **authors = NULL, *website = NULL, **dependencies = NULL;
 	guint abi_version = 0;
-	GPluginPluginInfoFlags flags = 0;
+	gboolean internal = FALSE, load_on_query = FALSE;
 	const gchar * const r_authors[] = { "author", NULL };
 	const gchar * const r_dependencies[] = { "dependency", NULL };
 
 	info = g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
 		"id", "gplugin-test/plugin-info-test",
 		"abi_version", GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-		"flags", GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY |
-		         GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL,
+		"internal", TRUE,
+		"load-on-query", TRUE,
 		"name", "name",
 		"version", "version",
 		"license-id", "license-id",
@@ -91,7 +96,8 @@ test_gplugin_plugin_info_construction(void) {
 	g_object_get(G_OBJECT(info),
 		"id", &id,
 		"abi_version", &abi_version,
-		"flags", &flags,
+		"internal", &internal,
+		"load-on-query", &load_on_query,
 		"name", &name,
 		"version", &version,
 		"license-id", &license_id,
@@ -109,8 +115,8 @@ test_gplugin_plugin_info_construction(void) {
 
 	test_string(id, "gplugin-test/plugin-info-test");
 	test_uint(abi_version, GPLUGIN_NATIVE_PLUGIN_ABI_VERSION);
-	test_uint(flags, GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY |
-	                 GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL);
+	test_bool(internal, TRUE);
+	test_bool(load_on_query, TRUE);
 	test_string(name, "name");
 	test_string(version, "version");
 	test_string(license_id, "license-id");
@@ -149,32 +155,6 @@ test_gplugin_plugin_info_new_empty(void) {
 }
 
 static void
-test_gplugin_plugin_info_new_flags(void) {
-	GPluginPluginInfo *info = NULL;
-	gchar *id = NULL;
-	guint32 abi_version = 0;
-	GPluginPluginInfoFlags flags = 0;
-
-	info = gplugin_plugin_info_new("flags", 2,
-	                               "flags", 1 << 1,
-	                               NULL);
-
-	g_assert(GPLUGIN_IS_PLUGIN_INFO(info));
-
-	g_object_get(G_OBJECT(info),
-	             "id", &id,
-	             "abi-version", &abi_version,
-	             "flags", &flags,
-	             NULL);
-
-	test_string(id, "flags");
-	test_uint(abi_version, 2);
-	test_uint(flags, 1 << 1);
-
-	g_object_unref(G_OBJECT(info));
-}
-
-static void
 test_gplugin_plugin_info_new_full(void) {
 	GPluginPluginInfo *info = NULL;
 	gchar *id = NULL, *name = NULL, *version = NULL;
@@ -182,15 +162,15 @@ test_gplugin_plugin_info_new_full(void) {
 	gchar *icon = NULL, *summary = NULL, *description = NULL, *category = NULL;
 	gchar **authors = NULL, *website = NULL, **dependencies = NULL;
 	guint abi_version = 0;
-	GPluginPluginInfoFlags flags = 0;
+	gboolean internal = FALSE, load_on_query = FALSE;
 	const gchar * const r_authors[] = { "author", NULL };
 	const gchar * const r_dependencies[] = { "dependency", NULL };
 
 	info = gplugin_plugin_info_new(
 		"gplugin-test/plugin-info-test",
 		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-		"flags", GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY |
-		         GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL,
+		"internal", TRUE,
+		"load-on-query", TRUE,
 		"name", "name",
 		"version", "version",
 		"license-id", "license-id",
@@ -211,7 +191,8 @@ test_gplugin_plugin_info_new_full(void) {
 	g_object_get(G_OBJECT(info),
 		"id", &id,
 		"abi_version", &abi_version,
-		"flags", &flags,
+		"internal", &internal,
+		"load-on-query", &load_on_query,
 		"name", &name,
 		"version", &version,
 		"license-id", &license_id,
@@ -229,8 +210,8 @@ test_gplugin_plugin_info_new_full(void) {
 
 	test_string(id, "gplugin-test/plugin-info-test");
 	test_uint(abi_version, GPLUGIN_NATIVE_PLUGIN_ABI_VERSION);
-	test_uint(flags, GPLUGIN_PLUGIN_INFO_FLAGS_LOAD_ON_QUERY |
-	                 GPLUGIN_PLUGIN_INFO_FLAGS_INTERNAL);
+	test_bool(internal, TRUE);
+	test_bool(load_on_query, TRUE);
 	test_string(name, "name");
 	test_string(version, "version");
 	test_string(license_id, "license-id");
@@ -389,8 +370,6 @@ main(gint argc, gchar **argv) {
 
 	g_test_add_func("/plugin-info/new/empty",
 	                test_gplugin_plugin_info_new_empty);
-	g_test_add_func("/plugin-info/new/flags",
-	                test_gplugin_plugin_info_new_flags);
 	g_test_add_func("/plugin-info/new/full",
 	                test_gplugin_plugin_info_new_full);
 

@@ -92,7 +92,6 @@ configure_file(gplugin-native.h.in gplugin-native.h @ONLY)
 ###############################################################################
 set(ENUM_HEADERS
 	gplugin-plugin.h
-	gplugin-plugin-info.h
 )
 
 add_custom_command(

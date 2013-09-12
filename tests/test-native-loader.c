@@ -80,7 +80,8 @@ test_basic_plugin_load(void) {
 		                "gplugin/basic-native-plugin");
 		g_assert_cmpint(gplugin_plugin_info_get_abi_version(info), ==,
 		                GPLUGIN_NATIVE_PLUGIN_ABI_VERSION);
-		g_assert_cmpuint(gplugin_plugin_info_get_flags(info), ==, 0);
+		g_assert(gplugin_plugin_info_get_internal(info) == FALSE);
+		g_assert(gplugin_plugin_info_get_load_on_query(info) == FALSE);
 		g_assert_cmpstr(gplugin_plugin_info_get_name(info), ==, "name");
 		g_assert_cmpstr(gplugin_plugin_info_get_version(info), ==, "version");
 		g_assert_cmpstr(gplugin_plugin_info_get_summary(info), ==, "summary");
