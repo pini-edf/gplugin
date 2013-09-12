@@ -7,6 +7,7 @@ def gplugin_plugin_query():
         id='gplugin-python/basic-plugin',
         abi_version=0x01020304,
         name='basic plugin',
+        authors=['author1'],
         category='test',
         version='version',
         license_id='license',

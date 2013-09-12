@@ -26,6 +26,9 @@ test_full(void) {
 	GPluginPluginInfo *info = NULL;
 	GError *error = NULL;
 	const gchar *id = "gplugin-python/basic-plugin";
+	gchar **authors = NULL;
+	const gchar * const r_authors[] = { "author1", NULL };
+	gint i;
 
 	plugin = gplugin_plugin_manager_find_plugin(id);
 	g_assert(plugin != NULL);
@@ -37,6 +40,11 @@ test_full(void) {
 	g_assert_cmpuint(0x01020304, ==,
 	                 gplugin_plugin_info_get_abi_version(info));
 	g_assert_cmpstr("basic plugin", ==, gplugin_plugin_info_get_name(info));
+
+	authors = gplugin_plugin_info_get_authors(info);
+	for(i = 0; r_authors[i]; i++)
+		g_assert_cmpstr(authors[i], ==, r_authors[i]);
+
 	g_assert_cmpstr("test", ==, gplugin_plugin_info_get_category(info));
 	g_assert_cmpstr("version", ==, gplugin_plugin_info_get_version(info));
 	g_assert_cmpstr("license", ==, gplugin_plugin_info_get_license_id(info));
@@ -117,6 +125,32 @@ test_unload_failed(void) {
 	g_object_unref(G_OBJECT(plugin));
 }
 
+static void
+test_dependencies(void) {
+	GPluginPlugin *plugin = NULL;
+	GPluginPluginInfo *info = NULL;
+	GError *error = NULL;
+	const gchar *id = "gplugin-python/dependent-plugin";
+	gchar **deps = NULL;
+	const gchar * const r_deps[] = { "dep1", "dep2", NULL };
+	gint i;
+
+	plugin = gplugin_plugin_manager_find_plugin(id);
+	g_assert(plugin != NULL);
+
+	info = gplugin_plugin_get_info(plugin);
+	g_assert(info != NULL);
+
+	g_assert_cmpstr(id, ==, gplugin_plugin_info_get_id(info));
+	g_assert_cmpuint(0x01020304, ==,
+	                 gplugin_plugin_info_get_abi_version(info));
+	g_assert_cmpstr("dependent plugin", ==, gplugin_plugin_info_get_name(info));
+
+	deps = gplugin_plugin_info_get_dependencies(info);
+	for(i = 0; r_deps[i]; i++)
+		g_assert_cmpstr(deps[i], ==, r_deps[i]);
+}
+
 /******************************************************************************
  * Main
  *****************************************************************************/
@@ -137,6 +171,7 @@ main(gint argc, gchar **argv) {
 	g_test_add_func("/loaders/python/load-failed", test_load_failed);
 	g_test_add_func("/loaders/python/load-exception", test_load_exception);
 	g_test_add_func("/loaders/python/unload-failed", test_unload_failed);
+	g_test_add_func("/loaders/python/dependencies", test_dependencies);
 
 	return g_test_run();
 }
