@@ -203,8 +203,7 @@ gplugin_native_plugin_complete_interface_info(GTypePlugin *plugin,
 static void
 gplugin_native_plugin_iface_init(GTypePluginClass *iface) {
 	iface->use_plugin = gplugin_native_plugin_priv_use;
-	iface->unuse_plugin =
-		(void (*)(GTypePlugin *))gplugin_native_plugin_priv_unuse;
+	iface->unuse_plugin = gplugin_native_plugin_priv_unuse;
 	iface->complete_type_info = gplugin_native_plugin_complete_type_info;
 	iface->complete_interface_info =
 		gplugin_native_plugin_complete_interface_info;
