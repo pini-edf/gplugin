@@ -21,6 +21,8 @@
 #include <gplugin/gplugin-plugin-loader.h>
 #include <gplugin/gplugin-plugin-manager.h>
 
+#include <gplugin/gplugin-core.h>
+
 #include <glib/gi18n.h>
 
 #define GPLUGIN_NATIVE_PLUGIN_GET_PRIVATE(obj) \
@@ -124,8 +126,9 @@ gplugin_native_plugin_find_interface_info(GPluginNativePlugin *plugin,
 static void
 gplugin_native_plugin_priv_use(GTypePlugin *plugin) {
 	GPluginNativePlugin *native = GPLUGIN_NATIVE_PLUGIN(plugin);
+	GError *error = NULL;
 
-	if(!gplugin_native_plugin_use(native)) {
+	if(!gplugin_native_plugin_use(native, &error)) {
 		const GPluginPluginInfo *info =
 			gplugin_plugin_get_info(GPLUGIN_PLUGIN(native));
 		const gchar *name = NULL;
@@ -133,12 +136,38 @@ gplugin_native_plugin_priv_use(GTypePlugin *plugin) {
 		if(GPLUGIN_IS_PLUGIN_INFO(info))
 			name = gplugin_plugin_info_get_name(info);
 
-		if(name == NULL)
-			name = _("(unknown)");
-
-		g_warning(_("Could not reload previously loaded plugin '%s'\n"), name);
+		g_warning(_("Could not reload previously loaded plugin '%s': %s\n"),
+		          name ? name : _("(unknown)"),
+		          error ? error->message : _("unknown"));
 
 		g_object_unref(G_OBJECT(info));
+
+		if (error)
+			g_error_free(error);
+	}
+}
+
+static void
+gplugin_native_plugin_priv_unuse(GTypePlugin *plugin) {
+	GPluginNativePlugin *native = GPLUGIN_NATIVE_PLUGIN(plugin);
+	GError *error = NULL;
+
+	if(!gplugin_native_plugin_unuse(native, &error)) {
+		const GPluginPluginInfo *info =
+			gplugin_plugin_get_info(GPLUGIN_PLUGIN(native));
+		const gchar *name = NULL;
+
+		if(GPLUGIN_IS_PLUGIN_INFO(info))
+			name = gplugin_plugin_info_get_name(info);
+
+		g_warning(_("Could not unuse plugin '%s': %s\n"),
+		          name ? name : _("(unknown)"),
+		          error ? error->message : _("unknown"));
+
+		g_object_unref(G_OBJECT(info));
+
+		if (error)
+			g_error_free(error);
 	}
 }
 
@@ -174,7 +203,8 @@ gplugin_native_plugin_complete_interface_info(GTypePlugin *plugin,
 static void
 gplugin_native_plugin_iface_init(GTypePluginClass *iface) {
 	iface->use_plugin = gplugin_native_plugin_priv_use;
-	iface->unuse_plugin = (void (*)(GTypePlugin *))gplugin_native_plugin_unuse;
+	iface->unuse_plugin =
+		(void (*)(GTypePlugin *))gplugin_native_plugin_priv_unuse;
 	iface->complete_type_info = gplugin_native_plugin_complete_type_info;
 	iface->complete_interface_info =
 		gplugin_native_plugin_complete_interface_info;
@@ -317,6 +347,7 @@ gplugin_native_plugin_get_type(void) {
 /**
  * gplugin_native_plugin_use:
  * @plugin: a #GPluginNativePlugin
+ * @error: (out): return location for a #GError or null
  *
  * Increments the ref count of @plugin by one.
  *
@@ -325,7 +356,7 @@ gplugin_native_plugin_get_type(void) {
  * Returns: FALSE if @plugin needed to be loaded and loading failed.
  */
 gboolean
-gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
+gplugin_native_plugin_use(GPluginNativePlugin *plugin, GError **error) {
 	GPluginNativePluginPrivate *priv = NULL;
 
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), FALSE);
@@ -335,7 +366,6 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
 	priv->use_count++;
 	if(priv->use_count == 1) {
 		GPluginNativePluginLoadFunc func;
-		GError *error = NULL;
 		GSList *l = NULL;
 
 		if(priv->load_func == NULL) {
@@ -353,12 +383,12 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
 		}
 
 		func = (GPluginNativePluginLoadFunc)priv->load_func;
-		if(!func(plugin, &error)) {
-			g_warning(_("Plugin load function return FALSE : %s"),
-			          (error) ? error->message : _("unknown"));
+		if(!func(plugin, error)) {
+			if (error && *error == NULL)
+				*error = g_error_new(GPLUGIN_DOMAIN, 0, _("unknown"));
 
-			if(error)
-				g_error_free(error);
+			g_warning(_("Plugin load function return FALSE : %s"),
+			          error ? (*error)->message : _("unknown"));
 
 			priv->use_count--;
 
@@ -399,6 +429,7 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
 /**
  * gplugin_native_plugin_unuse:
  * @plugin: a #GPluginNativePlugin
+ * @error: (out): return location for a #GError or null
  *
  * Decreases the ref count of @plugin by one.  If the result is zero, @plugin
  * is unloaded.
@@ -408,7 +439,7 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin) {
  * Returns: TRUE if successful, FALSE otherwise.
  */
 gboolean
-gplugin_native_plugin_unuse(GPluginNativePlugin *plugin) {
+gplugin_native_plugin_unuse(GPluginNativePlugin *plugin, GError **error) {
 	GPluginNativePluginPrivate *priv = NULL;
 
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), FALSE);
@@ -421,18 +452,29 @@ gplugin_native_plugin_unuse(GPluginNativePlugin *plugin) {
 
 	if(priv->use_count == 0) {
 		GPluginNativePluginUnloadFunc func = NULL;
-		GError *error = NULL;
 		GSList *l = NULL;
 
+		if(priv->unload_func == NULL) {
+			GPluginPluginInfo *info = NULL;
+			priv->use_count++;
+
+			info = gplugin_plugin_get_info(GPLUGIN_PLUGIN(plugin));
+
+			g_warning(_("unload function for %s is NULL"),
+			          gplugin_plugin_info_get_name(info));
+
+			g_object_unref(G_OBJECT(info));
+
+			return FALSE;
+		}
 
 		func = (GPluginNativePluginUnloadFunc)priv->unload_func;
+		if(!func(plugin, error)) {
+			if (error && *error == NULL)
+				*error = g_error_new(GPLUGIN_DOMAIN, 0, _("unknown"));
 
-		if(!func(plugin, &error)) {
 			g_warning(_("Plugin unload function returned FALSE : %s"),
-			          (error) ? error->message : _("unknown"));
-
-			if(error)
-				g_error_free(error);
+			          error ? (*error)->message : _("unknown"));
 
 			priv->use_count++;
 
@@ -444,13 +486,11 @@ gplugin_native_plugin_unuse(GPluginNativePlugin *plugin) {
 				(GPluginNativePluginTypeInfo *)(l->data);
 
 			info->loaded = FALSE;
-
-			return FALSE;
 		}
-	}
 
-	gplugin_plugin_set_state(GPLUGIN_PLUGIN(plugin),
-	                         GPLUGIN_PLUGIN_STATE_QUERIED);
+		gplugin_plugin_set_state(GPLUGIN_PLUGIN(plugin),
+		                         GPLUGIN_PLUGIN_STATE_QUERIED);
+	}
 
 	return TRUE;
 }

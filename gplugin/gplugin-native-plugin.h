@@ -60,8 +60,8 @@ G_BEGIN_DECLS
 
 GType gplugin_native_plugin_get_type(void);
 
-gboolean gplugin_native_plugin_use(GPluginNativePlugin *plugin);
-gboolean gplugin_native_plugin_unuse(GPluginNativePlugin *plugin);
+gboolean gplugin_native_plugin_use(GPluginNativePlugin *plugin, GError **error);
+gboolean gplugin_native_plugin_unuse(GPluginNativePlugin *plugin, GError **error);
 
 GType gplugin_native_plugin_register_type(GPluginNativePlugin *plugin, GType parent, const gchar *name, const GTypeInfo *info, GTypeFlags flags);
 void gplugin_native_plugin_add_interface(GPluginNativePlugin *plugin, GType instance_type, GType interface_type, const GInterfaceInfo *interface_info);

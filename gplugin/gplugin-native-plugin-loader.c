@@ -176,7 +176,7 @@ gplugin_native_plugin_loader_load(GPluginPluginLoader *loader,
 	g_return_val_if_fail(plugin != NULL, FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), FALSE);
 
-	return gplugin_native_plugin_use(GPLUGIN_NATIVE_PLUGIN(plugin));
+	return gplugin_native_plugin_use(GPLUGIN_NATIVE_PLUGIN(plugin), error);
 }
 
 static gboolean
@@ -187,7 +187,7 @@ gplugin_native_plugin_loader_unload(GPluginPluginLoader *loader,
 	g_return_val_if_fail(plugin != NULL, FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), FALSE);
 
-	return gplugin_native_plugin_unuse(GPLUGIN_NATIVE_PLUGIN(plugin));
+	return gplugin_native_plugin_unuse(GPLUGIN_NATIVE_PLUGIN(plugin), error);
 }
 
 static void
