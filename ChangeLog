@@ -2,6 +2,7 @@
   * Fixed some issues with loading Python plugins (#16)
   * Removed the flags property and replaced it with an internal and
     load-on-query properties.  Both of which default to FALSE.  Closes #15
+  * Various fixes for gplugin_native_plugin_(un)?use from Ankit
 
 0.0.7: 2013/09/01
   * Cleaned up the output of gplugin-query considerably
