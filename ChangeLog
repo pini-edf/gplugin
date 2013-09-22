@@ -1,3 +1,5 @@
+0.0.9:
+
 0.0.8: 2013/09/22
   * Fixed some issues with loading Python plugins (#16)
   * Removed the flags property and replaced it with an internal and
