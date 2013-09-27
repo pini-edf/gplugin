@@ -18,27 +18,39 @@
 #include <gplugin.h>
 #include <gplugin-native.h>
 
+#include "gplugin-perl-plugin-loader.h"
+
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(GError **error) {
 	const gchar * const authors[] = {
 		"Gary Kramlich <grim@reaperworld.com>",
-		NULL
+		NULL,
 	};
 
 	return gplugin_plugin_info_new(
-		"gplugin/license-check",
+		"gplugin/perl-loader",
 		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-		"name", "License Check",
+		"internal", TRUE,
+		"load-on-query", TRUE,
+		"name", "Perl plugin loader",
 		"version", GPLUGIN_VERSION,
-		"summary", "Checks the license compatibility of plugins",
 		"license-id", "GPL3",
+		"summary", "A plugin that can load perl plugins",
+		"description", "This plugin allows the loading of plugins written in "
+		               "the perl programming language.",
 		"authors", authors,
 		"website", GPLUGIN_WEBSITE,
-		NULL);
+		"category", "loaders",
+		NULL
+	);
 }
 
 G_MODULE_EXPORT gboolean
 gplugin_plugin_load(GPluginNativePlugin *plugin, GError **error) {
+	gplugin_perl_plugin_loader_register(plugin);
+
+	gplugin_plugin_manager_register_loader(GPLUGIN_TYPE_PERL_PLUGIN_LOADER);
+
 	return TRUE;
 }
 

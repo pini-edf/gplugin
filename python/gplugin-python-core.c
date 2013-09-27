@@ -40,7 +40,8 @@ gplugin_plugin_query(GError **error) {
 		"description", "This plugin allows the loading of plugins written in "
 		               "the python programming language.",
 		"authors", authors,
-		"website", "http://bitbucket.org/rw_grim/gplugin",
+		"website", GPLUGIN_WEBSITE,
+		"category", "loaders",
 		NULL
 	);
 }

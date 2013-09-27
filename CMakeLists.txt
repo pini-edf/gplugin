@@ -132,6 +132,7 @@ endif(NLS)
 add_definitions(
 	-g -g3 -Wall
 	-DPREFIX="${CMAKE_INSTALL_PREFIX}"
+	-DGPLUGIN_WEBSITE="http://bitbucket.org/rw_grim/gplugin/"
 )
 
 include_directories(
@@ -159,9 +160,11 @@ configure_file(gplugin-uninstalled.pc.in ${CMAKE_BINARY_DIR}/gplugin-uninstalled
 add_subdirectory(gplugin)
 add_subdirectory(gplugin-gtk)
 add_subdirectory(plugins)
-add_subdirectory(python)
 add_subdirectory(po)
 add_subdirectory(tests)
+
+add_subdirectory(perl)
+add_subdirectory(python)
 
 ###############################################################################
 # Install stuff
