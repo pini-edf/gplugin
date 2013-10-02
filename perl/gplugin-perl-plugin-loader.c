@@ -33,6 +33,7 @@
  * Typedefs
  *****************************************************************************/
 typedef struct {
+	gint dummy;
 } GPluginPerlPluginLoaderPrivate;
 
 /******************************************************************************
@@ -40,7 +41,9 @@ typedef struct {
  *****************************************************************************/
 static GObjectClass *parent_class = NULL;
 static volatile GType type_real = 0;
-static PerlInterpreter *interp;
+
+/* I can't believe I have to use this variable name... */
+static PerlInterpreter *my_perl = NULL;
 
 /******************************************************************************
  * GPluginPluginLoaderInterface API
@@ -54,9 +57,9 @@ gplugin_perl_plugin_loader_query(GPluginPluginLoader *loader,
 	gchar **argv = (gchar **)args;
 	gint argc = 2;
 
-	perl_parse(interp, NULL, argc, argv, NULL);
+	perl_parse(my_perl, NULL, argc, argv, NULL);
 
-	call_argv("gplugin_plugin_query", G_DISCARD | G_NOARGS, args);
+	call_argv("gplugin_plugin_query", G_DISCARD | G_NOARGS, argv);
 
 	return NULL;
 }
@@ -88,19 +91,19 @@ gplugin_perl_plugin_loader_init_perl(void) {
 
 	PERL_SYS_INIT(&argc, &argv);
 
-	interp = perl_alloc();
-	PERL_SET_CONTEXT(interp);
+	my_perl = perl_alloc();
+	PERL_SET_CONTEXT(my_perl);
 	PL_perl_destruct_level = 1;
-	perl_construct(interp);
+	perl_construct(my_perl);
 }
 
 static void
 gplugin_perl_plugin_loader_uninit_perl(void) {
 	PERL_SYS_TERM();
 
-	perl_destruct(interp);
-	perl_free(interp);
-	interp = NULL;
+	perl_destruct(my_perl);
+	perl_free(my_perl);
+	my_perl = NULL;
 }
 
 /******************************************************************************

@@ -10,10 +10,12 @@ if(BUILD_PERL)
 	if(PERLLIBS_FOUND)
 		set(GPLUGIN_PERL_SOURCES
 			gplugin-perl-core.c
+			gplugin-perl-plugin.c
 			gplugin-perl-plugin-loader.c
 		)
 
 		set(GPLUGIN_PERL_HEADERS
+			gplugin-perl-plugin.h
 			gplugin-perl-plugin-loader.h
 		)
 
@@ -24,9 +26,16 @@ if(BUILD_PERL)
 
 		execute_process(COMMAND ${PERL_EXECUTABLE} -MExtUtils::Embed -e ccopts
 						OUTPUT_VARIABLE PERL_CFLAGS)
-
-		message(STATUS Perl CFLAGS ${PERL_CFLAGS})
 		add_definitions(${PERL_EXTRA_C_FLAGS} ${PERL_CFLAGS})
+
+		execute_process(COMMAND ${PERL_EXECUTABLE} -V:lddlflags
+		                OUTPUT_VARIABLE PERL_LDFLAGS)
+		string(REGEX REPLACE "lddlflags='(.+)'" "\\1" PERL_LDFLAGS ${PERL_LDFLAGS})
+		string(STRIP ${PERL_LDFLAGS} PERL_LDFLAGS)
+		set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${PERL_LDFLAGS}")
+
+		message(STATUS "PERL_CFLAGS " ${PERL_CFLAGS})
+		message(STATUS "PERL_LDFLAGS " ${PERL_LDFLAGS})
 
 		set_target_properties(gplugin-perl PROPERTIES PREFIX "")
 
