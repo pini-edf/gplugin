@@ -42,7 +42,7 @@ gplugin_init(void) {
 	g_type_init();
 #endif /* !GLIB_CHECK_VERSION(2, 36, 0) */
 
-	gplugin_plugin_manager_init();
+	gplugin_plugin_manager_private_init();
 }
 
 /**
@@ -52,6 +52,6 @@ gplugin_init(void) {
  */
 void
 gplugin_uninit(void) {
-	gplugin_plugin_manager_uninit();
+	gplugin_plugin_manager_private_uninit();
 }
 

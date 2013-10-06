@@ -55,6 +55,8 @@ gboolean gplugin_plugin_manager_unload_plugin(GPluginPlugin *plugin, GError **er
 
 GList *gplugin_plugin_manager_list_plugins(void);
 
+GObject *gplugin_plugin_manager_get_instance(void);
+
 G_END_DECLS
 
 #endif /* GPLUGIN_PLUGIN_MANAGER_H */
