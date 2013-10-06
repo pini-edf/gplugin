@@ -30,6 +30,17 @@
 #include <gplugin/gplugin-native.h>
 
 /******************************************************************************
+ * Enums
+ *****************************************************************************/
+enum {
+	SIG_LOADING,
+	SIG_LOADED,
+	SIG_UNLOADING,
+	SIG_UNLOADED,
+	N_SIGNALS,
+};
+
+/******************************************************************************
  * Structs
  *****************************************************************************/
 typedef struct {
@@ -66,6 +77,26 @@ typedef struct {
 	GSList *(*find_plugins)(GPluginPluginManager *manager, const gchar *id);
 
 	GList *(*list_plugins)(GPluginPluginManager *manager);
+
+	gboolean (*load_plugin)(GPluginPluginManager *manager,
+	                        GPluginPlugin *plugin,
+	                        GError **error);
+	gboolean (*unload_plugin)(GPluginPluginManager *manager,
+	                          GPluginPlugin *plugin,
+	                          GError **error);
+
+	/* signals */
+	gboolean (*loading_plugin)(GObject *manager,
+	                           GPluginPlugin *plugin,
+	                           GError **error);
+	void (*loaded_plugin)(GObject *manager,
+	                      GPluginPlugin *plugin);
+	gboolean (*unloading_plugin)(GObject *manager,
+	                             GPluginPlugin *plugin,
+	                             GError **error);
+	void (*unloaded_plugin)(GObject *manager,
+	                        GPluginPlugin *plugin);
+
 } GPluginPluginManagerClass;
 
 #define GPLUGIN_TYPE_PLUGIN_MANAGER            (gplugin_plugin_manager_get_type())
@@ -83,6 +114,7 @@ G_DEFINE_TYPE(GPluginPluginManager, gplugin_plugin_manager, G_TYPE_OBJECT);
  * Globals
  *****************************************************************************/
 GPluginPluginManager *instance = NULL;
+static guint signals[N_SIGNALS] = {0, };
 
 /******************************************************************************
  * Helpers
@@ -617,6 +649,165 @@ gplugin_plugin_manager_real_list_plugins(GPluginPluginManager *manager) {
 	return ret;
 }
 
+static gboolean
+gplugin_plugin_manager_real_load_plugin(GPluginPluginManager *manager,
+                                        GPluginPlugin *plugin,
+                                        GError **error)
+{
+	const GPluginPluginInfo *info = NULL;
+	GPluginPluginLoader *loader = NULL;
+	const gchar * const *dependencies = NULL;
+	gboolean ret = TRUE;
+	gint i = 0;
+
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
+
+	/* if the plugin is already loaded there's nothing for us to do */
+	if(gplugin_plugin_get_state(plugin) == GPLUGIN_PLUGIN_STATE_LOADED)
+		return TRUE;
+
+	/* now try to get the plugin info from the plugin */
+	info = gplugin_plugin_get_info(plugin);
+	if(info == NULL) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     _("Plugin %s did not return value plugin info"),
+			                     gplugin_plugin_get_filename(plugin));
+		}
+
+		return FALSE;
+	}
+
+	/* now walk through any dependencies the plugin has and load them.  If they
+	 * fail to load we need to fail as well.
+	 */
+	dependencies = gplugin_plugin_info_get_dependencies(info);
+	if(dependencies != NULL) {
+		for(i = 0; dependencies[i]; i++) {
+			GSList *matches = NULL, *m = NULL;
+			gboolean ret = FALSE;
+
+			matches = gplugin_plugin_manager_find_plugins(dependencies[i]);
+
+			/* make sure we got at least 1 match */
+			if(matches == NULL) {
+				if(error) {
+					*error = g_error_new(GPLUGIN_DOMAIN, 0,
+					                     _("Failed to find plugin %s which %s "
+					                     "depends on"),
+					                     dependencies[i],
+					                     gplugin_plugin_get_filename(plugin));
+				}
+
+				g_object_unref(G_OBJECT(info));
+
+				return FALSE;
+			}
+
+			for(m = matches; m; m = m->next) {
+				GPluginPlugin *plugin = g_object_ref(G_OBJECT(m->data));
+
+				ret = gplugin_plugin_manager_load_plugin(plugin, error);
+
+				g_object_unref(G_OBJECT(plugin));
+
+				if(ret == TRUE)
+					break;
+			}
+
+			if(ret == FALSE) {
+				if(error) {
+					if (*error == NULL) {
+						*error = g_error_new(GPLUGIN_DOMAIN, 0,
+							                 _("Plugin did not give a reason."));
+					}
+
+					g_prefix_error(error,
+					               _("Found at least one dependency with the id %s, "
+					               "but failed to load it: "), dependencies[i]);
+				}
+
+				g_object_unref(G_OBJECT(info));
+
+				return FALSE;
+			}
+		}
+	}
+
+	g_object_unref(G_OBJECT(info));
+
+	/* now load the actual plugin */
+	loader = gplugin_plugin_get_loader(plugin);
+
+	if(!GPLUGIN_IS_PLUGIN_LOADER(loader)) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     _("The loader for %s is not a loader.  This "
+			                     "should not happend!"),
+			                     gplugin_plugin_get_filename(plugin));
+		}
+
+		return FALSE;
+	}
+
+	g_signal_emit(manager, signals[SIG_LOADING], 0, plugin, error, &ret);
+	if(!ret)
+		return ret;
+
+	ret = gplugin_plugin_loader_load_plugin(loader, plugin, error);
+	g_signal_emit(manager, signals[SIG_LOADED], 0, plugin);
+
+	return ret;
+}
+
+static gboolean
+gplugin_plugin_manager_real_unload_plugin(GPluginPluginManager *manager,
+                                          GPluginPlugin *plugin,
+                                          GError **error)
+{
+	GPluginPluginLoader *loader = NULL;
+	gboolean ret = TRUE;
+
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
+
+	if(gplugin_plugin_get_state(plugin) != GPLUGIN_PLUGIN_STATE_LOADED)
+		return TRUE;
+
+	loader = gplugin_plugin_get_loader(plugin);
+	if(!GPLUGIN_IS_PLUGIN_LOADER(loader)) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     _("Plugin loader is not a loader"));
+		}
+
+		return FALSE;
+	}
+
+	g_signal_emit(manager, signals[SIG_UNLOADING], 0, plugin, error, &ret);
+	if(!ret)
+		return ret;
+
+	ret = gplugin_plugin_loader_unload_plugin(loader, plugin, error);
+
+	g_signal_emit(manager, signals[SIG_UNLOADED], 0, plugin, error);
+
+	return ret;
+}
+
+static gboolean
+gplugin_plugin_manager_loading_cb(GObject *manager, GPluginPlugin *plugin,
+                                  GError **error)
+{
+	return TRUE;
+}
+
+static gboolean
+gplugin_plugin_manager_unloading_cb(GObject *manager, GPluginPlugin *plugin,
+                                    GError **error)
+{
+	return TRUE;
+}
+
 /******************************************************************************
  * Object Stuff
  *****************************************************************************/
@@ -676,6 +867,96 @@ gplugin_plugin_manager_class_init(GPluginPluginManagerClass *klass) {
 
 	manager_class->find_plugins = gplugin_plugin_manager_real_find_plugins;
 	manager_class->list_plugins = gplugin_plugin_manager_real_list_plugins;
+
+	manager_class->load_plugin = gplugin_plugin_manager_real_load_plugin;
+	manager_class->unload_plugin = gplugin_plugin_manager_real_unload_plugin;
+
+	manager_class->loading_plugin = gplugin_plugin_manager_loading_cb;
+	manager_class->unloading_plugin = gplugin_plugin_manager_unloading_cb;
+
+	/* signals */
+
+	/**
+	 * GPluginPluginManager::loading-plugin:
+	 * @manager: The #GPluginPluginManager instance.  Treat as a #GObject.
+	 * @plugin: The #GPluginPlugin that's about to be loaded.
+	 * @error: Return address for a #GError.
+	 *
+	 * Emitted before @plugin is loaded.
+	 *
+	 * Return TRUE to stop other handlers 
+	 */
+	signals[SIG_LOADING] =
+		g_signal_new("loading-plugin",
+		             G_OBJECT_CLASS_TYPE(manager_class),
+		             G_SIGNAL_RUN_LAST,
+		             G_STRUCT_OFFSET(GPluginPluginManagerClass,
+		                             loading_plugin),
+		             gplugin_boolean_accumulator, NULL,
+		             gplugin_marshal_BOOLEAN__OBJECT_POINTER,
+		             G_TYPE_BOOLEAN,
+		             2,
+		             GPLUGIN_TYPE_PLUGIN, G_TYPE_POINTER);
+
+	/**
+	 * GPluginPluginManager::loaded-plugin:
+	 * @manager: the #gpluginpluginmanager instance.  treat as a #gobject.
+	 * @plugin: the #gpluginplugin that's about to be loaded.
+	 * @error: return address for a #gerror.
+	 *
+	 * emitted after a plugin is loaded.
+	 */
+	signals[SIG_LOADED] =
+		g_signal_new("loaded-plugin",
+		             G_OBJECT_CLASS_TYPE(manager_class),
+		             G_SIGNAL_RUN_LAST,
+		             G_STRUCT_OFFSET(GPluginPluginManagerClass,
+		                             loaded_plugin),
+		             NULL, NULL,
+		             gplugin_marshal_VOID__OBJECT,
+		             G_TYPE_NONE,
+		             1,
+		             GPLUGIN_TYPE_PLUGIN);
+
+	/**
+	 * GPluginPluginManager::unloading-plugin:
+	 * @manager: the #gpluginpluginmanager instance.  treat as a #gobject.
+	 * @plugin: the #gpluginplugin that's about to be loaded.
+	 * @error: return address for a #gerror.
+	 *
+	 * emitted before a plugin is unloaded.
+	 */
+	signals[SIG_UNLOADING] =
+		g_signal_new("unloading-plugin",
+		             G_OBJECT_CLASS_TYPE(manager_class),
+		             G_SIGNAL_RUN_LAST,
+		             G_STRUCT_OFFSET(GPluginPluginManagerClass,
+		                             unloading_plugin),
+		             gplugin_boolean_accumulator, NULL,
+		             gplugin_marshal_BOOLEAN__OBJECT_POINTER,
+		             G_TYPE_BOOLEAN,
+		             2,
+		             GPLUGIN_TYPE_PLUGIN, G_TYPE_POINTER);
+
+	/**
+	 * GPluginPluginManager::unloaded-plugin:
+	 * @manager: the #gpluginpluginmanager instance.  treat as a #gobject.
+	 * @plugin: the #gpluginplugin that's about to be loaded.
+	 * @error: return address for a #gerror.
+	 *
+	 * emitted after a plugin is unloaded.
+	 */
+	signals[SIG_UNLOADED] =
+		g_signal_new("unloaded-plugin",
+		             G_OBJECT_CLASS_TYPE(manager_class),
+		             G_SIGNAL_RUN_LAST,
+		             G_STRUCT_OFFSET(GPluginPluginManagerClass,
+		                             unloaded_plugin),
+		             NULL, NULL,
+		             gplugin_marshal_VOID__OBJECT,
+		             G_TYPE_NONE,
+		             1,
+		             GPLUGIN_TYPE_PLUGIN);
 }
 
 static void
@@ -1004,102 +1285,19 @@ gplugin_plugin_manager_find_plugin(const gchar *id) {
  */
 gboolean
 gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
-	const GPluginPluginInfo *info = NULL;
-	GPluginPluginLoader *loader = NULL;
-	const gchar * const *dependencies = NULL;
-	gint i = 0;
+	GPluginPluginManager *manager = NULL;
+	GPluginPluginManagerClass *klass = NULL;
 
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
 
-	/* if the plugin is already loaded there's nothing for us to do */
-	if(gplugin_plugin_get_state(plugin) == GPLUGIN_PLUGIN_STATE_LOADED)
-		return TRUE;
+	manager = GPLUGIN_PLUGIN_MANAGER_INSTANCE;
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_MANAGER(manager), FALSE);
 
-	/* now try to get the plugin info from the plugin */
-	info = gplugin_plugin_get_info(plugin);
-	if(info == NULL) {
-		if(error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     _("Plugin %s did not return value plugin info"),
-			                     gplugin_plugin_get_filename(plugin));
-		}
+	klass = GPLUGIN_PLUGIN_MANAGER_GET_CLASS(manager);
+	if(klass && klass->load_plugin)
+		return klass->load_plugin(manager, plugin, error);
 
-		return FALSE;
-	}
-
-	/* now walk through any dependencies the plugin has and load them.  If they
-	 * fail to load we need to fail as well.
-	 */
-	dependencies = gplugin_plugin_info_get_dependencies(info);
-	if(dependencies != NULL) {
-		for(i = 0; dependencies[i]; i++) {
-			GSList *matches = NULL, *m = NULL;
-			gboolean ret = FALSE;
-
-			matches = gplugin_plugin_manager_find_plugins(dependencies[i]);
-
-			/* make sure we got at least 1 match */
-			if(matches == NULL) {
-				if(error) {
-					*error = g_error_new(GPLUGIN_DOMAIN, 0,
-					                     _("Failed to find plugin %s which %s "
-					                     "depends on"),
-					                     dependencies[i],
-					                     gplugin_plugin_get_filename(plugin));
-				}
-
-				g_object_unref(G_OBJECT(info));
-
-				return FALSE;
-			}
-
-			for(m = matches; m; m = m->next) {
-				GPluginPlugin *plugin = g_object_ref(G_OBJECT(m->data));
-
-				ret = gplugin_plugin_manager_load_plugin(plugin, error);
-
-				g_object_unref(G_OBJECT(plugin));
-
-				if(ret == TRUE)
-					break;
-			}
-
-			if(ret == FALSE) {
-				if(error) {
-					if (*error == NULL) {
-						*error = g_error_new(GPLUGIN_DOMAIN, 0,
-							                 _("Plugin did not give a reason."));
-					}
-
-					g_prefix_error(error,
-					               _("Found at least one dependency with the id %s, "
-					               "but failed to load it: "), dependencies[i]);
-				}
-
-				g_object_unref(G_OBJECT(info));
-
-				return FALSE;
-			}
-		}
-	}
-
-	g_object_unref(G_OBJECT(info));
-
-	/* now load the actual plugin */
-	loader = gplugin_plugin_get_loader(plugin);
-
-	if(!GPLUGIN_IS_PLUGIN_LOADER(loader)) {
-		if(error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     _("The loader for %s is not a loader.  This "
-			                     "should not happend!"),
-			                     gplugin_plugin_get_filename(plugin));
-		}
-
-		return FALSE;
-	}
-
-	return gplugin_plugin_loader_load_plugin(loader, plugin, error);
+	return FALSE;
 }
 
 /**
@@ -1114,24 +1312,19 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
  */
 gboolean
 gplugin_plugin_manager_unload_plugin(GPluginPlugin *plugin, GError **error) {
-	GPluginPluginLoader *loader = NULL;
+	GPluginPluginManager *manager = NULL;
+	GPluginPluginManagerClass *klass = NULL;
 
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
 
-	if(gplugin_plugin_get_state(plugin) != GPLUGIN_PLUGIN_STATE_LOADED)
-		return TRUE;
+	manager = GPLUGIN_PLUGIN_MANAGER_INSTANCE;
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_MANAGER(manager), FALSE);
 
-	loader = gplugin_plugin_get_loader(plugin);
-	if(!GPLUGIN_IS_PLUGIN_LOADER(loader)) {
-		if(error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     _("Plugin loader is not a loader"));
-		}
+	klass = GPLUGIN_PLUGIN_MANAGER_GET_CLASS(manager);
+	if(klass && klass->unload_plugin)
+		return klass->unload_plugin(manager, plugin, error);
 
-		return FALSE;
-	}
-
-	return gplugin_plugin_loader_unload_plugin(loader, plugin, error);
+	return FALSE;
 }
 
 /**

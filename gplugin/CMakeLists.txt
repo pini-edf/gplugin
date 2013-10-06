@@ -20,6 +20,7 @@ set(GPLUGIN_SOURCES
 	gplugin-plugin-info.c
 	gplugin-plugin-loader.c
 	gplugin-plugin-manager.c
+	gplugin-private.c
 	gplugin-version.c
 )
 

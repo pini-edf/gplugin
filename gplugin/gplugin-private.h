@@ -25,6 +25,7 @@
 #define GPLUGIN_PRIVATE_H
 
 #include <glib.h>
+#include <glib-object.h>
 
 #include <gplugin/gplugin-plugin.h>
 
@@ -34,6 +35,8 @@ gchar *gplugin_plugin_get_internal_filename(GPluginPlugin *plugin);
 
 void gplugin_plugin_manager_private_init(void);
 void gplugin_plugin_manager_private_uninit(void);
+
+gboolean gplugin_boolean_accumulator(GSignalInvocationHint *hint, GValue *return_accu, const GValue *handler_return, gpointer data);
 
 G_END_DECLS
 

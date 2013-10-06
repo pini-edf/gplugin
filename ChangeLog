@@ -1,4 +1,10 @@
 0.0.9:
+  * Updated the gplugin_plugin_manager_* API to use a singleton that has
+    signals for loading, loaded, unloading, and unloaded.  Use
+    gplugin_plugin_manager_get_instance to get the instance to use in
+    g_signal_connect.  Signals are "loading-plugin", "loaded-plugin",
+    "unloading-plugin", and "loaded-plugin".  See the documentation for the
+    prototype expected for the callbacks
 
 0.0.8: 2013/09/22
   * Fixed some issues with loading Python plugins (#16)
