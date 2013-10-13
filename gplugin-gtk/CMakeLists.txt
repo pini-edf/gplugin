@@ -24,6 +24,10 @@ include_directories(
 	${GTK3_INCLUDE_DIRS}
 )
 
+include_directories(
+	${CHAKE_CURRENT_SOURCE_DIR}
+)
+
 set(GPLUGIN_GTK_SOURCES
 	gplugin-gtk-view.c
 	gplugin-gtk-store.c
@@ -53,6 +57,12 @@ endforeach(HEADER)
 
 configure_file(gplugin-gtk.h.in gplugin-gtk.h @ONLY)
 
+configure_file(gplugin-gtk.pc.in gplugin-gtk.pc @ONLY)
+install(
+	FILES ${CMAKE_CURRENT_BINARY_DIR}/gplugin-gtk.pc
+	DESTINATION lib/pkgconfig
+)
+
 ###############################################################################
 # Library Target
 ###############################################################################
@@ -67,5 +77,35 @@ target_link_libraries(gplugin-gtk
 	${GTK3_LIBRARIES}
 	gplugin
 )
+
+install(TARGETS gplugin-gtk DESTINATION lib)
+
+# install the single include into the main directory
+install(
+	FILES ${CMAKE_CURRENT_BINARY_DIR}/gplugin-gtk.h
+	DESTINATION include/gplugin-1.0
+)
+
+# install the normal includes into the gplugin-gtk subdirectory
+foreach(HEADER ${GPLUGIN_GTK_HEADERS})
+	install(
+		FILES ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}
+		DESTINATION include/gplugin-1.0/gplugin-gtk
+	)
+endforeach(HEADER)
+
+###############################################################################
+# Application Target
+###############################################################################
+add_executable(gplugin-gtk-viewer
+	gplugin-gtk-viewer.c
+)
+
+target_link_libraries(gplugin-gtk-viewer
+	gplugin-gtk
+	gplugin
+)
+
+install(TARGETS gplugin-gtk-viewer RUNTIME DESTINATION bin)
 
 endif(BUILD_GTK3)

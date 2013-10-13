@@ -19,9 +19,8 @@
 
 static const GType column_types[] = {
 	G_TYPE_BOOLEAN,
-	G_TYPE_BOOLEAN,
-	G_TYPE_BOXED,
 	G_TYPE_OBJECT,
+	G_TYPE_STRING,
 };
 
 G_STATIC_ASSERT(G_N_ELEMENTS(column_types) == GPLUGIN_GTK_STORE_N_COLUMNS);

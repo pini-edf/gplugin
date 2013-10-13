@@ -16,6 +16,9 @@
  */
 
 #include <gplugin-gtk/gplugin-gtk-view.h>
+#include <gplugin-gtk/gplugin-gtk-store.h>
+
+#include <gplugin-gtk/gplugin-gtk-private.h>
 
 #define GPLUGIN_GTK_VIEW_GET_PRIVATE(obj) \
 	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_GTK_TYPE_VIEW, GPluginGtkViewPrivate))
@@ -39,7 +42,6 @@ enum {
 /******************************************************************************
  * Globals
  *****************************************************************************/
-static GParamSpec *properties[N_PROPERTIES] = { NULL };
 
 /******************************************************************************
  * GObject Stuff
@@ -108,6 +110,20 @@ gplugin_gtk_view_init(GPluginGtkView *view) {
 	gtk_tree_view_column_pack_start(col, rend, FALSE);
 
 	gtk_tree_view_append_column(GTK_TREE_VIEW(view), col);
+	gtk_tree_view_column_add_attribute(col, rend, "active",
+	                                   GPLUGIN_GTK_STORE_LOADED_COLUMN);
+
+	/* create the markup column */
+	col = gtk_tree_view_column_new();
+	gtk_tree_view_column_set_title(col, "Name");
+	gtk_tree_view_column_set_resizable(col, FALSE);
+
+	rend = gtk_cell_renderer_text_new();
+	gtk_tree_view_column_pack_start(col, rend, TRUE);
+
+	gtk_tree_view_append_column(GTK_TREE_VIEW(view), col);
+	gtk_tree_view_column_add_attribute(col, rend, "markup",
+	                                   GPLUGIN_GTK_STORE_MARKUP_COLUMN);
 }
 
 static void
@@ -128,14 +144,12 @@ gplugin_gtk_view_class_init(GPluginGtkViewClass *klass) {
 	 *
 	 * Whether or not to show internal plugins.
 	 */
-	properties[PROP_SHOW_INTERNAL] =
+	g_object_class_install_property(obj_class, PROP_SHOW_INTERNAL,
 		g_param_spec_boolean("show-internal",
 		                     "show-internal",
 		                     "Whether or not to show internal plugins",
 		                     FALSE,
-		                     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
-
-	g_object_class_install_properties(obj_class, N_PROPERTIES, properties);
+		                     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 /******************************************************************************
@@ -143,7 +157,14 @@ gplugin_gtk_view_class_init(GPluginGtkViewClass *klass) {
  *****************************************************************************/
 GtkWidget *
 gplugin_gtk_view_new(void) {
-	return GTK_WIDGET(g_object_new(GPLUGIN_GTK_TYPE_VIEW, NULL));
+	GObject *ret = NULL;
+	GPluginGtkStore *store = gplugin_gtk_store_new();
+
+	ret = g_object_new(GPLUGIN_GTK_TYPE_VIEW,
+	                   "model", GTK_TREE_MODEL(store),
+	                   NULL);
+
+	return GTK_WIDGET(ret);
 }
 
 void
