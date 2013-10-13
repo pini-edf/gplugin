@@ -884,7 +884,7 @@ gplugin_manager_class_init(GPluginManagerClass *klass) {
 	 *
 	 * Emitted before @plugin is loaded.
 	 *
-	 * Return TRUE to stop other handlers 
+	 * Return FALSE to stop loading
 	 */
 	signals[SIG_LOADING] =
 		g_signal_new("loading-plugin",
@@ -925,6 +925,8 @@ gplugin_manager_class_init(GPluginManagerClass *klass) {
 	 * @error: return address for a #gerror.
 	 *
 	 * emitted before a plugin is unloaded.
+	 *
+	 * Return FALSE to stop unloading
 	 */
 	signals[SIG_UNLOADING] =
 		g_signal_new("unloading-plugin",
