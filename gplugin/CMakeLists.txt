@@ -79,6 +79,9 @@ list(APPEND PRIVATE_HEADERS
 # Configure Files
 ###############################################################################
 configure_file(gplugin-version.h.in gplugin-version.h @ONLY)
+configure_file(gplugin.pc.in ${CMAKE_BINARY_DIR}/gplugin.pc @ONLY)
+configure_file(gplugin-uninstalled.pc.in ${CMAKE_BINARY_DIR}/gplugin-uninstalled.pc @ONLY)
+
 
 # build gplugin.h
 set(GPLUGIN_H_INCLUDES "")
@@ -237,4 +240,12 @@ foreach(HEADER ${GPLUGIN_PUBLIC_BUILT_HEADERS})
 		DESTINATION include/gplugin-1.0/gplugin
 	)
 endforeach(HEADER)
+
+# pkg-config files
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gplugin.pc DESTINATION lib/pkgconfig)
+
+###############################################################################
+# subdirectories
+###############################################################################
+add_subdirectory(tests)
 
