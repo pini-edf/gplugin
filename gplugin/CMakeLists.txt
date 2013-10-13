@@ -1,3 +1,5 @@
+add_subdirectory(utils)
+
 ###############################################################################
 # Library
 ###############################################################################
@@ -150,6 +152,7 @@ add_library(gplugin SHARED
 target_link_libraries(gplugin
 	${GLIB_LIBRARIES}
 	${GMODULE_LIBRARIES}
+	gplugin-utils
 )
 
 # nls

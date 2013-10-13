@@ -29,6 +29,8 @@
 
 #include <gplugin/gplugin-native.h>
 
+#include <gplugin/utils/gplugin-file-tree.h>
+
 /******************************************************************************
  * Enums
  *****************************************************************************/
@@ -43,11 +45,6 @@ enum {
 /******************************************************************************
  * Structs
  *****************************************************************************/
-typedef struct {
-	gchar *filename;
-	gchar *extension;
-} GPluginManagerTreeEntry;
-
 typedef struct {
 	GObject parent;
 
@@ -139,129 +136,6 @@ gplugin_manager_remove_list_value(gpointer k, gpointer v, gpointer d) {
 	g_slist_free((GSList *)v);
 
 	return TRUE;
-}
-
-/******************************************************************************
- * FileTree Stuff
- *****************************************************************************/
-static GPluginManagerTreeEntry *
-gplugin_manager_tree_entry_new(const gchar *filename) {
-	GPluginManagerTreeEntry *e = NULL;
-
-	e = g_slice_new(GPluginManagerTreeEntry);
-
-	e->filename = g_filename_to_utf8(filename, -1, NULL, NULL, NULL);
-
-	/* we have to use e->filename, because g_utf8_strrchr returns a pointer
-	 * in the string given too it, and not a new copy.
-	 */
-	e->extension = g_utf8_strrchr(e->filename, -1, g_utf8_get_char("."));
-
-	/* if we have an extension, we need to iterate past the . */
-	if(e->extension)
-		e->extension = g_utf8_next_char(e->extension);
-
-	return e;
-}
-
-static void
-gplugin_manager_tree_entry_free(GPluginManagerTreeEntry *e) {
-	if(!e)
-		return;
-
-	g_free(e->filename);
-
-	g_slice_free(GPluginManagerTreeEntry, e);
-
-	e = NULL;
-}
-
-/**
- * gplugin_manager_file_tree_new:
- *
- * Builds a GNode tree of consisting of a root node, whose children contain
- * an allocated string of a plugin directory.  The directory node's children
- * are GPluginManagerTreeEntry instances for the files in that directory.
- */
-static GNode *
-gplugin_manager_file_tree_new(void) {
-	GObject *obj = gplugin_manager_get_instance();
-	GPluginManager *manager = GPLUGIN_MANAGER(obj);
-	GList *iter = NULL;
-	GNode *root = NULL;
-
-	/* read all of the files from all of our paths and store then in a tree */
-	root = g_node_new(NULL);
-
-	for(iter = manager->paths->head; iter; iter = iter->next) {
-		GDir *d = NULL;
-		GError *error = NULL;
-		GNode *dir = NULL;
-		const gchar *path = (const gchar *)iter->data;
-		const gchar *filename = NULL;
-
-		d = g_dir_open(path, 0, &error);
-		if(error) {
-			g_debug(_("Failed to open %s: %s"),
-			        path,
-			        (error->message) ? error->message : _("unknown failure"));
-
-			g_error_free(error);
-			error = NULL;
-
-			continue;
-		}
-
-		/* insert the directory into the tree since we know it exists */
-		dir = g_node_new(g_strdup(path));
-		g_node_prepend(root, dir);
-
-		/* now run through all of the files and add them to the tree */
-		while((filename = g_dir_read_name(d)) != NULL) {
-			GNode *file = NULL;
-			GPluginManagerTreeEntry *entry = NULL;
-
-			entry = gplugin_manager_tree_entry_new(filename);
-
-			file = g_node_new(entry);
-
-			g_node_prepend(dir, file);
-		}
-
-		/* close the directory */
-		g_dir_close(d);
-	}
-
-	return root;
-}
-
-static gboolean
-gplugin_manager_file_tree_free_leaves(GNode *n, gpointer d) {
-	GPluginManagerTreeEntry *e = n->data;
-
-	gplugin_manager_tree_entry_free(e);
-
-	return FALSE;
-}
-
-static gboolean
-gplugin_manager_file_tree_free_nonleaves(GNode *n, gpointer d) {
-	g_free(n->data);
-
-	return FALSE;
-}
-
-static void
-gplugin_manager_file_tree_free(GNode *root) {
-	if (root->data) {
-		g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_LEAVES, -1,
-		                gplugin_manager_file_tree_free_leaves, NULL);
-
-		g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_NON_LEAVES, -1,
-		                gplugin_manager_file_tree_free_nonleaves, NULL);
-	}
-
-	g_node_destroy(root);
 }
 
 /******************************************************************************
@@ -441,7 +315,7 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 	GNode *root = NULL;
 
 	/* build a tree of all possible plugins */
-	root = gplugin_manager_file_tree_new();
+	root = gplugin_file_tree_new(manager->paths->head);
 
 	manager->refresh_needed = TRUE;
 
@@ -457,12 +331,12 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 			for(file = dir->children; file; file = file->next) {
 				GPluginPlugin *plugin = NULL;
 				GPluginLoader *loader = NULL;
-				GPluginManagerTreeEntry *e = NULL;
+				GPluginFileTreeEntry *e = NULL;
 				GError *error = NULL;
 				GSList *l = NULL;
 				gchar *filename = NULL;
 
-				e = (GPluginManagerTreeEntry *)file->data;
+				e = (GPluginFileTreeEntry *)file->data;
 
 				/* Build the path and see if we need to probe it! */
 				filename = g_build_filename(path, e->filename, NULL);
@@ -604,7 +478,7 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 	}
 
 	/* free the file tree */
-	gplugin_manager_file_tree_free(root);
+	gplugin_file_tree_free(root);
 }
 
 static GSList *
