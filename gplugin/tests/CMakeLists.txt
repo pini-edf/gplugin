@@ -62,7 +62,7 @@ add_custom_command(
 
 add_custom_command(
 	COMMAND ${XSLTPROC} -o ${GTESTER_JUNIT} --nonet
-			${CMAKE_CURRENT_SOURCE_DIR}/gtester-junit.xsl
+			${CMAKE_SOURCE_DIR}/xsl/gtester-junit.xsl
 			${GTESTER_LOG}
 	OUTPUT ${GTESTER_JUNIT}
 	DEPENDS ${GTESTER_LOG}
