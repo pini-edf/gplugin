@@ -21,8 +21,8 @@
 #endif
 #endif /* __GI_SCANNER__ */
 
-#ifndef GPLUGIN_PRIVATE_H
-#define GPLUGIN_PRIVATE_H
+#ifndef GPLUGIN_MANAGER_H
+#define GPLUGIN_MANAGER_H
 
 #include <glib.h>
 #include <glib-object.h>
@@ -31,14 +31,33 @@
 
 G_BEGIN_DECLS
 
-gchar *gplugin_plugin_get_internal_filename(GPluginPlugin *plugin);
+void gplugin_manager_append_path(const gchar *path);
+void gplugin_manager_prepend_path(const gchar *path);
+void gplugin_manager_remove_path(const gchar *path);
 
-void gplugin_manager_private_init(void);
-void gplugin_manager_private_uninit(void);
+void gplugin_manager_add_default_paths(void);
+void gplugin_manager_add_app_paths(const gchar *prefix, const gchar *appname);
 
-gboolean gplugin_boolean_accumulator(GSignalInvocationHint *hint, GValue *return_accu, const GValue *handler_return, gpointer data);
+GList *gplugin_manager_get_paths(void);
+
+void gplugin_manager_register_loader(GType type);
+void gplugin_manager_unregister_loader(GType type);
+
+void gplugin_manager_refresh(void);
+
+GSList *gplugin_manager_find_plugins(const gchar *id);
+void gplugin_manager_free_plugin_list(GSList *plugins_list);
+
+GPluginPlugin *gplugin_manager_find_plugin(const gchar *id);
+
+gboolean gplugin_manager_load_plugin(GPluginPlugin *plugin, GError **error);
+gboolean gplugin_manager_unload_plugin(GPluginPlugin *plugin, GError **error);
+
+GList *gplugin_manager_list_plugins(void);
+
+GObject *gplugin_manager_get_instance(void);
 
 G_END_DECLS
 
-#endif /* GPLUGIN_PRIVATE_H */
+#endif /* GPLUGIN_MANAGER_H */
 

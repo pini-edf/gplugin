@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gplugin-python-plugin-loader.h"
+#include "gplugin-python-loader.h"
 
 #include "gplugin-python-plugin.h"
 #include "gplugin-python-utils.h"
@@ -25,8 +25,8 @@
 #include <pygobject.h>
 #include <Python.h>
 
-#define GPLUGIN_PYTHON_PLUGIN_LOADER_GET_PRIVATE(obj) \
-	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_PYTHON_PLUGIN_LOADER, GPluginPythonPluginLoaderPrivate))
+#define GPLUGIN_PYTHON_LOADER_GET_PRIVATE(obj) \
+	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_PYTHON_LOADER, GPluginPythonLoaderPrivate))
 
 /******************************************************************************
  * Typedefs
@@ -34,7 +34,7 @@
 typedef struct {
 	guint gc_id;
 	PyThreadState *py_thread_state;
-} GPluginPythonPluginLoaderPrivate;
+} GPluginPythonLoaderPrivate;
 
 /******************************************************************************
  * Globals
@@ -43,10 +43,10 @@ static GObjectClass *parent_class = NULL;
 static GType type_real = 0;
 
 /******************************************************************************
- * GPluginPluginLoaderInterface API
+ * GPluginLoaderInterface API
  *****************************************************************************/
 static GPluginPlugin *
-gplugin_python_plugin_loader_query(GPluginPluginLoader *loader,
+gplugin_python_loader_query(GPluginLoader *loader,
                                    const gchar *filename,
                                    GError **error)
 {
@@ -175,7 +175,7 @@ gplugin_python_plugin_loader_query(GPluginPluginLoader *loader,
 }
 
 static gboolean
-gplugin_python_plugin_loader_load(GPluginPluginLoader *loader,
+gplugin_python_loader_load(GPluginLoader *loader,
                                   GPluginPlugin *plugin,
                                   GError **error)
 {
@@ -210,7 +210,7 @@ gplugin_python_plugin_loader_load(GPluginPluginLoader *loader,
 }
 
 static gboolean
-gplugin_python_plugin_loader_unload(GPluginPluginLoader *loader,
+gplugin_python_loader_unload(GPluginLoader *loader,
                                     GPluginPlugin *plugin,
                                     GError **error)
 {
@@ -251,7 +251,7 @@ gplugin_python_plugin_loader_unload(GPluginPluginLoader *loader,
  * Python Stuff
  *****************************************************************************/
 static gboolean
-gplugin_python_plugin_loader_init_pygobject(void) {
+gplugin_python_loader_init_pygobject(void) {
 	pygobject_init(3, 0, 0);
 	if(PyErr_Occurred()) {
 		g_warning("Failed to initialize PyGObject");
@@ -270,7 +270,7 @@ gplugin_python_plugin_loader_init_pygobject(void) {
 }
 
 static gboolean
-gplugin_python_plugin_loader_init_gettext(void) {
+gplugin_python_loader_init_gettext(void) {
 	PyObject *module_dict = NULL, *install = NULL;
 	PyObject *gettext = NULL, *gettext_args = NULL;
 
@@ -291,7 +291,7 @@ gplugin_python_plugin_loader_init_gettext(void) {
 }
 
 static gboolean
-gplugin_python_plugin_loader_init_python(void) {
+gplugin_python_loader_init_python(void) {
 	const gchar *program = NULL;
 	const gchar *argv[] = { "", NULL };
 
@@ -314,8 +314,8 @@ gplugin_python_plugin_loader_init_python(void) {
 #endif
 
 	/* initialize pygobject */
-	if(gplugin_python_plugin_loader_init_pygobject()) {
-		if(gplugin_python_plugin_loader_init_gettext()) {
+	if(gplugin_python_loader_init_pygobject()) {
+		if(gplugin_python_loader_init_gettext()) {
 			return TRUE;
 		}
 	}
@@ -327,63 +327,63 @@ gplugin_python_plugin_loader_init_python(void) {
  * Object Stuff
  *****************************************************************************/
 static void
-gplugin_python_plugin_loader_finalize(GObject *obj) {
+gplugin_python_loader_finalize(GObject *obj) {
 #if 0
-	GPluginPythonPluginLoaderPrivate *priv =
-		GPLUGIN_PYTHON_PLUGIN_LOADER_GET_PRIVATE(obj);
+	GPluginPythonLoaderPrivate *priv =
+		GPLUGIN_PYTHON_LOADER_GET_PRIVATE(obj);
 #endif
 
 	G_OBJECT_CLASS(parent_class)->finalize(obj);
 }
 
 static void
-gplugin_python_plugin_loader_class_init(GPluginPythonPluginLoaderClass *klass) {
+gplugin_python_loader_class_init(GPluginPythonLoaderClass *klass) {
 	GObjectClass *obj_class = G_OBJECT_CLASS(klass);
-	GPluginPluginLoaderClass *loader_class =
-		GPLUGIN_PLUGIN_LOADER_CLASS(klass);
+	GPluginLoaderClass *loader_class =
+		GPLUGIN_LOADER_CLASS(klass);
 
 	parent_class = g_type_class_peek_parent(klass);
 
-	g_type_class_add_private(klass, sizeof(GPluginPythonPluginLoaderPrivate));
+	g_type_class_add_private(klass, sizeof(GPluginPythonLoaderPrivate));
 
-	obj_class->finalize = gplugin_python_plugin_loader_finalize;
+	obj_class->finalize = gplugin_python_loader_finalize;
 
 	loader_class->supported_extensions = g_slist_append(NULL, "py");
-	loader_class->query = gplugin_python_plugin_loader_query;
-	loader_class->load = gplugin_python_plugin_loader_load;
-	loader_class->unload = gplugin_python_plugin_loader_unload;
+	loader_class->query = gplugin_python_loader_query;
+	loader_class->load = gplugin_python_loader_load;
+	loader_class->unload = gplugin_python_loader_unload;
 }
 
 /******************************************************************************
  * API
  *****************************************************************************/
 void
-gplugin_python_plugin_loader_register(GPluginNativePlugin *plugin) {
+gplugin_python_loader_register(GPluginNativePlugin *plugin) {
 	if(g_once_init_enter(&type_real)) {
 		GType type = 0;
 
 		static const GTypeInfo info = {
-			.class_size = sizeof(GPluginPythonPluginLoaderClass),
-			.class_init = (GClassInitFunc)gplugin_python_plugin_loader_class_init,
-			.instance_size = sizeof(GPluginPythonPluginLoader),
+			.class_size = sizeof(GPluginPythonLoaderClass),
+			.class_init = (GClassInitFunc)gplugin_python_loader_class_init,
+			.instance_size = sizeof(GPluginPythonLoader),
 		};
 
 		type = gplugin_native_plugin_register_type(plugin,
-		                                           GPLUGIN_TYPE_PLUGIN_LOADER,
-		                                           "GPluginPythonPluginLoader",
+		                                           GPLUGIN_TYPE_LOADER,
+		                                           "GPluginPythonLoader",
 		                                           &info,
 		                                           0);
 
-		gplugin_python_plugin_loader_init_python();
+		gplugin_python_loader_init_python();
 
 		g_once_init_leave(&type_real, type);
 	}
 }
 
 GType
-gplugin_python_plugin_loader_get_type(void) {
+gplugin_python_loader_get_type(void) {
 	if(G_UNLIKELY(type_real == 0)) {
-		g_warning("gplugin_python_plugin_loader_get_type was called before "
+		g_warning("gplugin_python_loader_get_type was called before "
 		          "the type was registered!\n");
 	}
 

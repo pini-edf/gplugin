@@ -73,7 +73,7 @@ output_plugin(const gchar *id) {
 	#define MAIN_FORMAT MAIN_FORMAT_NEL "%s\n"
 	#define STR_OR_EMPTY(str) ((str) ? (str) : "")
 
-	plugins = gplugin_plugin_manager_find_plugins(id);
+	plugins = gplugin_manager_find_plugins(id);
 	if(plugins == NULL) {
 		printf("%s not found\n", id);
 
@@ -148,7 +148,7 @@ output_plugin(const gchar *id) {
 			       STR_OR_EMPTY(gplugin_plugin_get_filename(plugin)));
 		}
 		if(verbosity > 2) {
-			GPluginPluginLoader *loader = gplugin_plugin_get_loader(plugin);
+			GPluginLoader *loader = gplugin_plugin_get_loader(plugin);
 
 			printf(MAIN_FORMAT_NEL "%08x\n", "abi version", abi_version);
 			printf(MAIN_FORMAT, "internal", (internal) ? "yes" : "no");
@@ -190,7 +190,7 @@ output_plugin(const gchar *id) {
 			first = FALSE;
 	}
 
-	gplugin_plugin_manager_free_plugin_list(plugins);
+	gplugin_manager_free_plugin_list(plugins);
 
 	return TRUE;
 }
@@ -269,16 +269,16 @@ main(gint argc, gchar **argv) {
 
 	/* add the default gplugin paths unless asked not to */
 	if(add_default_paths)
-		gplugin_plugin_manager_add_default_paths();
+		gplugin_manager_add_default_paths();
 
 	/* now add any paths the user provided */
 	if(paths) {
 		/* go through the paths and add them to the plugin manager */
 		for(i = 0; paths[i]; i++)
-			gplugin_plugin_manager_prepend_path(paths[i]);
+			gplugin_manager_prepend_path(paths[i]);
 	}
 
-	gplugin_plugin_manager_refresh();
+	gplugin_manager_refresh();
 
 	/* check if the user gave us atleast one plugin, and output them */
 	if(argc > 1) {
@@ -297,7 +297,7 @@ main(gint argc, gchar **argv) {
 		if(!output_plugins(plugins->head))
 			ret = EXIT_FAILURE;
 	} else {
-		GList *plugins = gplugin_plugin_manager_list_plugins();
+		GList *plugins = gplugin_manager_list_plugins();
 
 		if(!output_plugins(plugins))
 			ret = EXIT_FAILURE;

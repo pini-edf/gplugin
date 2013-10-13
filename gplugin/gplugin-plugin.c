@@ -43,7 +43,7 @@
 typedef struct {
 	gchar *filename;
 
-	GPluginPluginLoader *loader;
+	GPluginLoader *loader;
 	GPluginPluginInfo *info;
 
 	GPluginPluginState state;
@@ -87,13 +87,13 @@ gplugin_plugin_set_filename(GPluginPlugin *plugin, const gchar *filename) {
 }
 
 static void
-gplugin_plugin_set_loader(GPluginPlugin *plugin, GPluginPluginLoader *loader) {
+gplugin_plugin_set_loader(GPluginPlugin *plugin, GPluginLoader *loader) {
 	GPluginPluginPrivate *priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
 
 	if(priv->loader)
 		g_object_unref(G_OBJECT(priv->loader));
 
-	if(GPLUGIN_IS_PLUGIN_LOADER(loader))
+	if(GPLUGIN_IS_LOADER(loader))
 		priv->loader = g_object_ref(G_OBJECT(loader));
 	else
 		priv->loader = NULL;
@@ -208,12 +208,12 @@ gplugin_plugin_class_init(GPluginPluginClass *klass) {
 	/**
 	 * GPluginPlugin:loader:
 	 *
-	 * The #GPluginPluginLoader that loaded this plugin.
+	 * The #GPluginLoader that loaded this plugin.
 	 */
 	g_object_class_install_property(obj_class, PROP_LOADER,
 		g_param_spec_object("loader", "loader",
 		                    "The loader for this plugin",
-		                    GPLUGIN_TYPE_PLUGIN_LOADER,
+		                    GPLUGIN_TYPE_LOADER,
 		                    G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
 
 	/**
@@ -306,9 +306,9 @@ gplugin_plugin_get_filename(const GPluginPlugin *plugin) {
  * gplugin_plugin_get_loader:
  * @plugin: #GPluginPlugin instance
  *
- * Return Value: (transfer none): The #GPluginPluginLoader that loaded @plugin
+ * Return Value: (transfer none): The #GPluginLoader that loaded @plugin
  */
-GPluginPluginLoader *
+GPluginLoader *
 gplugin_plugin_get_loader(const GPluginPlugin *plugin) {
 	GPluginPluginPrivate *priv = NULL;
 

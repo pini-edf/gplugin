@@ -18,8 +18,8 @@
 #include <gplugin.h>
 #include <gplugin-native.h>
 
+#include "gplugin-perl-loader.h"
 #include "gplugin-perl-plugin.h"
-#include "gplugin-perl-plugin-loader.h"
 
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(GError **error) {
@@ -51,7 +51,7 @@ gplugin_plugin_load(GPluginNativePlugin *plugin, GError **error) {
 	gplugin_perl_plugin_register(plugin);
 	gplugin_perl_plugin_loader_register(plugin);
 
-	gplugin_plugin_manager_register_loader(GPLUGIN_TYPE_PERL_PLUGIN_LOADER);
+	gplugin_manager_register_loader(GPLUGIN_TYPE_PERL_PLUGIN_LOADER);
 
 	return TRUE;
 }

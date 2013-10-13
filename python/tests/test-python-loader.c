@@ -30,7 +30,7 @@ test_full(void) {
 	const gchar * const r_authors[] = { "author1", NULL };
 	gint i;
 
-	plugin = gplugin_plugin_manager_find_plugin(id);
+	plugin = gplugin_manager_find_plugin(id);
 	g_assert(plugin != NULL);
 
 	info = gplugin_plugin_get_info(plugin);
@@ -58,12 +58,12 @@ test_full(void) {
 	g_assert_cmpint(GPLUGIN_PLUGIN_STATE_QUERIED, ==,
 	                gplugin_plugin_get_state(plugin));
 
-	gplugin_plugin_manager_load_plugin(plugin, &error);
+	gplugin_manager_load_plugin(plugin, &error);
 	g_assert_no_error(error);
 	g_assert_cmpint(GPLUGIN_PLUGIN_STATE_LOADED, ==,
 	                gplugin_plugin_get_state(plugin));
 
-	gplugin_plugin_manager_unload_plugin(plugin, &error);
+	gplugin_manager_unload_plugin(plugin, &error);
 	g_assert_no_error(error);
 	g_assert_cmpint(GPLUGIN_PLUGIN_STATE_QUERIED, ==,
 	                gplugin_plugin_get_state(plugin));
@@ -77,10 +77,10 @@ test_load_failed(void) {
 	GError *error = NULL;
 	gboolean ret = FALSE;
 
-	plugin = gplugin_plugin_manager_find_plugin("gplugin-python/load-failed");
+	plugin = gplugin_manager_find_plugin("gplugin-python/load-failed");
 	g_assert(plugin != NULL);
 
-	ret = gplugin_plugin_manager_load_plugin(plugin, &error);
+	ret = gplugin_manager_load_plugin(plugin, &error);
 	g_assert(ret == FALSE);
 	g_assert_error(error, GPLUGIN_DOMAIN, 0);
 
@@ -93,10 +93,10 @@ test_load_exception(void) {
 	GError *error = NULL;
 	gboolean ret = FALSE;
 
-	plugin = gplugin_plugin_manager_find_plugin("gplugin-python/load-exception");
+	plugin = gplugin_manager_find_plugin("gplugin-python/load-exception");
 	g_assert(plugin != NULL);
 
-	ret = gplugin_plugin_manager_load_plugin(plugin, &error);
+	ret = gplugin_manager_load_plugin(plugin, &error);
 	g_assert(ret == FALSE);
 	g_assert_error(error, GPLUGIN_DOMAIN, 0);
 
@@ -109,16 +109,16 @@ test_unload_failed(void) {
 	GError *error = NULL;
 	gboolean ret = FALSE;
 
-	plugin = gplugin_plugin_manager_find_plugin("gplugin-python/unload-failed");
+	plugin = gplugin_manager_find_plugin("gplugin-python/unload-failed");
 	g_assert(plugin != NULL);
 
-	ret = gplugin_plugin_manager_load_plugin(plugin, &error);
+	ret = gplugin_manager_load_plugin(plugin, &error);
 	if(error)
 		printf("error: %s\n", error->message);
 	g_assert_no_error(error);
 	g_assert(ret == TRUE);
 
-	ret = gplugin_plugin_manager_unload_plugin(plugin, &error);
+	ret = gplugin_manager_unload_plugin(plugin, &error);
 	g_assert(ret == FALSE);
 	g_assert_error(error, GPLUGIN_DOMAIN, 0);
 
@@ -134,7 +134,7 @@ test_dependencies(void) {
 	const gchar * const r_deps[] = { "dep1", "dep2", NULL };
 	gint i;
 
-	plugin = gplugin_plugin_manager_find_plugin(id);
+	plugin = gplugin_manager_find_plugin(id);
 	g_assert(plugin != NULL);
 
 	info = gplugin_plugin_get_info(plugin);
@@ -161,10 +161,10 @@ main(gint argc, gchar **argv) {
 
 	g_setenv("GI_TYPELIB_PATH", GI_TYPELIB_PATH, TRUE);
 
-	gplugin_plugin_manager_append_path(PYTHON_LOADER_DIR);
-	gplugin_plugin_manager_append_path(PYTHON_PLUGIN_DIR);
+	gplugin_manager_append_path(PYTHON_LOADER_DIR);
+	gplugin_manager_append_path(PYTHON_PLUGIN_DIR);
 
-	gplugin_plugin_manager_refresh();
+	gplugin_manager_refresh();
 
 	g_test_add_func("/loaders/python/full", test_full);
 	g_test_add_func("/loaders/python/load-failed", test_load_failed);

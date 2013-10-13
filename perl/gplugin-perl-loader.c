@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gplugin-perl-plugin-loader.h"
+#include "gplugin-perl-loader.h"
 
 #include <EXTERN.h>
 #include <perl.h>
@@ -26,15 +26,15 @@
 #undef _
 #include <glib/gi18n.h>
 
-#define GPLUGIN_PERL_PLUGIN_LOADER_GET_PRIVATE(obj) \
-	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_PERL_PLUGIN_LOADER, GPluginPerlPluginLoaderPrivate))
+#define GPLUGIN_PERL_LOADER_GET_PRIVATE(obj) \
+	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_PERL_LOADER, GPluginPerlLoaderPrivate))
 
 /******************************************************************************
  * Typedefs
  *****************************************************************************/
 typedef struct {
 	gint dummy;
-} GPluginPerlPluginLoaderPrivate;
+} GPluginPerlLoaderPrivate;
 
 /******************************************************************************
  * Globals
@@ -46,10 +46,10 @@ static volatile GType type_real = 0;
 static PerlInterpreter *my_perl = NULL;
 
 /******************************************************************************
- * GPluginPluginLoaderInterface API
+ * GPluginLoaderInterface API
  *****************************************************************************/
 static GPluginPlugin *
-gplugin_perl_plugin_loader_query(GPluginPluginLoader *loader,
+gplugin_perl_loader_query(GPluginLoader *loader,
                                    const gchar *filename,
                                    GError **error)
 {
@@ -65,7 +65,7 @@ gplugin_perl_plugin_loader_query(GPluginPluginLoader *loader,
 }
 
 static gboolean
-gplugin_perl_plugin_loader_load(GPluginPluginLoader *loader,
+gplugin_perl_loader_load(GPluginLoader *loader,
                                   GPluginPlugin *plugin,
                                   GError **error)
 {
@@ -73,7 +73,7 @@ gplugin_perl_plugin_loader_load(GPluginPluginLoader *loader,
 }
 
 static gboolean
-gplugin_perl_plugin_loader_unload(GPluginPluginLoader *loader,
+gplugin_perl_loader_unload(GPluginLoader *loader,
                                     GPluginPlugin *plugin,
                                     GError **error)
 {
@@ -84,7 +84,7 @@ gplugin_perl_plugin_loader_unload(GPluginPluginLoader *loader,
  * Perl Stuff
  *****************************************************************************/
 static void
-gplugin_perl_plugin_loader_init_perl(void) {
+gplugin_perl_loader_init_perl(void) {
 	gchar *args[] = { "", };
 	gchar **argv = (gchar **)args;
 	gint argc = 1;
@@ -98,7 +98,7 @@ gplugin_perl_plugin_loader_init_perl(void) {
 }
 
 static void
-gplugin_perl_plugin_loader_uninit_perl(void) {
+gplugin_perl_loader_uninit_perl(void) {
 	PERL_SYS_TERM();
 
 	perl_destruct(my_perl);
@@ -110,50 +110,49 @@ gplugin_perl_plugin_loader_uninit_perl(void) {
  * Object Stuff
  *****************************************************************************/
 static void
-gplugin_perl_plugin_loader_class_init(GPluginPerlPluginLoaderClass *klass) {
+gplugin_perl_loader_class_init(GPluginPerlLoaderClass *klass) {
 	GObjectClass *obj_class = G_OBJECT_CLASS(klass);
-	GPluginPluginLoaderClass *loader_class =
-		GPLUGIN_PLUGIN_LOADER_CLASS(klass);
+	GPluginLoaderClass *loader_class = GPLUGIN_LOADER_CLASS(klass);
 
 	parent_class = g_type_class_peek_parent(klass);
 
-	g_type_class_add_private(klass, sizeof(GPluginPerlPluginLoaderPrivate));
+	g_type_class_add_private(klass, sizeof(GPluginPerlLoaderPrivate));
 
 	loader_class->supported_extensions = g_slist_append(NULL, "pl");
-	loader_class->query = gplugin_perl_plugin_loader_query;
-	loader_class->load = gplugin_perl_plugin_loader_load;
-	loader_class->unload = gplugin_perl_plugin_loader_unload;
+	loader_class->query = gplugin_perl_loader_query;
+	loader_class->load = gplugin_perl_loader_load;
+	loader_class->unload = gplugin_perl_loader_unload;
 
 	/* perl initialization */
-	gplugin_perl_plugin_loader_init_perl();
+	gplugin_perl_loader_init_perl();
 }
 
 static void
-gplugin_perl_plugin_loader_class_finalize(GPluginPerlPluginLoaderClass *klass,
+gplugin_perl_loader_class_finalize(GPluginPerlLoaderClass *klass,
                                           gpointer class_data)
 {
 	/* perl uninitialization */
-	gplugin_perl_plugin_loader_uninit_perl();
+	gplugin_perl_loader_uninit_perl();
 }
 
 /******************************************************************************
  * API
  *****************************************************************************/
 void
-gplugin_perl_plugin_loader_register(GPluginNativePlugin *plugin) {
+gplugin_perl_loader_register(GPluginNativePlugin *plugin) {
 	if(g_once_init_enter(&type_real)) {
 		GType type = 0;
 
 		static const GTypeInfo info = {
-			.class_size = sizeof(GPluginPerlPluginLoaderClass),
-			.class_init = (GClassInitFunc)gplugin_perl_plugin_loader_class_init,
-			.class_finalize = (GClassFinalizeFunc)gplugin_perl_plugin_loader_class_finalize,
-			.instance_size = sizeof(GPluginPerlPluginLoader),
+			.class_size = sizeof(GPluginPerlLoaderClass),
+			.class_init = (GClassInitFunc)gplugin_perl_loader_class_init,
+			.class_finalize = (GClassFinalizeFunc)gplugin_perl_loader_class_finalize,
+			.instance_size = sizeof(GPluginPerlLoader),
 		};
 
 		type = gplugin_native_plugin_register_type(plugin,
-		                                           GPLUGIN_TYPE_PLUGIN_LOADER,
-		                                           "GPluginPerlPluginLoader",
+		                                           GPLUGIN_TYPE_LOADER,
+		                                           "GPluginPerlLoader",
 		                                           &info,
 		                                           0);
 
@@ -162,9 +161,9 @@ gplugin_perl_plugin_loader_register(GPluginNativePlugin *plugin) {
 }
 
 GType
-gplugin_perl_plugin_loader_get_type(void) {
+gplugin_perl_loader_get_type(void) {
 	if(G_UNLIKELY(type_real == 0)) {
-		g_warning("gplugin_perl_plugin_loader_get_type was called before "
+		g_warning("gplugin_perl_loader_get_type was called before "
 		          "the type was registered!\n");
 	}
 

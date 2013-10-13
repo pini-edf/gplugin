@@ -17,7 +17,7 @@
 
 #include <gplugin/gplugin-core.h>
 
-#include <gplugin/gplugin-native-plugin-loader.h>
+#include <gplugin/gplugin-native-loader.h>
 #include <gplugin/gplugin-native-plugin.h>
 #include <gplugin/gplugin-native-private.h>
 
@@ -33,7 +33,7 @@
  * Helpers
  *****************************************************************************/
 static gpointer
-gplugin_native_plugin_loader_lookup_symbol(GModule *module,
+gplugin_native_loader_lookup_symbol(GModule *module,
                                            const gchar *name, GError **error)
 {
 	gpointer symbol = NULL;
@@ -54,7 +54,7 @@ gplugin_native_plugin_loader_lookup_symbol(GModule *module,
 }
 
 static GModule *
-gplugin_native_plugin_loader_open(const gchar *filename, GError **error) {
+gplugin_native_loader_open(const gchar *filename, GError **error) {
 	GModule *module = NULL;
 
 	module = g_module_open(filename, 0);
@@ -73,10 +73,10 @@ gplugin_native_plugin_loader_open(const gchar *filename, GError **error) {
 }
 
 /******************************************************************************
- * GPluginPluginLoaderInterface API
+ * GPluginLoaderInterface API
  *****************************************************************************/
 static GPluginPlugin *
-gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
+gplugin_native_loader_query(GPluginLoader *loader,
                                    const gchar *filename,
                                    GError **error)
 {
@@ -88,12 +88,12 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	GModule *module = NULL;
 
 	/* open the file via gmodule */
-	module = gplugin_native_plugin_loader_open(filename, error);
+	module = gplugin_native_loader_open(filename, error);
 	if(!module)
 		return NULL;
 
 	/* now look for the query symbol */
-	query = gplugin_native_plugin_loader_lookup_symbol(module,
+	query = gplugin_native_loader_lookup_symbol(module,
 	                                                   GPLUGIN_QUERY_SYMBOL,
 	                                                   error);
 	if((query == NULL) || (error && *error)) {
@@ -102,7 +102,7 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	}
 
 	/* now look for the load symbol */
-	load = gplugin_native_plugin_loader_lookup_symbol(module,
+	load = gplugin_native_loader_lookup_symbol(module,
 	                                                  GPLUGIN_LOAD_SYMBOL,
 	                                                  error);
 	if(error && *error) {
@@ -111,7 +111,7 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 	}
 
 	/* now look for the unload symbol */
-	unload = gplugin_native_plugin_loader_lookup_symbol(module,
+	unload = gplugin_native_loader_lookup_symbol(module,
 	                                                    GPLUGIN_UNLOAD_SYMBOL,
 	                                                    error);
 	if(error && *error) {
@@ -169,7 +169,7 @@ gplugin_native_plugin_loader_query(GPluginPluginLoader *loader,
 }
 
 static gboolean
-gplugin_native_plugin_loader_load(GPluginPluginLoader *loader,
+gplugin_native_loader_load(GPluginLoader *loader,
                                   GPluginPlugin *plugin,
                                   GError **error)
 {
@@ -180,7 +180,7 @@ gplugin_native_plugin_loader_load(GPluginPluginLoader *loader,
 }
 
 static gboolean
-gplugin_native_plugin_loader_unload(GPluginPluginLoader *loader,
+gplugin_native_loader_unload(GPluginLoader *loader,
                                     GPluginPlugin *plugin,
                                     GError **error)
 {
@@ -191,34 +191,34 @@ gplugin_native_plugin_loader_unload(GPluginPluginLoader *loader,
 }
 
 static void
-gplugin_native_plugin_loader_class_init(GPluginNativePluginLoaderClass *klass) {
-	GPluginPluginLoaderClass *loader_class =
-		GPLUGIN_PLUGIN_LOADER_CLASS(klass);
+gplugin_native_loader_class_init(GPluginNativeLoaderClass *klass) {
+	GPluginLoaderClass *loader_class =
+		GPLUGIN_LOADER_CLASS(klass);
 
 	loader_class->supported_extensions = g_slist_append(NULL, G_MODULE_SUFFIX);
-	loader_class->query = gplugin_native_plugin_loader_query;
-	loader_class->load = gplugin_native_plugin_loader_load;
-	loader_class->unload = gplugin_native_plugin_loader_unload;
+	loader_class->query = gplugin_native_loader_query;
+	loader_class->load = gplugin_native_loader_load;
+	loader_class->unload = gplugin_native_loader_unload;
 }
 
 /******************************************************************************
  * API
  *****************************************************************************/
 GType
-gplugin_native_plugin_loader_get_type(void) {
+gplugin_native_loader_get_type(void) {
 	static volatile gsize type_volatile = 0;
 
 	if(g_once_init_enter(&type_volatile)) {
 		 GType type = 0;
 
 		static const GTypeInfo info = {
-			.class_size = sizeof(GPluginNativePluginLoaderClass),
-			.class_init = (GClassInitFunc)gplugin_native_plugin_loader_class_init,
-			.instance_size = sizeof(GPluginNativePluginLoader),
+			.class_size = sizeof(GPluginNativeLoaderClass),
+			.class_init = (GClassInitFunc)gplugin_native_loader_class_init,
+			.instance_size = sizeof(GPluginNativeLoader),
 		};
 
-		type = g_type_register_static(GPLUGIN_TYPE_PLUGIN_LOADER,
-		                              "GPluginNativePluginLoader",
+		type = g_type_register_static(GPLUGIN_TYPE_LOADER,
+		                              "GPluginNativeLoader",
 		                              &info, 0);
 
 		g_once_init_leave(&type_volatile, type);

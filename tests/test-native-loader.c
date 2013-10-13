@@ -53,13 +53,13 @@ test_basic_plugin_load(void) {
 	const gchar * const *strv = NULL;
 
 	/* add the test directory to the plugin manager's search paths */
-	gplugin_plugin_manager_append_path(TEST_DIR);
+	gplugin_manager_append_path(TEST_DIR);
 
 	/* refresh the plugin manager */
-	gplugin_plugin_manager_refresh();
+	gplugin_manager_refresh();
 
 	/* now look for the plugin */
-	plugins = gplugin_plugin_manager_find_plugins("gplugin/basic-native-plugin");
+	plugins = gplugin_manager_find_plugins("gplugin/basic-native-plugin");
 	g_assert(plugins != NULL);
 
 	/* now iterate through the plugins (we really only should have one...) */
@@ -93,19 +93,19 @@ test_basic_plugin_load(void) {
 
 		g_object_unref(G_OBJECT(info));
 
-		g_assert(gplugin_plugin_manager_load_plugin(plugin, &error));
+		g_assert(gplugin_manager_load_plugin(plugin, &error));
 
 		state = gplugin_plugin_get_state(plugin);
 		g_assert_cmpint(state, ==, GPLUGIN_PLUGIN_STATE_LOADED);
 
-		g_assert(gplugin_plugin_manager_unload_plugin(plugin, &error));
+		g_assert(gplugin_manager_unload_plugin(plugin, &error));
 
 		state = gplugin_plugin_get_state(plugin);
 		g_assert_cmpint(state, !=, GPLUGIN_PLUGIN_STATE_LOADED);
 	}
 
 	/* make sure the free function works too */
-	gplugin_plugin_manager_free_plugin_list(plugins);
+	gplugin_manager_free_plugin_list(plugins);
 }
 
 static void
@@ -115,27 +115,27 @@ test_dependent_plugin_load(void) {
 	GError *error = NULL;
 
 	/* add the test directory to the plugin manager's search paths */
-	gplugin_plugin_manager_append_path(TEST_DIR);
+	gplugin_manager_append_path(TEST_DIR);
 
 	/* refresh the plugin manager */
-	gplugin_plugin_manager_refresh();
+	gplugin_manager_refresh();
 
 	/* find the parent plugin and make sure it isn't loaded */
-	parent = gplugin_plugin_manager_find_plugin("gplugin/basic-native-plugin");
+	parent = gplugin_manager_find_plugin("gplugin/basic-native-plugin");
 	g_assert(parent != NULL);
 
 	state = gplugin_plugin_get_state(parent);
 	g_assert_cmpint(state, !=, GPLUGIN_PLUGIN_STATE_LOADED);
 
 	/* find the dependent plugin and make sure it isn't loaded */
-	dependent = gplugin_plugin_manager_find_plugin("gplugin/dependent-native-plugin");
+	dependent = gplugin_manager_find_plugin("gplugin/dependent-native-plugin");
 	g_assert(dependent != NULL);
 
 	state = gplugin_plugin_get_state(dependent);
 	g_assert_cmpint(state, !=, GPLUGIN_PLUGIN_STATE_LOADED);
 
 	/* now load the dependent plugin */
-	g_assert(gplugin_plugin_manager_load_plugin(dependent, &error));
+	g_assert(gplugin_manager_load_plugin(dependent, &error));
 	g_assert_no_error(error);
 
 	/* make sure the parent plugin got loaded too */
@@ -150,21 +150,21 @@ test_broken_depend_plugin_load(void) {
 	GError *error = NULL;
 
 	/* add the test directory to the plugin manager's search paths */
-	gplugin_plugin_manager_append_path(TEST_DIR);
+	gplugin_manager_append_path(TEST_DIR);
 
 	/* refresh the plugin manager */
-	gplugin_plugin_manager_refresh();
+	gplugin_manager_refresh();
 
 	/* find the dependent plugin and make sure it isn't loaded */
 	plugin =
-		gplugin_plugin_manager_find_plugin("gplugin/broken-dependent-native-plugin");
+		gplugin_manager_find_plugin("gplugin/broken-dependent-native-plugin");
 	g_assert(plugin != NULL);
 
 	state = gplugin_plugin_get_state(plugin);
 	g_assert_cmpint(state, !=, GPLUGIN_PLUGIN_STATE_LOADED);
 
 	/* now attempt to load the dependent plugin, it's supposed to fail */
-	g_assert(!gplugin_plugin_manager_load_plugin(plugin, &error));
+	g_assert(!gplugin_manager_load_plugin(plugin, &error));
 }
 
 /******************************************************************************
@@ -176,13 +176,13 @@ test_query_error(void) {
 
 	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
 		/* add the test directory to the plugin manager's search paths */
-		gplugin_plugin_manager_append_path(TEST_BAD_DIR);
+		gplugin_manager_append_path(TEST_BAD_DIR);
 
 		/* refresh the plugin manager */
-		gplugin_plugin_manager_refresh();
+		gplugin_manager_refresh();
 
 		/* find the query-error plugin */
-		plugin = gplugin_plugin_manager_find_plugin("gplugin/query-error");
+		plugin = gplugin_manager_find_plugin("gplugin/query-error");
 		g_assert(plugin == NULL);
 	}
 
@@ -196,16 +196,16 @@ test_load_error(void) {
 
 	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
 		/* add the test directory to the plugin manager's search paths */
-		gplugin_plugin_manager_append_path(TEST_BAD_DIR);
+		gplugin_manager_append_path(TEST_BAD_DIR);
 
 		/* refresh the plugin manager */
-		gplugin_plugin_manager_refresh();
+		gplugin_manager_refresh();
 
 		/* find the query-error plugin */
-		plugin = gplugin_plugin_manager_find_plugin("gplugin/load-error");
+		plugin = gplugin_manager_find_plugin("gplugin/load-error");
 		g_assert(plugin == NULL);
 
-		g_assert(gplugin_plugin_manager_load_plugin(plugin, &error));
+		g_assert(gplugin_manager_load_plugin(plugin, &error));
 		g_assert_no_error(error);
 	}
 
@@ -219,19 +219,19 @@ test_unload_error(void) {
 
 	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
 		/* add the test directory to the plugin manager's search paths */
-		gplugin_plugin_manager_append_path(TEST_BAD_DIR);
+		gplugin_manager_append_path(TEST_BAD_DIR);
 
 		/* refresh the plugin manager */
-		gplugin_plugin_manager_refresh();
+		gplugin_manager_refresh();
 
 		/* find the query-error plugin */
-		plugin = gplugin_plugin_manager_find_plugin("gplugin/unload-error");
+		plugin = gplugin_manager_find_plugin("gplugin/unload-error");
 		g_assert(plugin == NULL);
 
-		g_assert(!gplugin_plugin_manager_load_plugin(plugin, &error));
+		g_assert(!gplugin_manager_load_plugin(plugin, &error));
 		g_assert_error(error, GPLUGIN_DOMAIN, 0);
 
-		g_assert(gplugin_plugin_manager_unload_plugin(plugin, &error));
+		g_assert(gplugin_manager_unload_plugin(plugin, &error));
 		g_assert_no_error(error);
 	}
 
@@ -243,15 +243,15 @@ static void
 test_id_collision(void) {
 	GSList *plugins = NULL;
 
-	gplugin_plugin_manager_append_path(TEST_ID_DIR);
-	gplugin_plugin_manager_refresh();
+	gplugin_manager_append_path(TEST_ID_DIR);
+	gplugin_manager_refresh();
 
-	plugins = gplugin_plugin_manager_find_plugins("gplugin/id-collision");
+	plugins = gplugin_manager_find_plugins("gplugin/id-collision");
 	g_assert(plugins);
 
 	g_assert(g_slist_length(plugins) == 2);
 
-	gplugin_plugin_manager_free_plugin_list(plugins);
+	gplugin_manager_free_plugin_list(plugins);
 }
 
 /* load on query */
@@ -259,10 +259,10 @@ static void
 test_load_on_query(void) {
 	GPluginPlugin *plugin = NULL;
 
-	gplugin_plugin_manager_append_path(TEST_DIR);
-	gplugin_plugin_manager_refresh();
+	gplugin_manager_append_path(TEST_DIR);
+	gplugin_manager_refresh();
 
-	plugin = gplugin_plugin_manager_find_plugin("gplugin/load-on-query");
+	plugin = gplugin_manager_find_plugin("gplugin/load-on-query");
 	g_assert(plugin);
 
 	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
@@ -274,10 +274,10 @@ test_load_on_query_fail(void) {
 	GPluginPlugin *plugin = NULL;
 
 	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
-		gplugin_plugin_manager_append_path(TEST_LOAD_DIR);
-		gplugin_plugin_manager_refresh();
+		gplugin_manager_append_path(TEST_LOAD_DIR);
+		gplugin_manager_refresh();
 
-		plugin = gplugin_plugin_manager_find_plugin("gplugin/load-on-query-fail");
+		plugin = gplugin_manager_find_plugin("gplugin/load-on-query-fail");
 		g_assert(plugin);
 
 		g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,

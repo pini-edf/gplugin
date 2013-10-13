@@ -37,7 +37,7 @@ typedef struct _GPluginPluginInfoClass      GPluginPluginInfoClass;
 #include <glib.h>
 #include <glib-object.h>
 
-#include <gplugin/gplugin-plugin-loader.h>
+#include <gplugin/gplugin-loader.h>
 #include <gplugin/gplugin-version.h>
 
 struct _GPluginPluginInfo {

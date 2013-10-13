@@ -10,13 +10,13 @@ if(BUILD_PERL)
 	if(PERLLIBS_FOUND)
 		set(GPLUGIN_PERL_SOURCES
 			gplugin-perl-core.c
+			gplugin-perl-loader.c
 			gplugin-perl-plugin.c
-			gplugin-perl-plugin-loader.c
 		)
 
 		set(GPLUGIN_PERL_HEADERS
+			gplugin-perl-loader.h
 			gplugin-perl-plugin.h
-			gplugin-perl-plugin-loader.h
 		)
 
 		add_library(gplugin-perl MODULE

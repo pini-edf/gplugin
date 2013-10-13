@@ -21,13 +21,15 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 
-#include <gplugin/gplugin-plugin-manager.h>
+#include <gplugin/gplugin-manager.h>
 #include <gplugin/gplugin-core.h>
 #include <gplugin/gplugin-marshallers.h>
 
 #include <gplugin/gplugin-private.h>
 
 #include <gplugin/gplugin-native.h>
+
+#include <gplugin/gplugin-file-tree.h>
 
 /******************************************************************************
  * Enums
@@ -44,11 +46,6 @@ enum {
  * Structs
  *****************************************************************************/
 typedef struct {
-	gchar *filename;
-	gchar *extension;
-} GPluginPluginManagerTreeEntry;
-
-typedef struct {
 	GObject parent;
 
 	GQueue *paths;
@@ -58,30 +55,30 @@ typedef struct {
 	GHashTable *loaders;
 
 	gboolean refresh_needed;
-} GPluginPluginManager;
+} GPluginManager;
 
 typedef struct {
 	GObjectClass parent;
 
-	void (*append_path)(GPluginPluginManager *manager, const gchar *path);
-	void (*prepend_path)(GPluginPluginManager *manager, const gchar *path);
-	void (*remove_path)(GPluginPluginManager *manager, const gchar *path);
+	void (*append_path)(GPluginManager *manager, const gchar *path);
+	void (*prepend_path)(GPluginManager *manager, const gchar *path);
+	void (*remove_path)(GPluginManager *manager, const gchar *path);
 
-	GList *(*get_paths)(GPluginPluginManager *manager);
+	GList *(*get_paths)(GPluginManager *manager);
 
-	void (*register_loader)(GPluginPluginManager *manager, GType type);
-	void (*unregister_loader)(GPluginPluginManager *manager, GType type);
+	void (*register_loader)(GPluginManager *manager, GType type);
+	void (*unregister_loader)(GPluginManager *manager, GType type);
 
-	void (*refresh)(GPluginPluginManager *manager);
+	void (*refresh)(GPluginManager *manager);
 
-	GSList *(*find_plugins)(GPluginPluginManager *manager, const gchar *id);
+	GSList *(*find_plugins)(GPluginManager *manager, const gchar *id);
 
-	GList *(*list_plugins)(GPluginPluginManager *manager);
+	GList *(*list_plugins)(GPluginManager *manager);
 
-	gboolean (*load_plugin)(GPluginPluginManager *manager,
+	gboolean (*load_plugin)(GPluginManager *manager,
 	                        GPluginPlugin *plugin,
 	                        GError **error);
-	gboolean (*unload_plugin)(GPluginPluginManager *manager,
+	gboolean (*unload_plugin)(GPluginManager *manager,
 	                          GPluginPlugin *plugin,
 	                          GError **error);
 
@@ -97,30 +94,30 @@ typedef struct {
 	void (*unloaded_plugin)(GObject *manager,
 	                        GPluginPlugin *plugin);
 
-} GPluginPluginManagerClass;
+} GPluginManagerClass;
 
-#define GPLUGIN_TYPE_PLUGIN_MANAGER            (gplugin_plugin_manager_get_type())
-#define GPLUGIN_PLUGIN_MANAGER(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GPLUGIN_TYPE_PLUGIN_MANAGER, GPluginPluginManager))
-#define GPLUGIN_PLUGIN_MANAGER_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), GPLUGIN_TYPE_PLUGIN_MANAGER, GPluginPluginManagerClass))
-#define GPLUGIN_IS_PLUGIN_MANAGER(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), GPLUGIN_TYPE_PLUGIN_MANAGER))
-#define GPLUGIN_IS_PLUGIN_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), GPLUGIN_TYPE_PLUGIN_MANAGER))
-#define GPLUGIN_PLUGIN_MANAGER_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), GPLUGIN_TYPE_PLUGIN_MANAGER, GPluginPluginManagerClass))
+#define GPLUGIN_TYPE_MANAGER            (gplugin_manager_get_type())
+#define GPLUGIN_MANAGER(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GPLUGIN_TYPE_MANAGER, GPluginManager))
+#define GPLUGIN_MANAGER_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), GPLUGIN_TYPE_MANAGER, GPluginManagerClass))
+#define GPLUGIN_IS_MANAGER(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), GPLUGIN_TYPE_MANAGER))
+#define GPLUGIN_IS_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), GPLUGIN_TYPE_MANAGER))
+#define GPLUGIN_MANAGER_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), GPLUGIN_TYPE_MANAGER, GPluginManagerClass))
 
-#define GPLUGIN_PLUGIN_MANAGER_INSTANCE        (GPLUGIN_PLUGIN_MANAGER(gplugin_plugin_manager_get_instance()))
+#define GPLUGIN_MANAGER_INSTANCE        (GPLUGIN_MANAGER(gplugin_manager_get_instance()))
 
-G_DEFINE_TYPE(GPluginPluginManager, gplugin_plugin_manager, G_TYPE_OBJECT);
+G_DEFINE_TYPE(GPluginManager, gplugin_manager, G_TYPE_OBJECT);
 
 /******************************************************************************
  * Globals
  *****************************************************************************/
-GPluginPluginManager *instance = NULL;
+GPluginManager *instance = NULL;
 static guint signals[N_SIGNALS] = {0, };
 
 /******************************************************************************
  * Helpers
  *****************************************************************************/
 static guint
-gplugin_plugin_manager_str_hash(gconstpointer v) {
+gplugin_manager_str_hash(gconstpointer v) {
 	if(v == NULL)
 		return g_str_hash("");
 
@@ -128,7 +125,7 @@ gplugin_plugin_manager_str_hash(gconstpointer v) {
 }
 
 static gboolean
-gplugin_plugin_manager_remove_list_value(gpointer k, gpointer v, gpointer d) {
+gplugin_manager_remove_list_value(gpointer k, gpointer v, gpointer d) {
 	GSList *l = NULL;
 
 	for(l = (GSList *)v; l; l = l->next) {
@@ -142,133 +139,10 @@ gplugin_plugin_manager_remove_list_value(gpointer k, gpointer v, gpointer d) {
 }
 
 /******************************************************************************
- * FileTree Stuff
- *****************************************************************************/
-static GPluginPluginManagerTreeEntry *
-gplugin_plugin_manager_tree_entry_new(const gchar *filename) {
-	GPluginPluginManagerTreeEntry *e = NULL;
-
-	e = g_slice_new(GPluginPluginManagerTreeEntry);
-
-	e->filename = g_filename_to_utf8(filename, -1, NULL, NULL, NULL);
-
-	/* we have to use e->filename, because g_utf8_strrchr returns a pointer
-	 * in the string given too it, and not a new copy.
-	 */
-	e->extension = g_utf8_strrchr(e->filename, -1, g_utf8_get_char("."));
-
-	/* if we have an extension, we need to iterate past the . */
-	if(e->extension)
-		e->extension = g_utf8_next_char(e->extension);
-
-	return e;
-}
-
-static void
-gplugin_plugin_manager_tree_entry_free(GPluginPluginManagerTreeEntry *e) {
-	if(!e)
-		return;
-
-	g_free(e->filename);
-
-	g_slice_free(GPluginPluginManagerTreeEntry, e);
-
-	e = NULL;
-}
-
-/**
- * gplugin_plugin_manager_file_tree_new:
- *
- * Builds a GNode tree of consisting of a root node, whose children contain
- * an allocated string of a plugin directory.  The directory node's children
- * are GPluginPluginManagerTreeEntry instances for the files in that directory.
- */
-static GNode *
-gplugin_plugin_manager_file_tree_new(void) {
-	GObject *obj = gplugin_plugin_manager_get_instance();
-	GPluginPluginManager *manager = GPLUGIN_PLUGIN_MANAGER(obj);
-	GList *iter = NULL;
-	GNode *root = NULL;
-
-	/* read all of the files from all of our paths and store then in a tree */
-	root = g_node_new(NULL);
-
-	for(iter = manager->paths->head; iter; iter = iter->next) {
-		GDir *d = NULL;
-		GError *error = NULL;
-		GNode *dir = NULL;
-		const gchar *path = (const gchar *)iter->data;
-		const gchar *filename = NULL;
-
-		d = g_dir_open(path, 0, &error);
-		if(error) {
-			g_debug(_("Failed to open %s: %s"),
-			        path,
-			        (error->message) ? error->message : _("unknown failure"));
-
-			g_error_free(error);
-			error = NULL;
-
-			continue;
-		}
-
-		/* insert the directory into the tree since we know it exists */
-		dir = g_node_new(g_strdup(path));
-		g_node_prepend(root, dir);
-
-		/* now run through all of the files and add them to the tree */
-		while((filename = g_dir_read_name(d)) != NULL) {
-			GNode *file = NULL;
-			GPluginPluginManagerTreeEntry *entry = NULL;
-
-			entry = gplugin_plugin_manager_tree_entry_new(filename);
-
-			file = g_node_new(entry);
-
-			g_node_prepend(dir, file);
-		}
-
-		/* close the directory */
-		g_dir_close(d);
-	}
-
-	return root;
-}
-
-static gboolean
-gplugin_plugin_manager_file_tree_free_leaves(GNode *n, gpointer d) {
-	GPluginPluginManagerTreeEntry *e = n->data;
-
-	gplugin_plugin_manager_tree_entry_free(e);
-
-	return FALSE;
-}
-
-static gboolean
-gplugin_plugin_manager_file_tree_free_nonleaves(GNode *n, gpointer d) {
-	g_free(n->data);
-
-	return FALSE;
-}
-
-static void
-gplugin_plugin_manager_file_tree_free(GNode *root) {
-	if (root->data) {
-		g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_LEAVES, -1,
-		                gplugin_plugin_manager_file_tree_free_leaves, NULL);
-
-		g_node_traverse(root, G_POST_ORDER, G_TRAVERSE_NON_LEAVES, -1,
-		                gplugin_plugin_manager_file_tree_free_nonleaves, NULL);
-	}
-
-	g_node_destroy(root);
-}
-
-/******************************************************************************
- * PluginManager implementation
+ * Manager implementation
  *****************************************************************************/
 static void
-gplugin_plugin_manager_real_append_path(GPluginPluginManager *manager,
+gplugin_manager_real_append_path(GPluginManager *manager,
                                         const gchar *path)
 {
 	GList *l = NULL;
@@ -284,7 +158,7 @@ gplugin_plugin_manager_real_append_path(GPluginPluginManager *manager,
 }
 
 static void
-gplugin_plugin_manager_real_prepend_path(GPluginPluginManager *manager,
+gplugin_manager_real_prepend_path(GPluginManager *manager,
                                          const gchar *path)
 {
 	GList *l = NULL;
@@ -300,7 +174,7 @@ gplugin_plugin_manager_real_prepend_path(GPluginPluginManager *manager,
 }
 
 static void
-gplugin_plugin_manager_real_remove_path(GPluginPluginManager *manager,
+gplugin_manager_real_remove_path(GPluginManager *manager,
                                         const gchar *path)
 {
 	GList *l = NULL, *link = NULL;
@@ -318,23 +192,23 @@ gplugin_plugin_manager_real_remove_path(GPluginPluginManager *manager,
 }
 
 static GList *
-gplugin_plugin_manager_real_get_paths(GPluginPluginManager *manager) {
+gplugin_manager_real_get_paths(GPluginManager *manager) {
 	return manager->paths->head;
 }
 
 static void
-gplugin_plugin_manager_real_register_loader(GPluginPluginManager *manager,
+gplugin_manager_real_register_loader(GPluginManager *manager,
                                             GType type)
 {
-	GPluginPluginLoader *loader = NULL;
-	GPluginPluginLoaderClass *lo_class = NULL;
+	GPluginLoader *loader = NULL;
+	GPluginLoaderClass *lo_class = NULL;
 	GSList *l = NULL;
 
-	g_return_if_fail(g_type_is_a(type, GPLUGIN_TYPE_PLUGIN_LOADER));
+	g_return_if_fail(g_type_is_a(type, GPLUGIN_TYPE_LOADER));
 
 	/* Create the loader instance first.  If we can't create it, we bail */
 	loader = g_object_new(type, NULL);
-	if(!GPLUGIN_IS_PLUGIN_LOADER(loader)) {
+	if(!GPLUGIN_IS_LOADER(loader)) {
 		g_warning(_("failed to create loader instance for %s"),
 		          g_type_name(type));
 
@@ -342,7 +216,7 @@ gplugin_plugin_manager_real_register_loader(GPluginPluginManager *manager,
 	}
 
 	/* grab the class of the loader */
-	lo_class = GPLUGIN_PLUGIN_LOADER_GET_CLASS(loader);
+	lo_class = GPLUGIN_LOADER_GET_CLASS(loader);
 	if(!lo_class) {
 		g_warning(_("failed to get the loader class for %s"), g_type_name(type));
 		g_object_unref(G_OBJECT(loader));
@@ -361,7 +235,7 @@ gplugin_plugin_manager_real_register_loader(GPluginPluginManager *manager,
 		existing = g_hash_table_lookup(manager->loaders, ext);
 		for(ll = existing; ll; ll = ll->next) {
 			if(G_OBJECT_TYPE(ll->data) == type) {
-				GPluginPluginLoader *old = GPLUGIN_PLUGIN_LOADER(ll->data);
+				GPluginLoader *old = GPLUGIN_LOADER(ll->data);
 
 				existing = g_slist_remove(existing, old);
 
@@ -385,13 +259,13 @@ gplugin_plugin_manager_real_register_loader(GPluginPluginManager *manager,
 }
 
 static void
-gplugin_plugin_manager_real_unregister_loader(GPluginPluginManager *manager,
+gplugin_manager_real_unregister_loader(GPluginManager *manager,
                                               GType type)
 {
-	GPluginPluginLoaderClass *klass = NULL;
+	GPluginLoaderClass *klass = NULL;
 	GSList *exts = NULL;
 
-	g_return_if_fail(g_type_is_a(type, GPLUGIN_TYPE_PLUGIN_LOADER));
+	g_return_if_fail(g_type_is_a(type, GPLUGIN_TYPE_LOADER));
 
 	klass = g_type_class_ref(type);
 	if(!klass)
@@ -406,9 +280,9 @@ gplugin_plugin_manager_real_unregister_loader(GPluginPluginManager *manager,
 		los = g_hash_table_lookup(manager->loaders, ext);
 
 		for(l = los; l; l = l->next) {
-			GPluginPluginLoader *lo = GPLUGIN_PLUGIN_LOADER(l->data);
+			GPluginLoader *lo = GPLUGIN_LOADER(l->data);
 
-			if(!GPLUGIN_IS_PLUGIN_LOADER(lo))
+			if(!GPLUGIN_IS_LOADER(lo))
 				continue;
 
 			if(G_OBJECT_TYPE(lo) != type)
@@ -437,11 +311,11 @@ gplugin_plugin_manager_real_unregister_loader(GPluginPluginManager *manager,
 }
 
 static void
-gplugin_plugin_manager_real_refresh(GPluginPluginManager *manager) {
+gplugin_manager_real_refresh(GPluginManager *manager) {
 	GNode *root = NULL;
 
 	/* build a tree of all possible plugins */
-	root = gplugin_plugin_manager_file_tree_new();
+	root = gplugin_file_tree_new(manager->paths->head);
 
 	manager->refresh_needed = TRUE;
 
@@ -456,13 +330,13 @@ gplugin_plugin_manager_real_refresh(GPluginPluginManager *manager) {
 
 			for(file = dir->children; file; file = file->next) {
 				GPluginPlugin *plugin = NULL;
-				GPluginPluginLoader *loader = NULL;
-				GPluginPluginManagerTreeEntry *e = NULL;
+				GPluginLoader *loader = NULL;
+				GPluginFileTreeEntry *e = NULL;
 				GError *error = NULL;
 				GSList *l = NULL;
 				gchar *filename = NULL;
 
-				e = (GPluginPluginManagerTreeEntry *)file->data;
+				e = (GPluginFileTreeEntry *)file->data;
 
 				/* Build the path and see if we need to probe it! */
 				filename = g_build_filename(path, e->filename, NULL);
@@ -490,14 +364,14 @@ gplugin_plugin_manager_real_refresh(GPluginPluginManager *manager) {
 					if(!l->data)
 						continue;
 
-					loader = GPLUGIN_PLUGIN_LOADER(l->data);
-					if(!GPLUGIN_IS_PLUGIN_LOADER(loader)) {
+					loader = GPLUGIN_LOADER(l->data);
+					if(!GPLUGIN_IS_LOADER(loader)) {
 						loader = NULL;
 						continue;
 					}
 
 					/* Try to probe the plugin with the current loader */
-					plugin = gplugin_plugin_loader_query_plugin(loader,
+					plugin = gplugin_loader_query_plugin(loader,
 					                                            filename,
 				                                                &error);
 
@@ -578,7 +452,7 @@ gplugin_plugin_manager_real_refresh(GPluginPluginManager *manager) {
 						GError *error = NULL;
 						gboolean loaded;
 
-						loaded = gplugin_plugin_loader_load_plugin(loader,
+						loaded = gplugin_loader_load_plugin(loader,
 						                                           plugin,
 						                                           &error);
 
@@ -604,11 +478,11 @@ gplugin_plugin_manager_real_refresh(GPluginPluginManager *manager) {
 	}
 
 	/* free the file tree */
-	gplugin_plugin_manager_file_tree_free(root);
+	gplugin_file_tree_free(root);
 }
 
 static GSList *
-gplugin_plugin_manager_real_find_plugins(GPluginPluginManager *manager,
+gplugin_manager_real_find_plugins(GPluginManager *manager,
                                          const gchar *id)
 {
 	GSList *plugins_list = NULL, *l;
@@ -631,7 +505,7 @@ gplugin_plugin_manager_real_find_plugins(GPluginPluginManager *manager,
 }
 
 static GList *
-gplugin_plugin_manager_real_list_plugins(GPluginPluginManager *manager) {
+gplugin_manager_real_list_plugins(GPluginManager *manager) {
 	GQueue *queue = g_queue_new();
 	GList *ret = NULL;
 	GHashTableIter iter;
@@ -650,12 +524,12 @@ gplugin_plugin_manager_real_list_plugins(GPluginPluginManager *manager) {
 }
 
 static gboolean
-gplugin_plugin_manager_real_load_plugin(GPluginPluginManager *manager,
+gplugin_manager_real_load_plugin(GPluginManager *manager,
                                         GPluginPlugin *plugin,
                                         GError **error)
 {
 	const GPluginPluginInfo *info = NULL;
-	GPluginPluginLoader *loader = NULL;
+	GPluginLoader *loader = NULL;
 	const gchar * const *dependencies = NULL;
 	gboolean ret = TRUE;
 	gint i = 0;
@@ -687,7 +561,7 @@ gplugin_plugin_manager_real_load_plugin(GPluginPluginManager *manager,
 			GSList *matches = NULL, *m = NULL;
 			gboolean ret = FALSE;
 
-			matches = gplugin_plugin_manager_find_plugins(dependencies[i]);
+			matches = gplugin_manager_find_plugins(dependencies[i]);
 
 			/* make sure we got at least 1 match */
 			if(matches == NULL) {
@@ -707,7 +581,7 @@ gplugin_plugin_manager_real_load_plugin(GPluginPluginManager *manager,
 			for(m = matches; m; m = m->next) {
 				GPluginPlugin *plugin = g_object_ref(G_OBJECT(m->data));
 
-				ret = gplugin_plugin_manager_load_plugin(plugin, error);
+				ret = gplugin_manager_load_plugin(plugin, error);
 
 				g_object_unref(G_OBJECT(plugin));
 
@@ -739,7 +613,7 @@ gplugin_plugin_manager_real_load_plugin(GPluginPluginManager *manager,
 	/* now load the actual plugin */
 	loader = gplugin_plugin_get_loader(plugin);
 
-	if(!GPLUGIN_IS_PLUGIN_LOADER(loader)) {
+	if(!GPLUGIN_IS_LOADER(loader)) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     _("The loader for %s is not a loader.  This "
@@ -754,18 +628,18 @@ gplugin_plugin_manager_real_load_plugin(GPluginPluginManager *manager,
 	if(!ret)
 		return ret;
 
-	ret = gplugin_plugin_loader_load_plugin(loader, plugin, error);
+	ret = gplugin_loader_load_plugin(loader, plugin, error);
 	g_signal_emit(manager, signals[SIG_LOADED], 0, plugin);
 
 	return ret;
 }
 
 static gboolean
-gplugin_plugin_manager_real_unload_plugin(GPluginPluginManager *manager,
+gplugin_manager_real_unload_plugin(GPluginManager *manager,
                                           GPluginPlugin *plugin,
                                           GError **error)
 {
-	GPluginPluginLoader *loader = NULL;
+	GPluginLoader *loader = NULL;
 	gboolean ret = TRUE;
 
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
@@ -774,7 +648,7 @@ gplugin_plugin_manager_real_unload_plugin(GPluginPluginManager *manager,
 		return TRUE;
 
 	loader = gplugin_plugin_get_loader(plugin);
-	if(!GPLUGIN_IS_PLUGIN_LOADER(loader)) {
+	if(!GPLUGIN_IS_LOADER(loader)) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     _("Plugin loader is not a loader"));
@@ -787,7 +661,7 @@ gplugin_plugin_manager_real_unload_plugin(GPluginPluginManager *manager,
 	if(!ret)
 		return ret;
 
-	ret = gplugin_plugin_loader_unload_plugin(loader, plugin, error);
+	ret = gplugin_loader_unload_plugin(loader, plugin, error);
 
 	g_signal_emit(manager, signals[SIG_UNLOADED], 0, plugin, error);
 
@@ -795,14 +669,14 @@ gplugin_plugin_manager_real_unload_plugin(GPluginPluginManager *manager,
 }
 
 static gboolean
-gplugin_plugin_manager_loading_cb(GObject *manager, GPluginPlugin *plugin,
+gplugin_manager_loading_cb(GObject *manager, GPluginPlugin *plugin,
                                   GError **error)
 {
 	return TRUE;
 }
 
 static gboolean
-gplugin_plugin_manager_unloading_cb(GObject *manager, GPluginPlugin *plugin,
+gplugin_manager_unloading_cb(GObject *manager, GPluginPlugin *plugin,
                                     GError **error)
 {
 	return TRUE;
@@ -812,8 +686,8 @@ gplugin_plugin_manager_unloading_cb(GObject *manager, GPluginPlugin *plugin,
  * Object Stuff
  *****************************************************************************/
 static void
-gplugin_plugin_manager_finalize(GObject *obj) {
-	GPluginPluginManager *manager = GPLUGIN_PLUGIN_MANAGER(obj);
+gplugin_manager_finalize(GObject *obj) {
+	GPluginManager *manager = GPLUGIN_MANAGER(obj);
 
 #if GLIB_CHECK_VERSION(2,32,0)
 	g_queue_free_full(manager->paths, g_free);
@@ -828,7 +702,7 @@ gplugin_plugin_manager_finalize(GObject *obj) {
 
 	/* free all the data in the plugins hash table and destroy it */
 	g_hash_table_foreach_remove(manager->plugins,
-	                            gplugin_plugin_manager_remove_list_value,
+	                            gplugin_manager_remove_list_value,
 	                            NULL);
 	g_hash_table_destroy(manager->plugins);
 
@@ -837,60 +711,60 @@ gplugin_plugin_manager_finalize(GObject *obj) {
 
 	/* free all the data in the loaders hash table and destroy it */
 	g_hash_table_foreach_remove(manager->loaders,
-	                            gplugin_plugin_manager_remove_list_value,
+	                            gplugin_manager_remove_list_value,
 	                            NULL);
 	g_hash_table_destroy(manager->loaders);
 
 	/* call the base class's destructor */
-	G_OBJECT_CLASS(gplugin_plugin_manager_parent_class)->finalize(obj);
+	G_OBJECT_CLASS(gplugin_manager_parent_class)->finalize(obj);
 }
 
 static void
-gplugin_plugin_manager_class_init(GPluginPluginManagerClass *klass) {
+gplugin_manager_class_init(GPluginManagerClass *klass) {
 	GObjectClass *obj_class = G_OBJECT_CLASS(klass);
-	GPluginPluginManagerClass *manager_class =
-		GPLUGIN_PLUGIN_MANAGER_CLASS(klass);
+	GPluginManagerClass *manager_class =
+		GPLUGIN_MANAGER_CLASS(klass);
 
-	obj_class->finalize = gplugin_plugin_manager_finalize;
+	obj_class->finalize = gplugin_manager_finalize;
 
-	manager_class->append_path = gplugin_plugin_manager_real_append_path;
-	manager_class->prepend_path = gplugin_plugin_manager_real_prepend_path;
-	manager_class->remove_path = gplugin_plugin_manager_real_remove_path;
-	manager_class->get_paths = gplugin_plugin_manager_real_get_paths;
+	manager_class->append_path = gplugin_manager_real_append_path;
+	manager_class->prepend_path = gplugin_manager_real_prepend_path;
+	manager_class->remove_path = gplugin_manager_real_remove_path;
+	manager_class->get_paths = gplugin_manager_real_get_paths;
 
 	manager_class->register_loader =
-		gplugin_plugin_manager_real_register_loader;
+		gplugin_manager_real_register_loader;
 	manager_class->unregister_loader =
-		gplugin_plugin_manager_real_unregister_loader;
+		gplugin_manager_real_unregister_loader;
 
-	manager_class->refresh = gplugin_plugin_manager_real_refresh;
+	manager_class->refresh = gplugin_manager_real_refresh;
 
-	manager_class->find_plugins = gplugin_plugin_manager_real_find_plugins;
-	manager_class->list_plugins = gplugin_plugin_manager_real_list_plugins;
+	manager_class->find_plugins = gplugin_manager_real_find_plugins;
+	manager_class->list_plugins = gplugin_manager_real_list_plugins;
 
-	manager_class->load_plugin = gplugin_plugin_manager_real_load_plugin;
-	manager_class->unload_plugin = gplugin_plugin_manager_real_unload_plugin;
+	manager_class->load_plugin = gplugin_manager_real_load_plugin;
+	manager_class->unload_plugin = gplugin_manager_real_unload_plugin;
 
-	manager_class->loading_plugin = gplugin_plugin_manager_loading_cb;
-	manager_class->unloading_plugin = gplugin_plugin_manager_unloading_cb;
+	manager_class->loading_plugin = gplugin_manager_loading_cb;
+	manager_class->unloading_plugin = gplugin_manager_unloading_cb;
 
 	/* signals */
 
 	/**
-	 * GPluginPluginManager::loading-plugin:
-	 * @manager: The #GPluginPluginManager instance.  Treat as a #GObject.
+	 * GPluginManager::loading-plugin:
+	 * @manager: The #GPluginManager instance.  Treat as a #GObject.
 	 * @plugin: The #GPluginPlugin that's about to be loaded.
 	 * @error: Return address for a #GError.
 	 *
 	 * Emitted before @plugin is loaded.
 	 *
-	 * Return TRUE to stop other handlers 
+	 * Return FALSE to stop loading
 	 */
 	signals[SIG_LOADING] =
 		g_signal_new("loading-plugin",
 		             G_OBJECT_CLASS_TYPE(manager_class),
 		             G_SIGNAL_RUN_LAST,
-		             G_STRUCT_OFFSET(GPluginPluginManagerClass,
+		             G_STRUCT_OFFSET(GPluginManagerClass,
 		                             loading_plugin),
 		             gplugin_boolean_accumulator, NULL,
 		             gplugin_marshal_BOOLEAN__OBJECT_POINTER,
@@ -899,7 +773,7 @@ gplugin_plugin_manager_class_init(GPluginPluginManagerClass *klass) {
 		             GPLUGIN_TYPE_PLUGIN, G_TYPE_POINTER);
 
 	/**
-	 * GPluginPluginManager::loaded-plugin:
+	 * GPluginManager::loaded-plugin:
 	 * @manager: the #gpluginpluginmanager instance.  treat as a #gobject.
 	 * @plugin: the #gpluginplugin that's about to be loaded.
 	 * @error: return address for a #gerror.
@@ -910,7 +784,7 @@ gplugin_plugin_manager_class_init(GPluginPluginManagerClass *klass) {
 		g_signal_new("loaded-plugin",
 		             G_OBJECT_CLASS_TYPE(manager_class),
 		             G_SIGNAL_RUN_LAST,
-		             G_STRUCT_OFFSET(GPluginPluginManagerClass,
+		             G_STRUCT_OFFSET(GPluginManagerClass,
 		                             loaded_plugin),
 		             NULL, NULL,
 		             gplugin_marshal_VOID__OBJECT,
@@ -919,18 +793,20 @@ gplugin_plugin_manager_class_init(GPluginPluginManagerClass *klass) {
 		             GPLUGIN_TYPE_PLUGIN);
 
 	/**
-	 * GPluginPluginManager::unloading-plugin:
+	 * GPluginManager::unloading-plugin:
 	 * @manager: the #gpluginpluginmanager instance.  treat as a #gobject.
 	 * @plugin: the #gpluginplugin that's about to be loaded.
 	 * @error: return address for a #gerror.
 	 *
 	 * emitted before a plugin is unloaded.
+	 *
+	 * Return FALSE to stop unloading
 	 */
 	signals[SIG_UNLOADING] =
 		g_signal_new("unloading-plugin",
 		             G_OBJECT_CLASS_TYPE(manager_class),
 		             G_SIGNAL_RUN_LAST,
-		             G_STRUCT_OFFSET(GPluginPluginManagerClass,
+		             G_STRUCT_OFFSET(GPluginManagerClass,
 		                             unloading_plugin),
 		             gplugin_boolean_accumulator, NULL,
 		             gplugin_marshal_BOOLEAN__OBJECT_POINTER,
@@ -939,7 +815,7 @@ gplugin_plugin_manager_class_init(GPluginPluginManagerClass *klass) {
 		             GPLUGIN_TYPE_PLUGIN, G_TYPE_POINTER);
 
 	/**
-	 * GPluginPluginManager::unloaded-plugin:
+	 * GPluginManager::unloaded-plugin:
 	 * @manager: the #gpluginpluginmanager instance.  treat as a #gobject.
 	 * @plugin: the #gpluginplugin that's about to be loaded.
 	 * @error: return address for a #gerror.
@@ -950,7 +826,7 @@ gplugin_plugin_manager_class_init(GPluginPluginManagerClass *klass) {
 		g_signal_new("unloaded-plugin",
 		             G_OBJECT_CLASS_TYPE(manager_class),
 		             G_SIGNAL_RUN_LAST,
-		             G_STRUCT_OFFSET(GPluginPluginManagerClass,
+		             G_STRUCT_OFFSET(GPluginManagerClass,
 		                             unloaded_plugin),
 		             NULL, NULL,
 		             gplugin_marshal_VOID__OBJECT,
@@ -960,7 +836,7 @@ gplugin_plugin_manager_class_init(GPluginPluginManagerClass *klass) {
 }
 
 static void
-gplugin_plugin_manager_init(GPluginPluginManager *manager) {
+gplugin_manager_init(GPluginManager *manager) {
 	manager->paths = g_queue_new();
 
 	/* the plugins hashtable is keyed on a plugin id and holds a GSList of all
@@ -987,7 +863,7 @@ gplugin_plugin_manager_init(GPluginPluginManager *manager) {
 	 * again and again.
 	 */
 	manager->loaders =
-		g_hash_table_new_full(gplugin_plugin_manager_str_hash, g_str_equal,
+		g_hash_table_new_full(gplugin_manager_str_hash, g_str_equal,
 		g_free, NULL);
 }
 
@@ -995,14 +871,14 @@ gplugin_plugin_manager_init(GPluginPluginManager *manager) {
  * Private API
  *****************************************************************************/
 void
-gplugin_plugin_manager_private_init(void) {
-	instance = g_object_new(GPLUGIN_TYPE_PLUGIN_MANAGER, NULL);
+gplugin_manager_private_init(void) {
+	instance = g_object_new(GPLUGIN_TYPE_MANAGER, NULL);
 
-	gplugin_plugin_manager_register_loader(GPLUGIN_TYPE_NATIVE_PLUGIN_LOADER);
+	gplugin_manager_register_loader(GPLUGIN_TYPE_NATIVE_LOADER);
 }
 
 void
-gplugin_plugin_manager_private_uninit(void) {
+gplugin_manager_private_uninit(void) {
 	g_object_unref(G_OBJECT(instance));
 }
 
@@ -1011,84 +887,84 @@ gplugin_plugin_manager_private_uninit(void) {
  *****************************************************************************/
 
 /**
- * gplugin_plugin_manager_append_path:
+ * gplugin_manager_append_path:
  * @path: A path to add to the end of the plugin search paths
  *
  * Adds @path to the end of the list of paths to search for plugins.
  */
 void
-gplugin_plugin_manager_append_path(const gchar *path) {
-	GPluginPluginManager *manager = GPLUGIN_PLUGIN_MANAGER_INSTANCE;
-	GPluginPluginManagerClass *klass = NULL;
+gplugin_manager_append_path(const gchar *path) {
+	GPluginManager *manager = GPLUGIN_MANAGER_INSTANCE;
+	GPluginManagerClass *klass = NULL;
 
-	g_return_if_fail(GPLUGIN_IS_PLUGIN_MANAGER(manager));
+	g_return_if_fail(GPLUGIN_IS_MANAGER(manager));
 
-	klass = GPLUGIN_PLUGIN_MANAGER_GET_CLASS(manager);
+	klass = GPLUGIN_MANAGER_GET_CLASS(manager);
 
 	if(klass && klass->append_path)
 		klass->append_path(manager, path);
 }
 
 /**
- * gplugin_plugin_manager_prepend_path:
+ * gplugin_manager_prepend_path:
  * @path: A path to add to the beginning of the plugin search paths
  *
  * Adds @path to the beginning of the list of paths to search for plugins.
  */
 void
-gplugin_plugin_manager_prepend_path(const gchar *path) {
-	GPluginPluginManager *manager = GPLUGIN_PLUGIN_MANAGER_INSTANCE;
-	GPluginPluginManagerClass *klass = NULL;
+gplugin_manager_prepend_path(const gchar *path) {
+	GPluginManager *manager = GPLUGIN_MANAGER_INSTANCE;
+	GPluginManagerClass *klass = NULL;
 
-	g_return_if_fail(GPLUGIN_IS_PLUGIN_MANAGER(manager));
+	g_return_if_fail(GPLUGIN_IS_MANAGER(manager));
 
-	klass = GPLUGIN_PLUGIN_MANAGER_GET_CLASS(manager);
+	klass = GPLUGIN_MANAGER_GET_CLASS(manager);
 
 	if(klass && klass->prepend_path)
 		klass->prepend_path(manager, path);
 }
 
 /**
- * gplugin_plugin_manager_remove_path:
+ * gplugin_manager_remove_path:
  * @path: A path to remove from the plugin search paths
  *
  * Removes @path from the list of paths to search for plugins.
  */
 void
-gplugin_plugin_manager_remove_path(const gchar *path) {
-	GPluginPluginManager *manager = GPLUGIN_PLUGIN_MANAGER_INSTANCE;
-	GPluginPluginManagerClass *klass = NULL;
+gplugin_manager_remove_path(const gchar *path) {
+	GPluginManager *manager = GPLUGIN_MANAGER_INSTANCE;
+	GPluginManagerClass *klass = NULL;
 
-	g_return_if_fail(GPLUGIN_IS_PLUGIN_MANAGER(manager));
+	g_return_if_fail(GPLUGIN_IS_MANAGER(manager));
 
-	klass = GPLUGIN_PLUGIN_MANAGER_GET_CLASS(manager);
+	klass = GPLUGIN_MANAGER_GET_CLASS(manager);
 
 	if(klass && klass->remove_path)
 		klass->remove_path(manager, path);
 }
 
 /**
- * gplugin_plugin_manager_add_default_paths:
+ * gplugin_manager_add_default_paths:
  *
  * Adds the path that GPlugin was installed to to the plugin search path, as
  * well as ${XDG_CONFIG_HOME}/gplugin.
  */
 void
-gplugin_plugin_manager_add_default_paths(void) {
+gplugin_manager_add_default_paths(void) {
 	gchar *path;
 
 	path = g_build_filename(PREFIX, "lib", "gplugin", NULL);
-	gplugin_plugin_manager_prepend_path(path);
+	gplugin_manager_prepend_path(path);
 	g_free(path);
 
 	path = g_build_filename(g_get_user_config_dir(), "gplugin", NULL);
-	gplugin_plugin_manager_prepend_path(path);
+	gplugin_manager_prepend_path(path);
 	g_free(path);
 }
 
 
 /**
- * gplugin_plugin_manager_add_app_paths:
+ * gplugin_manager_add_app_paths:
  * @prefix: The installation prefix for the application.
  * @appname: The name of the application whose paths to add.
  *
@@ -1097,7 +973,7 @@ gplugin_plugin_manager_add_default_paths(void) {
  * ${XDG_CONFIG_HOME}/@appname/plugins.
  */
 void
-gplugin_plugin_manager_add_app_paths(const gchar *prefix,
+gplugin_manager_add_app_paths(const gchar *prefix,
                                      const gchar *appname)
 {
 	gchar *path;
@@ -1105,16 +981,16 @@ gplugin_plugin_manager_add_app_paths(const gchar *prefix,
 	g_return_if_fail(appname != NULL);
 
 	path = g_build_filename(prefix, appname, NULL);
-	gplugin_plugin_manager_prepend_path(path);
+	gplugin_manager_prepend_path(path);
 	g_free(path);
 
 	path = g_build_filename(g_get_user_config_dir(), appname, "plugins", NULL);
-	gplugin_plugin_manager_prepend_path(path);
+	gplugin_manager_prepend_path(path);
 	g_free(path);
 }
 
 /**
- * gplugin_plugin_manager_get_paths:
+ * gplugin_manager_get_paths:
  *
  * Gets the list of paths which will be search for plugins.
  *
@@ -1123,13 +999,13 @@ gplugin_plugin_manager_add_app_paths(const gchar *prefix,
  *               done.
  */
 GList *
-gplugin_plugin_manager_get_paths(void) {
-	GPluginPluginManager *manager = GPLUGIN_PLUGIN_MANAGER_INSTANCE;
-	GPluginPluginManagerClass *klass = NULL;
+gplugin_manager_get_paths(void) {
+	GPluginManager *manager = GPLUGIN_MANAGER_INSTANCE;
+	GPluginManagerClass *klass = NULL;
 
-	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_MANAGER(manager), NULL);
+	g_return_val_if_fail(GPLUGIN_IS_MANAGER(manager), NULL);
 
-	klass = GPLUGIN_PLUGIN_MANAGER_GET_CLASS(manager);
+	klass = GPLUGIN_MANAGER_GET_CLASS(manager);
 	if(klass && klass->get_paths)
 		return klass->get_paths(manager);
 
@@ -1137,77 +1013,77 @@ gplugin_plugin_manager_get_paths(void) {
 }
 
 /**
- * gplugin_plugin_manager_register_loader:
- * @type: #GType of a #GPluginPluginLoader
+ * gplugin_manager_register_loader:
+ * @type: #GType of a #GPluginLoader
  *
  * Registers @type as an available loader.
  */
 void
-gplugin_plugin_manager_register_loader(GType type) {
-	GPluginPluginManager *manager = GPLUGIN_PLUGIN_MANAGER_INSTANCE;
-	GPluginPluginManagerClass *klass = NULL;
+gplugin_manager_register_loader(GType type) {
+	GPluginManager *manager = GPLUGIN_MANAGER_INSTANCE;
+	GPluginManagerClass *klass = NULL;
 
-	g_return_if_fail(GPLUGIN_IS_PLUGIN_MANAGER(manager));
+	g_return_if_fail(GPLUGIN_IS_MANAGER(manager));
 
-	klass = GPLUGIN_PLUGIN_MANAGER_GET_CLASS(manager);
+	klass = GPLUGIN_MANAGER_GET_CLASS(manager);
 	if(klass && klass->register_loader)
 		klass->register_loader(manager, type);
 }
 
 /**
- * gplugin_plugin_manager_unregister_loader:
- * @type: #GType of a #GPluginPluginLoader
+ * gplugin_manager_unregister_loader:
+ * @type: #GType of a #GPluginLoader
  *
  * Unregisters @type as an available loader.
  */
 void
-gplugin_plugin_manager_unregister_loader(GType type) {
-	GPluginPluginManager *manager = GPLUGIN_PLUGIN_MANAGER_INSTANCE;
-	GPluginPluginManagerClass *klass = NULL;
+gplugin_manager_unregister_loader(GType type) {
+	GPluginManager *manager = GPLUGIN_MANAGER_INSTANCE;
+	GPluginManagerClass *klass = NULL;
 
-	g_return_if_fail(GPLUGIN_IS_PLUGIN_MANAGER(manager));
+	g_return_if_fail(GPLUGIN_IS_MANAGER(manager));
 
-	klass = GPLUGIN_PLUGIN_MANAGER_GET_CLASS(manager);
+	klass = GPLUGIN_MANAGER_GET_CLASS(manager);
 	if(klass && klass->unregister_loader)
 		klass->unregister_loader(manager, type);
 }
 
 /**
- * gplugin_plugin_manager_refresh:
+ * gplugin_manager_refresh:
  *
  * Forces a refresh of all plugins found in the search paths.
  */
 void
-gplugin_plugin_manager_refresh(void) {
-	GPluginPluginManager *manager = GPLUGIN_PLUGIN_MANAGER_INSTANCE;
-	GPluginPluginManagerClass *klass = NULL;
+gplugin_manager_refresh(void) {
+	GPluginManager *manager = GPLUGIN_MANAGER_INSTANCE;
+	GPluginManagerClass *klass = NULL;
 
-	g_return_if_fail(GPLUGIN_IS_PLUGIN_MANAGER(manager));
+	g_return_if_fail(GPLUGIN_IS_MANAGER(manager));
 
-	klass = GPLUGIN_PLUGIN_MANAGER_GET_CLASS(manager);
+	klass = GPLUGIN_MANAGER_GET_CLASS(manager);
 	if(klass && klass->refresh)
 		klass->refresh(manager);
 }
 
 /**
- * gplugin_plugin_manager_find_plugins:
+ * gplugin_manager_find_plugins:
  * @id: id string of the plugin to find
  *
  * Finds all plugins matching @id.
  *
  * Return value: (element-type GPlugin.Plugin) (transfer full): A #GSList of
  *               referenced #GPluginPlugin's matching @id.  Call
- *               #gplugin_plugin_manager_free_plugin_list on the returned value
+ *               #gplugin_manager_free_plugin_list on the returned value
  *               when you're done with it.
  */
 GSList *
-gplugin_plugin_manager_find_plugins(const gchar *id) {
-	GPluginPluginManager *manager = GPLUGIN_PLUGIN_MANAGER_INSTANCE;
-	GPluginPluginManagerClass *klass = NULL;
+gplugin_manager_find_plugins(const gchar *id) {
+	GPluginManager *manager = GPLUGIN_MANAGER_INSTANCE;
+	GPluginManagerClass *klass = NULL;
 
-	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_MANAGER(manager), NULL);
+	g_return_val_if_fail(GPLUGIN_IS_MANAGER(manager), NULL);
 
-	klass = GPLUGIN_PLUGIN_MANAGER_GET_CLASS(manager);
+	klass = GPLUGIN_MANAGER_GET_CLASS(manager);
 	if(klass && klass->find_plugins)
 		return klass->find_plugins(manager, id);
 
@@ -1215,14 +1091,14 @@ gplugin_plugin_manager_find_plugins(const gchar *id) {
 }
 
 /**
- * gplugin_plugin_manager_free_plugin_list:
+ * gplugin_manager_free_plugin_list:
  * @plugins_list: (element-type GPlugin.Plugin): Returned value from
- *                #gplugin_plugin_manager_find_plugins
+ *                #gplugin_manager_find_plugins
  *
- * Frees the return value of #gplugin_plugin_manager_find_plugins.
+ * Frees the return value of #gplugin_manager_find_plugins.
  */
 void
-gplugin_plugin_manager_free_plugin_list(GSList *plugins_list) {
+gplugin_manager_free_plugin_list(GSList *plugins_list) {
 	GSList *l = NULL;
 
 	g_return_if_fail(plugins_list != NULL);
@@ -1242,37 +1118,37 @@ gplugin_plugin_manager_free_plugin_list(GSList *plugins_list) {
 }
 
 /**
- * gplugin_plugin_manager_find_plugin:
+ * gplugin_manager_find_plugin:
  * @id: The id of the plugin to find.
  *
  * Finds the first plugin matching @id.  This function uses
- * #gplugin_plugin_manager_find_plugins and returns the first plugin in the
+ * #gplugin_manager_find_plugins and returns the first plugin in the
  * list.
  *
  * Return value: (transfer full): A referenced #GPluginPlugin instance or NULL
  *               if no plugin matching @id was found.
  */
 GPluginPlugin *
-gplugin_plugin_manager_find_plugin(const gchar *id) {
+gplugin_manager_find_plugin(const gchar *id) {
 	GSList *plugins_list = NULL;
 	GPluginPlugin *plugin = NULL;
 
 	g_return_val_if_fail(id != NULL, NULL);
 
-	plugins_list = gplugin_plugin_manager_find_plugins(id);
+	plugins_list = gplugin_manager_find_plugins(id);
 	if(plugins_list == NULL)
 		return NULL;
 
 	plugin = g_object_ref(G_OBJECT(plugins_list->data));
 
-	gplugin_plugin_manager_free_plugin_list(plugins_list);
+	gplugin_manager_free_plugin_list(plugins_list);
 
 	return plugin;
 }
 
 
 /**
- * gplugin_plugin_manager_load_plugin:
+ * gplugin_manager_load_plugin:
  * @plugin: #GPluginPlugin instance
  * @error: (out): return location for a #GError or null
  *
@@ -1284,16 +1160,16 @@ gplugin_plugin_manager_find_plugin(const gchar *id) {
  *               FALSE otherwise.
  */
 gboolean
-gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
-	GPluginPluginManager *manager = NULL;
-	GPluginPluginManagerClass *klass = NULL;
+gplugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
+	GPluginManager *manager = NULL;
+	GPluginManagerClass *klass = NULL;
 
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
 
-	manager = GPLUGIN_PLUGIN_MANAGER_INSTANCE;
-	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_MANAGER(manager), FALSE);
+	manager = GPLUGIN_MANAGER_INSTANCE;
+	g_return_val_if_fail(GPLUGIN_IS_MANAGER(manager), FALSE);
 
-	klass = GPLUGIN_PLUGIN_MANAGER_GET_CLASS(manager);
+	klass = GPLUGIN_MANAGER_GET_CLASS(manager);
 	if(klass && klass->load_plugin)
 		return klass->load_plugin(manager, plugin, error);
 
@@ -1301,7 +1177,7 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
 }
 
 /**
- * gplugin_plugin_manager_unload_plugin:
+ * gplugin_manager_unload_plugin:
  * @plugin: #GPluginPlugin instance
  * @error: (out): return location for a #GError or null
  *
@@ -1311,16 +1187,16 @@ gplugin_plugin_manager_load_plugin(GPluginPlugin *plugin, GError **error) {
  *               FALSE otherwise.
  */
 gboolean
-gplugin_plugin_manager_unload_plugin(GPluginPlugin *plugin, GError **error) {
-	GPluginPluginManager *manager = NULL;
-	GPluginPluginManagerClass *klass = NULL;
+gplugin_manager_unload_plugin(GPluginPlugin *plugin, GError **error) {
+	GPluginManager *manager = NULL;
+	GPluginManagerClass *klass = NULL;
 
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
 
-	manager = GPLUGIN_PLUGIN_MANAGER_INSTANCE;
-	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_MANAGER(manager), FALSE);
+	manager = GPLUGIN_MANAGER_INSTANCE;
+	g_return_val_if_fail(GPLUGIN_IS_MANAGER(manager), FALSE);
 
-	klass = GPLUGIN_PLUGIN_MANAGER_GET_CLASS(manager);
+	klass = GPLUGIN_MANAGER_GET_CLASS(manager);
 	if(klass && klass->unload_plugin)
 		return klass->unload_plugin(manager, plugin, error);
 
@@ -1328,7 +1204,7 @@ gplugin_plugin_manager_unload_plugin(GPluginPlugin *plugin, GError **error) {
 }
 
 /**
- * gplugin_plugin_manager_list_plugins:
+ * gplugin_manager_list_plugins:
  *
  * Returns a #GList of all plugin id's.  Each id should be queried directly
  * for more information.
@@ -1337,13 +1213,13 @@ gplugin_plugin_manager_unload_plugin(GPluginPlugin *plugin, GError **error) {
  *               plugin id.
  */
 GList *
-gplugin_plugin_manager_list_plugins(void) {
-	GPluginPluginManager *manager = GPLUGIN_PLUGIN_MANAGER_INSTANCE;
-	GPluginPluginManagerClass *klass = NULL;
+gplugin_manager_list_plugins(void) {
+	GPluginManager *manager = GPLUGIN_MANAGER_INSTANCE;
+	GPluginManagerClass *klass = NULL;
 
-	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_MANAGER(manager), NULL);
+	g_return_val_if_fail(GPLUGIN_IS_MANAGER(manager), NULL);
 
-	klass = GPLUGIN_PLUGIN_MANAGER_GET_CLASS(manager);
+	klass = GPLUGIN_MANAGER_GET_CLASS(manager);
 	if(klass && klass->list_plugins)
 		return klass->list_plugins(manager);
 
@@ -1352,7 +1228,7 @@ gplugin_plugin_manager_list_plugins(void) {
 
 
 /**
- * gplugin_plugin_manager_get_instance:
+ * gplugin_manager_get_instance:
  *
  * Returns a #GObject that is the instance of the plugin manager that is being
  * used.
@@ -1364,7 +1240,7 @@ gplugin_plugin_manager_list_plugins(void) {
  *                                plugin manager.
  */
 GObject *
-gplugin_plugin_manager_get_instance(void) {
+gplugin_manager_get_instance(void) {
 	if(instance)
 		return G_OBJECT(instance);
 

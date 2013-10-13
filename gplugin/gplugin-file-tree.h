@@ -15,30 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GI_SCANNER__ /* hide this bit from g-ir-scanner */
-#if !defined(GPLUGIN_GLOBAL_HEADER_INSIDE) && !defined(GPLUGIN_COMPILATION)
-#error "only <gplugin.h> may be included directly"
-#endif
-#endif /* __GI_SCANNER__ */
-
-#ifndef GPLUGIN_PRIVATE_H
-#define GPLUGIN_PRIVATE_H
+#ifndef GPLUGIN_FILE_TREE_H
+#define GPLUGIN_FILE_TREE_H
 
 #include <glib.h>
-#include <glib-object.h>
 
-#include <gplugin/gplugin-plugin.h>
+typedef struct {
+	gchar *filename;
+	gchar *extension;
+} GPluginFileTreeEntry;
 
 G_BEGIN_DECLS
 
-gchar *gplugin_plugin_get_internal_filename(GPluginPlugin *plugin);
-
-void gplugin_manager_private_init(void);
-void gplugin_manager_private_uninit(void);
-
-gboolean gplugin_boolean_accumulator(GSignalInvocationHint *hint, GValue *return_accu, const GValue *handler_return, gpointer data);
+GNode *gplugin_file_tree_new(GList *paths);
+void gplugin_file_tree_free(GNode *root);
 
 G_END_DECLS
 
-#endif /* GPLUGIN_PRIVATE_H */
+#endif /* GPLUGIN_FILE_TREE_H */
 
