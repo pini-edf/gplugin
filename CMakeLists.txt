@@ -163,5 +163,5 @@ add_subdirectory(python)
 # Install stuff
 ###############################################################################
 # documentation
-install(FILES ChangeLog INSTALL README DESTINATION share/doc/gplugin)
+install(FILES ChangeLog INSTALL README HACKING DESTINATION share/doc/gplugin)
 
