@@ -14,14 +14,14 @@ if(BUILD_PYTHON)
 
 		set(GPLUGIN_PYTHON_SOURCES
 			gplugin-python-core.c
+			gplugin-python-loader.c
 			gplugin-python-plugin.c
-			gplugin-python-plugin-loader.c
 			gplugin-python-utils.c
 		)
 
 		set(GPLUGIN_PYTHON_HEADERS
+			gplugin-python-loader.h
 			gplugin-python-plugin.h
-			gplugin-python-plugin-loader.h
 			gplugin-python-utils.h
 		)
 

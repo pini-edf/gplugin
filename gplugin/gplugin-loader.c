@@ -15,25 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <gplugin/gplugin-plugin-loader.h>
+#include <gplugin/gplugin-loader.h>
 
 /******************************************************************************
  * API
  *****************************************************************************/
 GType
-gplugin_plugin_loader_get_type(void) {
+gplugin_loader_get_type(void) {
 	static volatile gsize type_volatile = 0;
 
 	if(g_once_init_enter(&type_volatile)) {
 		GType type = 0;
 
 		static const GTypeInfo info = {
-			.class_size = sizeof(GPluginPluginLoaderClass),
-			.instance_size = sizeof(GPluginPluginLoader),
+			.class_size = sizeof(GPluginLoaderClass),
+			.instance_size = sizeof(GPluginLoader),
 		};
 
 		type = g_type_register_static(G_TYPE_OBJECT,
-		                              "GPluginPluginLoader",
+		                              "GPluginLoader",
 		                              &info, G_TYPE_FLAG_ABSTRACT);
 
 		g_once_init_leave(&type_volatile, type);
@@ -43,25 +43,25 @@ gplugin_plugin_loader_get_type(void) {
 }
 
 /**
- * gplugin_plugin_loader_query_plugin:
- * @loader: #GPluginPluginLoader instance performing the query
+ * gplugin_loader_query_plugin:
+ * @loader: #GPluginLoader instance performing the query
  * @filename: filename to query
  * error: return location for a GError, or NULL
  *
  * Return value: (transfer full): A #GPluginPlugin instance or NULL on failure
  */
 GPluginPlugin *
-gplugin_plugin_loader_query_plugin(GPluginPluginLoader *loader,
+gplugin_loader_query_plugin(GPluginLoader *loader,
                                    const gchar *filename, GError **error)
 {
-	GPluginPluginLoaderClass *klass = NULL;
+	GPluginLoaderClass *klass = NULL;
 
 	g_return_val_if_fail(loader != NULL, NULL);
-	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_LOADER(loader), NULL);
+	g_return_val_if_fail(GPLUGIN_IS_LOADER(loader), NULL);
 	g_return_val_if_fail(filename, NULL);
 	g_return_val_if_fail(error != NULL, NULL);
 
-	klass = GPLUGIN_PLUGIN_LOADER_GET_CLASS(loader);
+	klass = GPLUGIN_LOADER_GET_CLASS(loader);
 
 	if(klass && klass->query)
 		return klass->query(loader, filename, error);
@@ -70,25 +70,25 @@ gplugin_plugin_loader_query_plugin(GPluginPluginLoader *loader,
 }
 
 /**
- * gplugin_plugin_loader_load_plugin:
- * @loader: #GPluginPluginLoader instance performing the load
+ * gplugin_loader_load_plugin:
+ * @loader: #GPluginLoader instance performing the load
  * @plugin: #GPluginPlugin instance to load
  * error: return location for a GError, or NULL
  *
  * Return value: TRUE if @plugin was loaded successfully, FALSE otherwise
  */
 gboolean
-gplugin_plugin_loader_load_plugin(GPluginPluginLoader *loader,
+gplugin_loader_load_plugin(GPluginLoader *loader,
                                   GPluginPlugin *plugin, GError **error)
 {
-	GPluginPluginLoaderClass *klass = NULL;
+	GPluginLoaderClass *klass = NULL;
 
 	g_return_val_if_fail(loader != NULL, FALSE);
-	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_LOADER(loader), FALSE);
+	g_return_val_if_fail(GPLUGIN_IS_LOADER(loader), FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
 	g_return_val_if_fail(error != NULL, FALSE);
 
-	klass = GPLUGIN_PLUGIN_LOADER_GET_CLASS(loader);
+	klass = GPLUGIN_LOADER_GET_CLASS(loader);
 
 	if(klass && klass->load)
 		return klass->load(loader, plugin, error);
@@ -97,24 +97,24 @@ gplugin_plugin_loader_load_plugin(GPluginPluginLoader *loader,
 }
 
 /**
- * gplugin_plugin_loader_unload_plugin:
- * @loader: #GPluginPluginLoader instance performing the unload
+ * gplugin_loader_unload_plugin:
+ * @loader: #GPluginLoader instance performing the unload
  * @plugin: #GPluginPlugin instance to unload
  * error: return location for a GError, or NULL
  *
  * Return value: TRUE if @plugin was unloaded successfully, FALSE otherwise
  */
 gboolean
-gplugin_plugin_loader_unload_plugin(GPluginPluginLoader *loader,
+gplugin_loader_unload_plugin(GPluginLoader *loader,
                                     GPluginPlugin *plugin, GError **error)
 {
-	GPluginPluginLoaderClass *klass = NULL;
+	GPluginLoaderClass *klass = NULL;
 
 	g_return_val_if_fail(loader != NULL, FALSE);
-	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_LOADER(loader), FALSE);
+	g_return_val_if_fail(GPLUGIN_IS_LOADER(loader), FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
 
-	klass = GPLUGIN_PLUGIN_LOADER_GET_CLASS(loader);
+	klass = GPLUGIN_LOADER_GET_CLASS(loader);
 
 	if(klass && klass->unload)
 		return klass->unload(loader, plugin, error);

@@ -20,7 +20,7 @@
 #include <glib.h>
 
 #define test_path_count(e) G_STMT_START { \
-	GList *paths = gplugin_plugin_manager_get_paths(); \
+	GList *paths = gplugin_manager_get_paths(); \
 	g_assert_cmpint(g_list_length(paths), ==, (e)); \
 } G_STMT_END
 
@@ -28,61 +28,61 @@
  * Tests
  *****************************************************************************/
 static void
-test_gplugin_plugin_manager_paths_single(void) {
-	gplugin_plugin_manager_append_path("foo");
+test_gplugin_manager_paths_single(void) {
+	gplugin_manager_append_path("foo");
 	test_path_count(1);
 
-	gplugin_plugin_manager_remove_path("foo");
+	gplugin_manager_remove_path("foo");
 	test_path_count(0);
 }
 
 static void
-test_gplugin_plugin_manager_paths_duplicate(void) {
-	gplugin_plugin_manager_append_path("foo");
-	gplugin_plugin_manager_append_path("foo");
+test_gplugin_manager_paths_duplicate(void) {
+	gplugin_manager_append_path("foo");
+	gplugin_manager_append_path("foo");
 
 	test_path_count(1);
 
-	gplugin_plugin_manager_remove_path("foo");
+	gplugin_manager_remove_path("foo");
 	test_path_count(0);
 }
 
 static void
-test_gplugin_plugin_manager_paths_multiple_fifo(void) {
+test_gplugin_manager_paths_multiple_fifo(void) {
 	/* add */
-	gplugin_plugin_manager_append_path("foo");
+	gplugin_manager_append_path("foo");
 	test_path_count(1);
 
-	gplugin_plugin_manager_append_path("bar");
+	gplugin_manager_append_path("bar");
 	test_path_count(2);
 
 	/* remove */
-	gplugin_plugin_manager_remove_path("foo");
+	gplugin_manager_remove_path("foo");
 	test_path_count(1);
 
-	gplugin_plugin_manager_remove_path("bar");
+	gplugin_manager_remove_path("bar");
 	test_path_count(0);
 }
 
 static void
-test_gplugin_plugin_manager_paths_multiple_filo(void) {
+test_gplugin_manager_paths_multiple_filo(void) {
 	/* add */
-	gplugin_plugin_manager_append_path("foo");
+	gplugin_manager_append_path("foo");
 	test_path_count(1);
 
-	gplugin_plugin_manager_append_path("bar");
+	gplugin_manager_append_path("bar");
 	test_path_count(2);
 
 	/* remove */
-	gplugin_plugin_manager_remove_path("bar");
+	gplugin_manager_remove_path("bar");
 	test_path_count(1);
 
-	gplugin_plugin_manager_remove_path("foo");
+	gplugin_manager_remove_path("foo");
 	test_path_count(0);
 }
 
 static void
-test_gplugin_plugin_manager_add_default_paths(void) {
+test_gplugin_manager_add_default_paths(void) {
 	GHashTable *req = NULL;
 	GList *paths = NULL, *l = NULL;
 	gchar *path = NULL;
@@ -99,10 +99,10 @@ test_gplugin_plugin_manager_add_default_paths(void) {
 	g_hash_table_insert(req, path, GINT_TO_POINTER(FALSE));
 
 	/* now tell the plugin manager to add the default paths */
-	gplugin_plugin_manager_add_default_paths();
+	gplugin_manager_add_default_paths();
 
 	/* now remove each path that the manager knows about from our table */
-	paths = gplugin_plugin_manager_get_paths();
+	paths = gplugin_manager_get_paths();
 	for(l = paths; l; l = l->next) {
 		g_hash_table_remove(req, l->data);
 	}
@@ -116,7 +116,7 @@ test_gplugin_plugin_manager_add_default_paths(void) {
 }
 
 static void
-test_gplugin_plugin_manager_add_app_paths(void) {
+test_gplugin_manager_add_app_paths(void) {
 	GHashTable *req = NULL;
 	GList *paths = NULL, *l = NULL;
 	const gchar *prefix = "/opt";
@@ -134,12 +134,12 @@ test_gplugin_plugin_manager_add_app_paths(void) {
 	g_hash_table_insert(req, path, GINT_TO_POINTER(FALSE));
 
 	/* now add the app paths */
-	gplugin_plugin_manager_add_app_paths(prefix, "foo");
+	gplugin_manager_add_app_paths(prefix, "foo");
 
 	/* now get all the paths that the manager is managing and remove them from
 	 * our required table.
 	 */
-	paths = gplugin_plugin_manager_get_paths();
+	paths = gplugin_manager_get_paths();
 	for(l = paths; l != NULL; l = l->next)
 		g_hash_table_remove(req, l->data);
 	g_list_free(paths);
@@ -162,21 +162,21 @@ main(gint argc, gchar **argv) {
 	gplugin_init();
 
 	g_test_add_func("/plugins/paths/add_remove_single",
-	                test_gplugin_plugin_manager_paths_single);
+	                test_gplugin_manager_paths_single);
 
 	g_test_add_func("/plugins/paths/add_remove_duplicate",
-	                test_gplugin_plugin_manager_paths_duplicate);
+	                test_gplugin_manager_paths_duplicate);
 
 	g_test_add_func("/plugins/paths/add_remove_multiple_fifo",
-	                test_gplugin_plugin_manager_paths_multiple_fifo);
+	                test_gplugin_manager_paths_multiple_fifo);
 
 	g_test_add_func("/plugins/paths/add_remove_multiple_filo",
-	                test_gplugin_plugin_manager_paths_multiple_filo);
+	                test_gplugin_manager_paths_multiple_filo);
 
 	g_test_add_func("/plugins/paths/add_default_paths",
-	                test_gplugin_plugin_manager_add_default_paths);
+	                test_gplugin_manager_add_default_paths);
 	g_test_add_func("/plugins/paths/add_app_paths",
-	                test_gplugin_plugin_manager_add_app_paths);
+	                test_gplugin_manager_add_app_paths);
 
 	return g_test_run();
 }
