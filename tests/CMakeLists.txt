@@ -25,6 +25,7 @@ endmacro(add_gtest)
 add_gtest(test-core)
 add_gtest(test-plugin-manager-paths)
 add_gtest(test-plugin-info)
+add_gtest(test-signals)
 
 add_gtest(test-native-loader)
 add_dependencies(test-native-loader
