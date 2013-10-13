@@ -18,8 +18,8 @@
 
 #include <gplugin/gplugin-native-private.h>
 
-#include <gplugin/gplugin-plugin-loader.h>
-#include <gplugin/gplugin-plugin-manager.h>
+#include <gplugin/gplugin-loader.h>
+#include <gplugin/gplugin-manager.h>
 
 #include <gplugin/gplugin-core.h>
 
@@ -580,10 +580,10 @@ gplugin_native_plugin_register_type(GPluginNativePlugin *plugin, GType parent,
 		                                       sizeof(GTypeValueTable));
 	}
 
-	if(g_type_is_a(type_info->type, GPLUGIN_TYPE_PLUGIN_LOADER) &&
+	if(g_type_is_a(type_info->type, GPLUGIN_TYPE_LOADER) &&
 	   !G_TYPE_IS_ABSTRACT(type_info->type))
 	{
-		gplugin_plugin_manager_register_loader(type_info->type);
+		gplugin_manager_register_loader(type_info->type);
 	}
 
 	return type_info->type;

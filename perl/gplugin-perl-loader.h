@@ -18,20 +18,20 @@
 #define GPLUGIN_PERL_PLUGIN_LOADER_H
 
 #define GPLUGIN_TYPE_PERL_PLUGIN_LOADER            (gplugin_perl_plugin_loader_get_type())
-#define GPLUGIN_PERL_PLUGIN_LOADER(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GPLUGIN_TYPE_PERL_PLUGIN_LOADER, GPluginPerlPluginLoader))
-#define GPLUGIN_PERL_PLUGIN_LOADER_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((obj), GPLUGIN_TYPE_PERL_PLUGIN_LOADER, GPluginPerlPluginLoaderClass))
+#define GPLUGIN_PERL_PLUGIN_LOADER(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GPLUGIN_TYPE_PERL_PLUGIN_LOADER, GPluginPerlLoader))
+#define GPLUGIN_PERL_PLUGIN_LOADER_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((obj), GPLUGIN_TYPE_PERL_PLUGIN_LOADER, GPluginPerlLoaderClass))
 #define GPLUGIN_IS_PERL_PLUGIN_LOADER(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), GPLUGIN_TYPE_PERL_PLUGIN_LOADER))
 #define GPLUGIN_IS_PERL_PLUGIN_LOADER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((obj), GPLUGIN_TYPE_PERL_PLUGIN_LOADER))
-#define GPLUGIN_PERL_PLUGIN_LOADER_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), GPLUGIN_TYPE_PERL_PLUGIN_LOADER, GPluginPerlPluginLoaderClass))
+#define GPLUGIN_PERL_PLUGIN_LOADER_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), GPLUGIN_TYPE_PERL_PLUGIN_LOADER, GPluginPerlLoaderClass))
 
-typedef struct _GPluginPerlPluginLoader            GPluginPerlPluginLoader;
-typedef struct _GPluginPerlPluginLoaderClass       GPluginPerlPluginLoaderClass;
+typedef struct _GPluginPerlLoader            GPluginPerlLoader;
+typedef struct _GPluginPerlLoaderClass       GPluginPerlLoaderClass;
 
 #include <gplugin.h>
 #include <gplugin-native.h>
 
-struct _GPluginPerlPluginLoader {
-	GPluginPluginLoader parent;
+struct _GPluginPerlLoader {
+	GPluginLoader parent;
 
 	void (*_gplugin_reserved_1)(void);
 	void (*_gplugin_reserved_2)(void);
@@ -39,8 +39,8 @@ struct _GPluginPerlPluginLoader {
 	void (*_gplugin_reserved_4)(void);
 };
 
-struct _GPluginPerlPluginLoaderClass {
-	GPluginPluginLoaderClass parent;
+struct _GPluginPerlLoaderClass {
+	GPluginLoaderClass parent;
 
 	void (*_gplugin_reserved_1)(void);
 	void (*_gplugin_reserved_2)(void);

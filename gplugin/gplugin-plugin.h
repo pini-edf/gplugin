@@ -48,7 +48,7 @@ typedef enum /*< prefix=GPLUGIN_PLUGIN_STATE,underscore_name=GPLUGIN_PLUGIN_STAT
 #include <glib-object.h>
 
 #include <gplugin/gplugin-plugin-info.h>
-#include <gplugin/gplugin-plugin-loader.h>
+#include <gplugin/gplugin-loader.h>
 
 struct _GPluginPlugin {
 	GObject gparent;
@@ -70,7 +70,7 @@ G_BEGIN_DECLS
 GType gplugin_plugin_get_type(void);
 
 const gchar *gplugin_plugin_get_filename(const GPluginPlugin *plugin);
-GPluginPluginLoader *gplugin_plugin_get_loader(const GPluginPlugin *plugin);
+GPluginLoader *gplugin_plugin_get_loader(const GPluginPlugin *plugin);
 GPluginPluginInfo *gplugin_plugin_get_info(const GPluginPlugin *plugin);
 
 GPluginPluginState gplugin_plugin_get_state(const GPluginPlugin *plugin);

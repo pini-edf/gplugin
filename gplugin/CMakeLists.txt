@@ -8,18 +8,18 @@ add_definitions(
 
 set(GPLUGIN_HEADERS
 	gplugin-core.h
+	gplugin-loader.h
+	gplugin-manager.h
 	gplugin-plugin.h
 	gplugin-plugin-info.h
-	gplugin-plugin-loader.h
-	gplugin-plugin-manager.h
 )
 
 set(GPLUGIN_SOURCES
 	gplugin-core.c
 	gplugin-plugin.c
+	gplugin-loader.c
+	gplugin-manager.c
 	gplugin-plugin-info.c
-	gplugin-plugin-loader.c
-	gplugin-plugin-manager.c
 	gplugin-private.c
 	gplugin-version.c
 )
@@ -43,12 +43,12 @@ set(GPLUGIN_PRIVATE_BUILT_SOURCES
 
 set(GPLUGIN_NATIVE_HEADERS
 	gplugin-native-plugin.h
-	gplugin-native-plugin-loader.h
+	gplugin-native-loader.h
 )
 
 set(GPLUGIN_NATIVE_SOURCES
 	gplugin-native-plugin.c
-	gplugin-native-plugin-loader.c
+	gplugin-native-loader.c
 )
 
 ##############################################################################

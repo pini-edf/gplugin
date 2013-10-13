@@ -31,15 +31,15 @@ test_gplugin_init_uninit(void) {
 static void
 test_gplugin_init_uninit_with_refresh(void) {
 	gplugin_init();
-	gplugin_plugin_manager_refresh();
+	gplugin_manager_refresh();
 	gplugin_uninit();
 }
 
 static void
 test_gplugin_init_uninit_with_refresh_plugins(void) {
 	gplugin_init();
-	gplugin_plugin_manager_append_path(TEST_DIR);
-	gplugin_plugin_manager_refresh();
+	gplugin_manager_append_path(TEST_DIR);
+	gplugin_manager_refresh();
 	gplugin_uninit();
 }
 
@@ -50,28 +50,28 @@ test_gplugin_init_uninit_with_double_refresh_plugins(void) {
 	gint f_ids = 0, s_ids = 0, f_plugins = 0, s_plugins = 0;
 
 	gplugin_init();
-	gplugin_plugin_manager_append_path(TEST_DIR);
-	gplugin_plugin_manager_append_path(TEST_ID_DIR);
+	gplugin_manager_append_path(TEST_DIR);
+	gplugin_manager_append_path(TEST_ID_DIR);
 
 	/* run the first refresh and count everything */
-	gplugin_plugin_manager_refresh();
-	for(l = gplugin_plugin_manager_list_plugins(); l; l = l->next) {
+	gplugin_manager_refresh();
+	for(l = gplugin_manager_list_plugins(); l; l = l->next) {
 		const gchar *id = (const gchar *)l->data;
 
 		f_ids += 1;
 
-		for(sl = gplugin_plugin_manager_find_plugins(id); sl; sl = sl->next)
+		for(sl = gplugin_manager_find_plugins(id); sl; sl = sl->next)
 			f_plugins += 1;
 	}
 
 	/* now run the second refresh and make sure the counts match */
-	gplugin_plugin_manager_refresh();
-	for(l = gplugin_plugin_manager_list_plugins(); l; l = l->next) {
+	gplugin_manager_refresh();
+	for(l = gplugin_manager_list_plugins(); l; l = l->next) {
 		const gchar *id = (const gchar *)l->data;
 
 		s_ids += 1;
 
-		for(sl = gplugin_plugin_manager_find_plugins(id); sl; sl = sl->next)
+		for(sl = gplugin_manager_find_plugins(id); sl; sl = sl->next)
 			s_plugins += 1;
 	}
 
