@@ -79,8 +79,10 @@ list(APPEND PRIVATE_HEADERS
 # Configure Files
 ###############################################################################
 configure_file(gplugin-version.h.in gplugin-version.h @ONLY)
-configure_file(gplugin.pc.in ${CMAKE_BINARY_DIR}/gplugin.pc @ONLY)
-configure_file(gplugin-uninstalled.pc.in ${CMAKE_BINARY_DIR}/gplugin-uninstalled.pc @ONLY)
+configure_file(gplugin.pc.in ${CMAKE_CURRENT_BINARY_DIR}/gplugin.pc @ONLY)
+configure_file(gplugin-uninstalled.pc.in
+               ${CMAKE_CURRENT_BINARY_DIR}/gplugin-uninstalled.pc
+               @ONLY)
 
 
 # build gplugin.h
