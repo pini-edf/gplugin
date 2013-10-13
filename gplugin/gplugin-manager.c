@@ -29,7 +29,7 @@
 
 #include <gplugin/gplugin-native.h>
 
-#include <gplugin/utils/gplugin-file-tree.h>
+#include <gplugin/gplugin-file-tree.h>
 
 /******************************************************************************
  * Enums

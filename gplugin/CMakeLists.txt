@@ -1,5 +1,3 @@
-add_subdirectory(utils)
-
 ###############################################################################
 # Library
 ###############################################################################
@@ -31,12 +29,20 @@ set(GPLUGIN_PUBLIC_BUILT_HEADERS
 	gplugin-version.h
 )
 
-set(GPLUGIN_PRIVATE_BUILT_HEADERS
-	gplugin-marshallers.h
-)
-
 set(GPLUGIN_PUBLIC_BUILT_SOURCES
 	gplugin-enums.c
+)
+
+set(GPLUGIN_PRIVATE_HEADERS
+	gplugin-file-tree.h
+)
+
+set(GPLUGIN_PRIVATE_SOURCES
+	gplugin-file-tree.c
+)
+
+set(GPLUGIN_PRIVATE_BUILT_HEADERS
+	gplugin-marshallers.h
 )
 
 set(GPLUGIN_PRIVATE_BUILT_SOURCES
@@ -63,6 +69,7 @@ list(APPEND PUBLIC_HEADERS
 list(SORT PUBLIC_HEADERS)
 
 list(APPEND PRIVATE_HEADERS
+	${GPLUGIN_PRIVATE_HEADERS}
 	${GPLUGIN_PRIVATE_BUILT_HEADERS}
 	gplugin-private.h
 	gplugin-native-private.h
@@ -141,6 +148,7 @@ add_library(gplugin SHARED
 	${GPLUGIN_SOURCES}
 	${GPLUGIN_NATIVE_SOURCES}
 	${GPLUGIN_PUBLIC_BUILT_SOURCES}
+	${GPLUGIN_PRIVATE_SOURCES}
 	${GPLUGIN_PRIVATE_BUILT_SOURCES}
 	${GPLUGIN_NATIVE_HEADERS}
 	${PUBLIC_HEADERS}
@@ -152,7 +160,6 @@ add_library(gplugin SHARED
 target_link_libraries(gplugin
 	${GLIB_LIBRARIES}
 	${GMODULE_LIBRARIES}
-	gplugin-utils
 )
 
 # nls
