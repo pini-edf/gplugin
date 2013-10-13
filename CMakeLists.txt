@@ -133,7 +133,6 @@ add_definitions(
 	-g -g3 -Wall
 	-DPREFIX="${CMAKE_INSTALL_PREFIX}"
 	-DGPLUGIN_WEBSITE="http://bitbucket.org/rw_grim/gplugin/"
-	-fPIC
 )
 
 include_directories(
