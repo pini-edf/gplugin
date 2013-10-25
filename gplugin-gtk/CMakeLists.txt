@@ -29,13 +29,15 @@ include_directories(
 )
 
 set(GPLUGIN_GTK_SOURCES
-	gplugin-gtk-view.c
+	gplugin-gtk-plugin-info.c
 	gplugin-gtk-store.c
+	gplugin-gtk-view.c
 )
 
 set(GPLUGIN_GTK_HEADERS
-	gplugin-gtk-view.h
+	gplugin-gtk-plugin-info.h
 	gplugin-gtk-store.h
+	gplugin-gtk-view.h
 )
 
 set(GPLUGIN_GTK_PRIVATE_SOURCES
