@@ -57,11 +57,21 @@ struct _GPluginGtkStoreClass {
 	void (*_gplugin_reserved4)(void);
 };
 
+typedef enum {
+	GPLUGIN_GTK_STORE_LOADED_COLUMN,
+	GPLUGIN_GTK_STORE_PLUGIN_COLUMN,
+	GPLUGIN_GTK_STORE_MARKUP_COLUMN,
+	GPLUGIN_GTK_STORE_N_COLUMNS,
+} GPluginGtkStoreColumns;
+
+
 G_BEGIN_DECLS
 
 GType gplugin_gtk_store_get_type(void);
 
 GPluginGtkStore *gplugin_gtk_store_new(void);
+
+const GType *gplugin_gtk_get_store_column_types(void);
 
 G_END_DECLS
 
