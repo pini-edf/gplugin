@@ -87,6 +87,7 @@ create_window(void) {
 
 	grid = gtk_grid_new();
 	gtk_grid_set_row_homogeneous(GTK_GRID(grid), TRUE);
+	gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
 	gtk_container_add(GTK_CONTAINER(window), grid);
 
 	sw = gtk_scrolled_window_new(NULL, NULL);
