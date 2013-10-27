@@ -30,6 +30,8 @@ typedef struct _GPluginLuaPluginClass       GPluginLuaPluginClass;
 #include <gplugin.h>
 #include <gplugin-native.h>
 
+#include <lua.h>
+
 struct _GPluginLuaPlugin {
 	GPluginPlugin parent;
 };
@@ -47,6 +49,8 @@ G_BEGIN_DECLS
 
 void gplugin_lua_plugin_register(GPluginNativePlugin *plugin);
 GType gplugin_lua_plugin_get_type(void);
+
+lua_State *gplugin_lua_plugin_get_state(const GPluginLuaPlugin *plugin);
 
 G_END_DECLS
 

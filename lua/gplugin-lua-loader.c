@@ -25,21 +25,47 @@
 #include <lauxlib.h>
 #include <lualib.h>
 
-#define GPLUGIN_LUA_LOADER_GET_PRIVATE(obj) \
-	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_LUA_LOADER, GPluginLuaLoaderPrivate))
-
-/******************************************************************************
- * Typedefs
- *****************************************************************************/
-typedef struct {
-	guint dummy;
-} GPluginLuaLoaderPrivate;
-
 /******************************************************************************
  * Globals
  *****************************************************************************/
 static GObjectClass *parent_class = NULL;
 static GType type_real = 0;
+
+/******************************************************************************
+ * Helpers
+ *****************************************************************************/
+static gboolean
+_gplugin_lua_loader_load_unload_plugin(GPluginLoader *loader,
+                                       GPluginPlugin *plugin,
+                                       const gchar *function, GError **error)
+{
+	gboolean ret;
+	lua_State *L = gplugin_lua_plugin_get_state(GPLUGIN_LUA_PLUGIN(plugin));
+
+	lua_getglobal(L, function);
+	lua_pushlightuserdata(L, plugin);
+	if(lua_pcall(L, 1, 1, 0) != 0) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "%s", lua_tostring(L, -1));
+		}
+
+		return FALSE;
+	}
+
+	if(!lua_isboolean(L, -1)) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "%s", lua_tostring(L, -1));
+		}
+
+		return FALSE;
+	}
+
+	ret = lua_toboolean(L, -1);
+
+	return ret;
+}
 
 /******************************************************************************
  * GPluginLoaderInterface API
@@ -93,7 +119,7 @@ gplugin_lua_loader_query(GPluginLoader *loader, const gchar *filename,
 		return NULL;
 	}
 
-	info = lua_topointer(L, -1);
+	info = lua_touserdata(L, -1);
 	lua_pop(L, 1);
 
 	plugin = g_object_new(GPLUGIN_TYPE_LUA_PLUGIN,
@@ -110,38 +136,26 @@ static gboolean
 gplugin_lua_loader_load(GPluginLoader *loader, GPluginPlugin *plugin,
                         GError **error)
 {
-	return FALSE;
+	return _gplugin_lua_loader_load_unload_plugin(loader, plugin,
+	                                              "gplugin_load", error);
 }
 
 static gboolean
 gplugin_lua_loader_unload(GPluginLoader *loader, GPluginPlugin *plugin,
                           GError **error)
 {
-	return FALSE;
+	return _gplugin_lua_loader_load_unload_plugin(loader, plugin,
+	                                              "gplugin_unload", error);
 }
 
 /******************************************************************************
- * Lua Stuff
+ * GObject Stuff
  *****************************************************************************/
-
-/******************************************************************************
- * Object Stuff
- *****************************************************************************/
-static void
-gplugin_lua_loader_finalize(GObject *obj) {
-	G_OBJECT_CLASS(parent_class)->finalize(obj);
-}
-
 static void
 gplugin_lua_loader_class_init(GPluginLuaLoaderClass *klass) {
-	GObjectClass *obj_class = G_OBJECT_CLASS(klass);
 	GPluginLoaderClass *loader_class = GPLUGIN_LOADER_CLASS(klass);
 
 	parent_class = g_type_class_peek_parent(klass);
-
-	g_type_class_add_private(klass, sizeof(GPluginLuaLoaderPrivate));
-
-	obj_class->finalize = gplugin_lua_loader_finalize;
 
 	loader_class->supported_extensions = g_slist_append(NULL, "lua");
 	loader_class->query = gplugin_lua_loader_query;

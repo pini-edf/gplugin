@@ -54,13 +54,6 @@ gplugin_lua_plugin_set_state(GPluginLuaPlugin *plugin, lua_State *L) {
 	priv->L = L;
 }
 
-static lua_State *
-gplugin_lua_plugin_get_state(const GPluginLuaPlugin *plugin) {
-	GPluginLuaPluginPrivate *priv = GPLUGIN_LUA_PLUGIN_GET_PRIVATE(plugin);
-
-	return priv->L;
-}
-
 /******************************************************************************
  * Object Stuff
  *****************************************************************************/
@@ -158,5 +151,12 @@ gplugin_lua_plugin_get_type(void) {
 	}
 
 	return type_real;
+}
+
+lua_State *
+gplugin_lua_plugin_get_state(const GPluginLuaPlugin *plugin) {
+	GPluginLuaPluginPrivate *priv = GPLUGIN_LUA_PLUGIN_GET_PRIVATE(plugin);
+
+	return priv->L;
 }
 
