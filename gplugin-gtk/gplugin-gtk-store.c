@@ -52,13 +52,20 @@ gplugin_gtk_store_add_plugin(GPluginGtkStore *store, GPluginPlugin *plugin) {
 	GtkTreeIter iter;
 	GPluginPluginInfo *info = gplugin_plugin_get_info(plugin);
 	GString *str = g_string_new("");
+	gchar *name = NULL, *summary = NULL;
 
-	g_string_append_printf(str, "<span font-weight=\"bold\">%s</span>",
-	                       gplugin_plugin_info_get_name(info));
-	g_string_append_printf(str, " %s\n",
-	                       gplugin_plugin_info_get_version(info));
+	g_object_get(G_OBJECT(info),
+	             "name", &name,
+	             "summary", &summary,
+	             NULL);
+
+	g_string_append_printf(str, "<b>%s</b>\n",
+	                       (name) ? name : "<i>Unnamed</i>");
 	g_string_append_printf(str, "%s",
-	                       gplugin_plugin_info_get_summary(info));
+	                       (summary) ? summary : "<i>No Summary</i>");
+
+	g_free(name);
+	g_free(summary);
 
 	gtk_list_store_append(GTK_LIST_STORE(store), &iter);
 	gtk_list_store_set(GTK_LIST_STORE(store), &iter,
