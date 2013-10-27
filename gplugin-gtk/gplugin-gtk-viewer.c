@@ -40,6 +40,22 @@ window_closed_cb(GtkWidget *w, GdkEvent *e, gpointer d) {
 	return FALSE;
 }
 
+static void
+selection_changed_cb(GtkTreeSelection *sel, gpointer data) {
+	GPluginGtkPluginInfo *info = GPLUGIN_GTK_PLUGIN_INFO(data);
+	GPluginPlugin *plugin = NULL;
+	GtkTreeModel *model = NULL;
+	GtkTreeIter iter;
+
+	if(gtk_tree_selection_get_selected(sel, &model, &iter)) {
+		gtk_tree_model_get(model, &iter,
+		                   GPLUGIN_GTK_STORE_PLUGIN_COLUMN, &plugin,
+		                   -1);
+	}
+
+	gplugin_gtk_plugin_info_set_plugin(info, plugin);
+}
+
 /******************************************************************************
  * Helpers
  *****************************************************************************/
@@ -59,7 +75,9 @@ no_default_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
 
 static GtkWidget *
 create_window(void) {
-	GtkWidget *window, *view, *sw;
+	GtkWidget *window = NULL, *grid = NULL, *sw = NULL;
+	GtkWidget *view = NULL, *info = NULL;
+	GtkTreeSelection *sel = NULL;
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW(window), "GPlugin Viewer");
@@ -67,16 +85,27 @@ create_window(void) {
 	g_signal_connect(G_OBJECT(window), "delete-event",
 	                 G_CALLBACK(window_closed_cb), NULL);
 
+	grid = gtk_grid_new();
+	gtk_grid_set_row_homogeneous(GTK_GRID(grid), TRUE);
+	gtk_container_add(GTK_CONTAINER(window), grid);
+
 	sw = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
 	                               GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(sw),
 	                                    GTK_SHADOW_IN);
-	gtk_container_add(GTK_CONTAINER(window), sw);
+	gtk_grid_attach(GTK_GRID(grid), sw, 0, 0, 1, 1);
 
 	view = gplugin_gtk_view_new();
 	gplugin_gtk_view_set_show_internal(GPLUGIN_GTK_VIEW(view), show_internal);
 	gtk_container_add(GTK_CONTAINER(sw), view);
+
+	info = gplugin_gtk_plugin_info_new();
+	gtk_grid_attach(GTK_GRID(grid), info, 1, 0, 1, 1);
+
+	sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
+	g_signal_connect(G_OBJECT(sel), "changed",
+	                 G_CALLBACK(selection_changed_cb), info);
 
 	return window;
 }

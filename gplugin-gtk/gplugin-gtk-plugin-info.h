@@ -39,8 +39,10 @@ typedef struct _GPluginGtkPluginInfoClass      GPluginGtkPluginInfoClass;
 
 #include <gtk/gtk.h>
 
+#include <gplugin/gplugin.h>
+
 struct _GPluginGtkPluginInfo {
-	GtkGrid parent;
+	GtkFrame parent;
 
 	void (*_gplugin_reserved1)(void);
 	void (*_gplugin_reserved2)(void);
@@ -49,7 +51,7 @@ struct _GPluginGtkPluginInfo {
 };
 
 struct _GPluginGtkPluginInfoClass {
-	GtkGridClass parent;
+	GtkFrameClass parent;
 
 	void (*_gplugin_reserved1)(void);
 	void (*_gplugin_reserved2)(void);
@@ -63,8 +65,8 @@ GType gplugin_gtk_plugin_info_get_type(void);
 
 GtkWidget *gplugin_gtk_plugin_info_new(void);
 
-void gplugin_gtk_plugin_info_set_show_internal(GPluginGtkPluginInfo *view, gboolean show_internal);
-gboolean gplugin_gtk_plugin_info_get_show_internal(const GPluginGtkPluginInfo *view);
+void gplugin_gtk_plugin_info_set_plugin(GPluginGtkPluginInfo *info, GPluginPlugin *plugin);
+GPluginPlugin *gplugin_gtk_plugin_info_get_plugin(const GPluginGtkPluginInfo *info);
 
 G_END_DECLS
 

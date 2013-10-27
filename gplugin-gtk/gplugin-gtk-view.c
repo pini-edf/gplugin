@@ -18,8 +18,6 @@
 #include <gplugin-gtk/gplugin-gtk-view.h>
 #include <gplugin-gtk/gplugin-gtk-store.h>
 
-#include <gplugin-gtk/gplugin-gtk-private.h>
-
 #define GPLUGIN_GTK_VIEW_GET_PRIVATE(obj) \
 	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_GTK_TYPE_VIEW, GPluginGtkViewPrivate))
 

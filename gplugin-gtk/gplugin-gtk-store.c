@@ -18,7 +18,6 @@
 #include <gplugin/gplugin.h>
 
 #include <gplugin-gtk/gplugin-gtk-store.h>
-#include <gplugin-gtk/gplugin-gtk-private.h>
 
 #define GPLUGIN_GTK_STORE_GET_PRIVATE(obj) \
 	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_GTK_TYPE_STORE, GPluginGtkStorePrivate))
@@ -37,6 +36,13 @@ typedef struct {
 /******************************************************************************
  * Globals
  *****************************************************************************/
+static const GType column_types[] = {
+	G_TYPE_BOOLEAN,
+	G_TYPE_OBJECT,
+	G_TYPE_STRING,
+};
+
+G_STATIC_ASSERT(G_N_ELEMENTS(column_types) == GPLUGIN_GTK_STORE_N_COLUMNS);
 
 /******************************************************************************
  * Helpers
@@ -124,5 +130,10 @@ gplugin_gtk_store_class_init(GPluginGtkStoreClass *klass) {
 GPluginGtkStore *
 gplugin_gtk_store_new(void) {
 	return GPLUGIN_GTK_STORE(g_object_new(GPLUGIN_GTK_TYPE_STORE, NULL));
+}
+
+const GType *
+gplugin_gtk_get_store_column_types(void) {
+	return column_types;
 }
 

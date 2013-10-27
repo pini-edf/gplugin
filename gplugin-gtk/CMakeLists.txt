@@ -41,11 +41,15 @@ set(GPLUGIN_GTK_HEADERS
 )
 
 set(GPLUGIN_GTK_PRIVATE_SOURCES
-	gplugin-gtk-private.c
 )
 
 set(GPLUGIN_GTK_PRIVATE_HEADERS
-	gplugin-gtk-private.h
+)
+
+set(GPLUGIN_GTK_BUILT_SOURCES
+)
+
+set(GPLUGIN_GTK_BUILT_HEADERS
 )
 
 ###############################################################################
@@ -73,6 +77,8 @@ add_library(gplugin-gtk SHARED
 	${GPLUGIN_GTK_HEADERS}
 	${GPLUGIN_GTK_PRIVATE_SOURCES}
 	${GPLUGIN_GTK_PRIVATE_HEADERS}
+	${GPLUGIN_GTK_BUILT_SOURCES}
+	${GPLUGIN_GTK_BUILT_HEADERS}
 )
 
 target_link_libraries(gplugin-gtk
@@ -95,6 +101,12 @@ foreach(HEADER ${GPLUGIN_GTK_HEADERS})
 		DESTINATION include/gplugin-1.0/gplugin-gtk
 	)
 endforeach(HEADER)
+
+# install the GtkBuilder files
+install(
+	FILES gplugin-gtk-plugin-info.ui
+	DESTINATION share/gplugin/gplugin-gtk/
+)
 
 ###############################################################################
 # Application Target
