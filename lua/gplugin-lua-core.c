@@ -18,6 +18,9 @@
 #include <gplugin.h>
 #include <gplugin-native.h>
 
+#include "gplugin-lua-loader.h"
+
+
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_plugin_query(GError **error) {
 	const gchar * const authors[] = {
@@ -26,7 +29,7 @@ gplugin_plugin_query(GError **error) {
 	};
 
 	return gplugin_plugin_info_new(
-		"gplugin/lua" LUA_VERSION "-loader",
+		"gplugin/lua" LOADER_LUA_VERSION "-loader",
 		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
 		"internal", TRUE,
 		"load-on-query", TRUE,
@@ -45,6 +48,10 @@ gplugin_plugin_query(GError **error) {
 
 G_MODULE_EXPORT gboolean
 gplugin_plugin_load(GPluginNativePlugin *plugin, GError **error) {
+	gplugin_lua_loader_register(plugin);
+
+	gplugin_manager_register_loader(gplugin_lua_loader_get_type());
+
 	return TRUE;
 }
 

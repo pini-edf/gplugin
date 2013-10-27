@@ -7,32 +7,12 @@ option(
 if(BUILD_LUA)
 	set(GPLUGIN_LUA_SOURCES
 		gplugin-lua-core.c
+		gplugin-lua-loader.c
 	)
 
 	set(GPLUGIN_LUA_HEADERS
+		gplugin-lua-loader.h
 	)
-
-	find_package(Lua50)
-	if(LUA50_FOUND)
-		add_library(gplugin-lua50 MODULE
-			${GPLUGIN_LUA_SOURCES}
-			${GPLUGIN_LUA_HEADERS}
-		)
-
-		set_target_properties(gplugin-lua50 PROPERTIES PREFIX "")
-
-		include_directories(${LUA_INCLUDE_DIR})
-		target_link_libraries(gplugin-lua50
-			${LUA_LIBRARIES}
-			gplugin
-		)
-
-		target_compile_definitions(gplugin-lua50 PUBLIC -DLUA_VERSION="50")
-
-		install(TARGETS gplugin-lua50 DESTINATION lib/gplugin)
-	else(LUA50_FOUND)
-		message(WARNING "Failed to find the lua50 library")
-	endif(LUA50_FOUND)
 
 	find_package(Lua51)
 	if(LUA51_FOUND)
@@ -44,12 +24,12 @@ if(BUILD_LUA)
 		set_target_properties(gplugin-lua51 PROPERTIES PREFIX "")
 
 		include_directories(${LUA_INCLUDE_DIR})
-		target_link_libraries(gplugin-lua50
+		target_link_libraries(gplugin-lua51
 			${LUA_LIBRARIES}
 			gplugin
 		)
 
-		target_compile_definitions(gplugin-lua51 PUBLIC -DLUA_VERSION="51")
+		target_compile_definitions(gplugin-lua51 PUBLIC -DLOADER_LUA_VERSION="51")
 
 		install(TARGETS gplugin-lua51 DESTINATION lib/gplugin)
 	else(LUA51_FOUND)
