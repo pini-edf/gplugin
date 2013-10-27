@@ -1,7 +1,7 @@
 option(
 	BUILD_LUA
 	"Whether or not to build the Lua plugin loader"
-	"Off"
+	"On"
 )
 
 if(BUILD_LUA)
