@@ -33,7 +33,7 @@ if(BUILD_LUA)
 
 		install(TARGETS gplugin-lua DESTINATION lib/gplugin)
 	else(LUA51_FOUND)
-		message(WARNING "Failed to find the lua51 library")
+		message(FATAL_ERROR "Failed to find the lua51 library")
 	endif(LUA51_FOUND)
 endif(BUILD_LUA)
 
