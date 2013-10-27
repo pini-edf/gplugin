@@ -19,6 +19,7 @@
 #include <gplugin-native.h>
 
 #include "gplugin-lua-loader.h"
+#include "gplugin-lua-plugin.h"
 
 
 G_MODULE_EXPORT GPluginPluginInfo *
@@ -29,7 +30,7 @@ gplugin_plugin_query(GError **error) {
 	};
 
 	return gplugin_plugin_info_new(
-		"gplugin/lua" LOADER_LUA_VERSION "-loader",
+		"gplugin/lua-loader",
 		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
 		"internal", TRUE,
 		"load-on-query", TRUE,

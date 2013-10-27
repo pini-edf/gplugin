@@ -18,22 +18,20 @@ if(BUILD_LUA)
 
 	find_package(Lua51)
 	if(LUA51_FOUND)
-		add_library(gplugin-lua51 MODULE
+		add_library(gplugin-lua MODULE
 			${GPLUGIN_LUA_SOURCES}
 			${GPLUGIN_LUA_HEADERS}
 		)
 
-		set_target_properties(gplugin-lua51 PROPERTIES PREFIX "")
+		set_target_properties(gplugin-lua PROPERTIES PREFIX "")
 
 		include_directories(${LUA_INCLUDE_DIR})
-		target_link_libraries(gplugin-lua51
+		target_link_libraries(gplugin-lua
 			${LUA_LIBRARIES}
 			gplugin
 		)
 
-		target_compile_definitions(gplugin-lua51 PUBLIC -DLOADER_LUA_VERSION="51")
-
-		install(TARGETS gplugin-lua51 DESTINATION lib/gplugin)
+		install(TARGETS gplugin-lua DESTINATION lib/gplugin)
 	else(LUA51_FOUND)
 		message(WARNING "Failed to find the lua51 library")
 	endif(LUA51_FOUND)
