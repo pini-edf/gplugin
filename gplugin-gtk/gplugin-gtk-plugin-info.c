@@ -30,7 +30,7 @@ typedef struct {
 	GtkBuilder *builder;
 } GPluginGtkPluginInfoPrivate;
 
-/******************************************************************************
+/*****************************************************************************s
  * Enums
  *****************************************************************************/
 enum {
@@ -38,6 +38,19 @@ enum {
 	PROP_PLUGIN,
 	N_PROPERTIES,
 };
+
+/******************************************************************************
+ * Callbacks
+ *****************************************************************************/
+static void
+_gplugin_gtk_plugin_info_expander_activate_cb(GtkExpander *expander,
+                                              gpointer data)
+{
+	if(gtk_expander_get_expanded(expander))
+		gtk_expander_set_label(expander, "More");
+	else
+		gtk_expander_set_label(expander, "Less");
+}
 
 /******************************************************************************
  * Helpers
@@ -216,8 +229,8 @@ gplugin_gtk_plugin_info_get_property(GObject *obj, guint prop_id,
 static void
 gplugin_gtk_plugin_info_constructed(GObject *obj) {
 	GPluginGtkPluginInfoPrivate *priv = NULL;
+	GtkWidget *widget = NULL;
 	GError *error = NULL;
-	GObject *ui = NULL;
 	gchar *filename = NULL;
 
 	G_OBJECT_CLASS(gplugin_gtk_plugin_info_parent_class)->constructed(obj);
@@ -235,8 +248,15 @@ gplugin_gtk_plugin_info_constructed(GObject *obj) {
 	}
 	g_free(filename);
 
-	ui = gtk_builder_get_object(priv->builder, "plugin_info");
-	gtk_container_add(GTK_CONTAINER(obj), GTK_WIDGET(ui));
+	widget = GTK_WIDGET(gtk_builder_get_object(priv->builder, "plugin_info"));
+	gtk_container_add(GTK_CONTAINER(obj), widget);
+
+	/* add a callback for the expander */
+	widget = GTK_WIDGET(gtk_builder_get_object(priv->builder,
+	                                           "more_expander"));
+	g_signal_connect(G_OBJECT(widget), "activate",
+	                 G_CALLBACK(_gplugin_gtk_plugin_info_expander_activate_cb),
+	                 NULL);
 }
 
 static void
