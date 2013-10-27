@@ -8,10 +8,12 @@ if(BUILD_LUA)
 	set(GPLUGIN_LUA_SOURCES
 		gplugin-lua-core.c
 		gplugin-lua-loader.c
+		gplugin-lua-plugin.c
 	)
 
 	set(GPLUGIN_LUA_HEADERS
 		gplugin-lua-loader.h
+		gplugin-lua-plugin.h
 	)
 
 	find_package(Lua51)

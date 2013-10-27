@@ -49,6 +49,7 @@ gplugin_plugin_query(GError **error) {
 G_MODULE_EXPORT gboolean
 gplugin_plugin_load(GPluginNativePlugin *plugin, GError **error) {
 	gplugin_lua_loader_register(plugin);
+	gplugin_lua_plugin_register(plugin);
 
 	gplugin_manager_register_loader(gplugin_lua_loader_get_type());
 

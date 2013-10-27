@@ -17,6 +17,8 @@
 
 #include "gplugin-lua-loader.h"
 
+#include "gplugin-lua-plugin.h"
+
 #include <glib/gi18n.h>
 
 #include <lua.h>
@@ -46,14 +48,15 @@ static GPluginPlugin *
 gplugin_lua_loader_query(GPluginLoader *loader, const gchar *filename,
                          GError **error)
 {
+	GPluginPlugin *plugin = NULL;
 	GPluginPluginInfo *info = NULL;
-	lua_State *state = NULL;
+	lua_State *L = NULL;
 	gint ret;
 
-	state = lua_open();
-	luaL_openlibs(state);
+	L = lua_open();
+	luaL_openlibs(L);
 
-	ret = luaL_loadfile(state, filename);
+	ret = luaL_loadfile(L, filename);
 	if(ret != 0) {
 		if(error)
 			*error = g_error_new(GPLUGIN_DOMAIN, 0, "Failed to load file %s",
@@ -62,43 +65,45 @@ gplugin_lua_loader_query(GPluginLoader *loader, const gchar *filename,
 	}
 
 	/* run the script */
-	if(lua_pcall(state, 0, 0, 0) != 0) {
+	if(lua_pcall(L, 0, 0, 0) != 0) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "%s", lua_tostring(state, -1));
+			                     "%s", lua_tostring(L, -1));
 		}
 
 		return NULL;
 	}
 
-	lua_getglobal(state, "gplugin_query");
-	if(lua_pcall(state, 0, 1, 0) != 0) {
+	lua_getglobal(L, "gplugin_query");
+	if(lua_pcall(L, 0, 1, 0) != 0) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "%s", lua_tostring(state, -1));
+			                     "%s", lua_tostring(L, -1));
 		}
 
 		return NULL;
 	}
 
-	g_message("type: %s", luaL_typename(state, -1));
-	if(!lua_isuserdata(state, -1)) {
+	if(!lua_isuserdata(L, -1)) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "istable %s", lua_tostring(state, -1));
+			                     "istable %s", lua_tostring(L, -1));
 		}
 
 		return NULL;
 	}
 
-	info = lua_topointer(state, -1);
-	lua_pop(state, 1);
+	info = lua_topointer(L, -1);
+	lua_pop(L, 1);
 
-	g_message("info: %p", info);
+	plugin = g_object_new(GPLUGIN_TYPE_LUA_PLUGIN,
+	                      "filename", filename,
+	                      "loader", loader,
+	                      "state", L,
+	                      "info", info,
+	                      NULL);
 
-	g_message("plugin info? %d", GPLUGIN_IS_PLUGIN_INFO(info));
-
-	return NULL;
+	return plugin;
 }
 
 static gboolean
