@@ -6,6 +6,7 @@
     to get the instance to use in g_signal_connect.  Signals are
     "loading-plugin", "loaded-plugin", "unloading-plugin", and "loaded-plugin".
     See the documentation for the prototype expected for the callbacks.
+  * Got the gplugin-gtk stuff working for the most part
 
 0.0.8: 2013/09/22
   * Fixed some issues with loading Python plugins (#16)
