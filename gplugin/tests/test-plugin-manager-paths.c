@@ -119,7 +119,7 @@ static void
 test_gplugin_manager_add_app_paths(void) {
 	GHashTable *req = NULL;
 	GList *paths = NULL, *l = NULL;
-	const gchar *prefix = "/opt";
+	const gchar *prefix = "/usr/local/";
 	const gchar *appname = "foo";
 	gchar *path = NULL;
 	guint size = 0;
@@ -127,7 +127,7 @@ test_gplugin_manager_add_app_paths(void) {
 	/* build our table of required paths */
 	req = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 
-	path = g_build_filename(prefix, appname, NULL);
+	path = g_build_filename(prefix, "lib", appname, NULL);
 	g_hash_table_insert(req, path, GINT_TO_POINTER(FALSE));
 
 	path = g_build_filename(g_get_user_config_dir(), appname, "plugins", NULL);

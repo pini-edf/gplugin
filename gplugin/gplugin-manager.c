@@ -980,7 +980,7 @@ gplugin_manager_add_app_paths(const gchar *prefix,
 
 	g_return_if_fail(appname != NULL);
 
-	path = g_build_filename(prefix, appname, NULL);
+	path = g_build_filename(prefix, "lib", appname, NULL);
 	gplugin_manager_prepend_path(path);
 	g_free(path);
 
