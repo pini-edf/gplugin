@@ -79,7 +79,7 @@ gplugin_lua_loader_query(GPluginLoader *loader, const gchar *filename,
 	lua_State *L = NULL;
 	gint ret;
 
-	L = lua_open();
+	L = luaL_newstate();
 	luaL_openlibs(L);
 
 	ret = luaL_loadfile(L, filename);
@@ -113,12 +113,13 @@ gplugin_lua_loader_query(GPluginLoader *loader, const gchar *filename,
 	if(!lua_isuserdata(L, -1)) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "istable %s", lua_tostring(L, -1));
+			                     "islightuserdata %s", lua_tostring(L, -1));
 		}
 
 		return NULL;
 	}
 
+	lua_getfield(L, -1, "_native");
 	info = lua_touserdata(L, -1);
 	lua_pop(L, 1);
 

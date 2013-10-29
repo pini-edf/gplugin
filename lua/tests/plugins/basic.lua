@@ -19,9 +19,9 @@ local lgi = require 'lgi'
 local GPlugin = lgi.GPlugin
 
 function gplugin_query()
-	info = GPlugin.PluginInfo {
+	return GPlugin.PluginInfo {
 		id = "gplugin-lua/basic-plugin",
-		abi_version = 0x01020304,
+		abi_version = 0x01000000,
 		name = "basic plugin",
 		category = "test",
 		version = "0.0.10",
@@ -31,8 +31,6 @@ function gplugin_query()
 		authors = { "Gary Kramlich <grim@reaperworld.com>" },
 		website = "http://bitbucket.org/rw_grim/gplugin/"
 	}
-
-	return info._native
 end
 
 function gplugin_load(plugin)
