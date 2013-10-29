@@ -79,7 +79,7 @@ gplugin_lua_loader_query(GPluginLoader *loader, const gchar *filename,
 	lua_State *L = NULL;
 	gint ret;
 
-	L = lua_open();
+	L = luaL_newstate();
 	luaL_openlibs(L);
 
 	ret = luaL_loadfile(L, filename);
