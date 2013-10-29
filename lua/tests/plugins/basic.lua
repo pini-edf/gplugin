@@ -32,9 +32,6 @@ function gplugin_query()
 		website = "http://bitbucket.org/rw_grim/gplugin/"
 	}
 
-	print(info)
-	print(info._native)
-
 	return info._native
 end
 
