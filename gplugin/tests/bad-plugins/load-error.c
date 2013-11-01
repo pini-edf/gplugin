@@ -18,7 +18,7 @@
 #include <gplugin-native.h>
 
 G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_plugin_query(GError **error) {
+gplugin_query(GError **error) {
 	return gplugin_plugin_info_new(
 		"gplugin/test-load-error",
 		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
@@ -27,7 +27,7 @@ gplugin_plugin_query(GError **error) {
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_plugin_load(GPluginNativePlugin *plugin, GError **error) {
+gplugin_load(GPluginNativePlugin *plugin, GError **error) {
 	if(error)
 		*error = g_error_new(GPLUGIN_DOMAIN, 0, "expected error");
 
@@ -35,7 +35,7 @@ gplugin_plugin_load(GPluginNativePlugin *plugin, GError **error) {
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_plugin_unload(GPluginNativePlugin *plugin, GError **error) {
+gplugin_unload(GPluginNativePlugin *plugin, GError **error) {
 	return TRUE;
 }
 

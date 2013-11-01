@@ -23,7 +23,7 @@
 
 
 G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_plugin_query(GError **error) {
+gplugin_query(GError **error) {
 	const gchar * const authors[] = {
 		"Gary Kramlich <grim@reaperworld.com>",
 		NULL
@@ -48,7 +48,7 @@ gplugin_plugin_query(GError **error) {
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_plugin_load(GPluginNativePlugin *plugin, GError **error) {
+gplugin_load(GPluginNativePlugin *plugin, GError **error) {
 	gplugin_lua_loader_register(plugin);
 	gplugin_lua_plugin_register(plugin);
 
@@ -58,7 +58,7 @@ gplugin_plugin_load(GPluginNativePlugin *plugin, GError **error) {
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_plugin_unload(GPluginNativePlugin *plugin, GError **error) {
+gplugin_unload(GPluginNativePlugin *plugin, GError **error) {
 	return FALSE;
 }
 
