@@ -41,7 +41,8 @@ set(GTESTER_PYTHON_JUNIT "test-gplugin-python-junit.xml")
 add_custom_command(
 	COMMAND ${GTESTER} -k --verbose -o ${GTESTER_PYTHON_LOG} ${PYTHON_TESTS}
 	OUTPUT ${GTESTER_PYTHON_LOG}
-	DEPENDS ${PYTHON_TESTS}
+	DEPENDS gplugin gplugin-python
+	        ${PYTHON_TESTS} ${CMAKE_CURRENT_SOURCE_DIR}/plugins
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 

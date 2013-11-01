@@ -190,8 +190,11 @@ gplugin_python_loader_load(GPluginLoader *loader,
 	Py_DECREF(pyplugin);
 
 	*error = gplugin_python_exception_to_gerror();
-	if(*error)
+	if(*error) {
+		gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
+
 		return FALSE;
+	}
 
 	ret = PyObject_IsTrue(result);
 	Py_DECREF(result);
