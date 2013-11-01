@@ -1,4 +1,4 @@
-0.0.10:
+0.0.10: 2013/11/01
   * Got the gplugin-gtk stuff working for the most part
   * Implemented the Lua loader
   * Renamed the external methods for native plugins to remove the redundant
