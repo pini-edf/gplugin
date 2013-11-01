@@ -37,3 +37,5 @@ if(BUILD_LUA)
 	endif(LUA51_FOUND)
 endif(BUILD_LUA)
 
+add_subdirectory(tests)
+
