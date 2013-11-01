@@ -47,6 +47,9 @@ _gplugin_lua_loader_load_unload_plugin(GPluginLoader *loader,
 	lua_getglobal(L, function);
 	lua_pushlightuserdata(L, plugin);
 	if(lua_pcall(L, 1, 1, 0) != 0) {
+		if(load)
+			gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
+
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     "%s", lua_tostring(L, -1));
