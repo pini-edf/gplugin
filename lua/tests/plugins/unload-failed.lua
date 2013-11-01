@@ -20,16 +20,7 @@ local GPlugin = lgi.GPlugin
 
 function gplugin_query()
 	return GPlugin.PluginInfo {
-		id = "gplugin-lua/basic-plugin",
-		abi_version = 0x01000000,
-		name = "basic plugin",
-		category = "test",
-		version = "version",
-		license_id = "license",
-		summary = "summary",
-		description = "description",
-		authors = { "author1" },
-		website = "website"
+		id="gplugin-lua/unload-failed",
 	}
 end
 
@@ -38,6 +29,6 @@ function gplugin_load(plugin)
 end
 
 function gplugin_unload(plugin)
-	return true
+	return false
 end
 
