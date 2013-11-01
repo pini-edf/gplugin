@@ -25,9 +25,9 @@
 
 #include <gmodule.h>
 
-#define GPLUGIN_QUERY_SYMBOL "gplugin_plugin_query"
-#define GPLUGIN_LOAD_SYMBOL "gplugin_plugin_load"
-#define GPLUGIN_UNLOAD_SYMBOL "gplugin_plugin_unload"
+#define GPLUGIN_QUERY_SYMBOL "gplugin_query"
+#define GPLUGIN_LOAD_SYMBOL "gplugin_load"
+#define GPLUGIN_UNLOAD_SYMBOL "gplugin_unload"
 
 /******************************************************************************
  * Helpers

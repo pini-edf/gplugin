@@ -1,6 +1,8 @@
 0.0.10:
   * Got the gplugin-gtk stuff working for the most part
   * Implemented the Lua loader
+  * Renamed the external methods for native plugins to remove the redundant
+    _plugin in their names
 
 0.0.9: 2013/10/13
   * Renamed GPluginPluginLoader to GPluginLoader
