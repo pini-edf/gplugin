@@ -2,17 +2,17 @@
 
 from gi.repository import GPlugin
 
-def gplugin_plugin_query():
+def gplugin_query():
     return GPlugin.PluginInfo(
         id="gplugin-python/load-failed",
     )
 
 
-def gplugin_plugin_load(plugin):
+def gplugin_load(plugin):
     return False
 
 
-def gplugin_plugin_unload(plugin):
+def gplugin_unload(plugin):
     return True
 
 
