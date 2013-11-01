@@ -83,6 +83,8 @@ test_load_failed(void) {
 	ret = gplugin_manager_load_plugin(plugin, &error);
 	g_assert(ret == FALSE);
 	g_assert_error(error, GPLUGIN_DOMAIN, 0);
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
 
 	g_object_unref(G_OBJECT(plugin));
 }
@@ -99,6 +101,8 @@ test_load_exception(void) {
 	ret = gplugin_manager_load_plugin(plugin, &error);
 	g_assert(ret == FALSE);
 	g_assert_error(error, GPLUGIN_DOMAIN, 0);
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
 
 	g_object_unref(G_OBJECT(plugin));
 }
@@ -121,6 +125,8 @@ test_unload_failed(void) {
 	ret = gplugin_manager_unload_plugin(plugin, &error);
 	g_assert(ret == FALSE);
 	g_assert_error(error, GPLUGIN_DOMAIN, 0);
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOADED);
 
 	g_object_unref(G_OBJECT(plugin));
 }

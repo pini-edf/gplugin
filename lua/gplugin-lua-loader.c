@@ -37,7 +37,9 @@ static GType type_real = 0;
 static gboolean
 _gplugin_lua_loader_load_unload_plugin(GPluginLoader *loader,
                                        GPluginPlugin *plugin,
-                                       const gchar *function, GError **error)
+                                       const gchar *function,
+                                       gboolean load,
+                                       GError **error)
 {
 	gboolean ret;
 	lua_State *L = gplugin_lua_plugin_get_state(GPLUGIN_LUA_PLUGIN(plugin));
@@ -63,6 +65,27 @@ _gplugin_lua_loader_load_unload_plugin(GPluginLoader *loader,
 	}
 
 	ret = lua_toboolean(L, -1);
+	if(ret) {
+		GPluginPluginState state = GPLUGIN_PLUGIN_STATE_LOADED;
+		if(!load)
+			state = GPLUGIN_PLUGIN_STATE_QUERIED;
+
+		gplugin_plugin_set_state(plugin, state);
+	} else {
+		if(load) {
+			gplugin_plugin_set_state(plugin,
+			                         GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
+		}
+
+		if(error) {
+			const gchar *message = _("Failed to load plugin");
+
+			if(!load)
+				message = _("Failed to unload plugin");
+
+			*error = g_error_new(GPLUGIN_DOMAIN, 0, message);
+		}
+	}
 
 	return ret;
 }
@@ -138,7 +161,7 @@ gplugin_lua_loader_load(GPluginLoader *loader, GPluginPlugin *plugin,
                         GError **error)
 {
 	return _gplugin_lua_loader_load_unload_plugin(loader, plugin,
-	                                              "gplugin_load", error);
+	                                              "gplugin_load", TRUE, error);
 }
 
 static gboolean
@@ -146,7 +169,8 @@ gplugin_lua_loader_unload(GPluginLoader *loader, GPluginPlugin *plugin,
                           GError **error)
 {
 	return _gplugin_lua_loader_load_unload_plugin(loader, plugin,
-	                                              "gplugin_unload", error);
+	                                              "gplugin_unload", FALSE,
+	                                              error);
 }
 
 /******************************************************************************

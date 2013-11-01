@@ -30,7 +30,8 @@ set(GTESTER_LUA_JUNIT "test-gplugin-lua-junit.xml")
 add_custom_command(
 	COMMAND ${GTESTER} -k --verbose -o ${GTESTER_LUA_LOG} ${LUA_TESTS}
 	OUTPUT ${GTESTER_LUA_LOG}
-	DEPENDS ${LUA_TESTS} ${CMAKE_CURRENT_SOURCE_DIR}/plugins
+	DEPENDS gplugin gplugin-lua
+	        ${LUA_TESTS} ${CMAKE_CURRENT_SOURCE_DIR}/plugins
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
