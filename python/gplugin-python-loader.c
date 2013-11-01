@@ -92,7 +92,7 @@ gplugin_python_loader_query(GPluginLoader *loader,
 	 */
 	module_dict = PyModule_GetDict(module);
 
-	query = PyDict_GetItemString(module_dict, "gplugin_plugin_query");
+	query = PyDict_GetItemString(module_dict, "gplugin_query");
 	if(query == NULL) {
 		g_warning(_("Failed to find the gplugin_plugin_query function in %s"),
 		          filename);
@@ -102,7 +102,7 @@ gplugin_python_loader_query(GPluginLoader *loader,
 		return NULL;
 	}
 	if(!PyCallable_Check(query)) {
-		g_warning(_("Found gplugin_plugin_query in %s but it is not a "
+		g_warning(_("Found gplugin_query in %s but it is not a "
 		            "function"),
 		          filename);
 
@@ -111,9 +111,9 @@ gplugin_python_loader_query(GPluginLoader *loader,
 		return NULL;
 	}
 
-	load = PyDict_GetItemString(module_dict, "gplugin_plugin_load");
+	load = PyDict_GetItemString(module_dict, "gplugin_load");
 	if(load == NULL) {
-		g_warning(_("Failed to find the gplugin_plugin_load function in %s"),
+		g_warning(_("Failed to find the gplugin_load function in %s"),
 		          filename);
 
 		pyg_gil_state_release(state);
@@ -121,7 +121,7 @@ gplugin_python_loader_query(GPluginLoader *loader,
 		return NULL;
 	}
 	if(!PyCallable_Check(load)) {
-		g_warning(_("Found gplugin_plugin_load in %s but it is not a "
+		g_warning(_("Found gplugin_load in %s but it is not a "
 		            "function"),
 		          filename);
 
@@ -130,9 +130,9 @@ gplugin_python_loader_query(GPluginLoader *loader,
 		return NULL;
 	}
 
-	unload = PyDict_GetItemString(module_dict, "gplugin_plugin_unload");
+	unload = PyDict_GetItemString(module_dict, "gplugin_unload");
 	if(unload == NULL) {
-		g_warning(_("Failed to find the gplugin_plugin_unload function in %s"),
+		g_warning(_("Failed to find the gplugin_unload function in %s"),
 		          filename);
 
 		pyg_gil_state_release(state);
@@ -140,7 +140,7 @@ gplugin_python_loader_query(GPluginLoader *loader,
 		return NULL;
 	}
 	if(!PyCallable_Check(unload)) {
-		g_warning(_("Found gplugin_plugin_unload in %s but it is not a "
+		g_warning(_("Found gplugin_unload in %s but it is not a "
 		            "function"),
 		          filename);
 
@@ -190,8 +190,11 @@ gplugin_python_loader_load(GPluginLoader *loader,
 	Py_DECREF(pyplugin);
 
 	*error = gplugin_python_exception_to_gerror();
-	if(*error)
+	if(*error) {
+		gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
+
 		return FALSE;
+	}
 
 	ret = PyObject_IsTrue(result);
 	Py_DECREF(result);

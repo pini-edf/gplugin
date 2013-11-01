@@ -2,7 +2,7 @@
 
 from gi.repository import GPlugin
 
-def gplugin_plugin_query():
+def gplugin_query():
     return GPlugin.PluginInfo(
         id='gplugin-python/basic-plugin',
         abi_version=0x01020304,
@@ -16,10 +16,10 @@ def gplugin_plugin_query():
         description='description',
     )
 
-def gplugin_plugin_load(plugin):
+def gplugin_load(plugin):
     return True
 
 
-def gplugin_plugin_unload(plugin):
+def gplugin_unload(plugin):
     return True
 

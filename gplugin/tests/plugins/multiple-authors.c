@@ -18,22 +18,30 @@
 #include <gplugin-native.h>
 
 G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_plugin_query(GError **error) {
-	return gplugin_plugin_info_new(
-		"gplugin/id-collision",
-		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-		"name", "second",
+gplugin_query(GError **error) {
+	const gchar * const authors[] = {
+		"author1",
+		"author2",
+		"author3",
+		"author4",
+		NULL
+	};
+
+	return g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
+		"id", "gplugin/multiple-authors",
+		"abi-version", GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
+		"authors", authors,
 		NULL
 	);
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_plugin_load(GPluginNativePlugin *plugin, GError **error) {
+gplugin_load(GPluginNativePlugin *plugin, GError **error) {
 	return TRUE;
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_plugin_unload(GPluginNativePlugin *plugin, GError **error) {
+gplugin_unload(GPluginNativePlugin *plugin, GError **error) {
 	return TRUE;
 }
 

@@ -18,22 +18,27 @@
 #include <gplugin-native.h>
 
 G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_plugin_query(GError **error) {
+gplugin_query(GError **error) {
+	const gchar * const dependencies[] = {
+		"gplugin/does-not-exist",
+		NULL
+	};
+
 	return gplugin_plugin_info_new(
-		"gplugin/load-on-query-fail",
+		"gplugin/broken-dependent-native-plugin",
 		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-		"load-on-query", TRUE,
+		"dependencies",  dependencies,
 		NULL
 	);
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_plugin_load(GPluginNativePlugin *plugin, GError **error) {
-	return FALSE;
+gplugin_load(GPluginNativePlugin *plugin, GError **error) {
+	return TRUE;
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_plugin_unload(GPluginNativePlugin *plugin, GError **error) {
+gplugin_unload(GPluginNativePlugin *plugin, GError **error) {
 	return TRUE;
 }
 

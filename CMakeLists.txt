@@ -18,7 +18,7 @@ project(gplugin C)
 
 set(GPLUGIN_MAJOR_VERSION 0)
 set(GPLUGIN_MINOR_VERSION 0)
-set(GPLUGIN_MICRO_VERSION 9)
+set(GPLUGIN_MICRO_VERSION 10)
 set(GPLUGIN_EXTRA_VERSION)
 
 set(GPLUGIN_VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.${GPLUGIN_MICRO_VERSION}${GPLUGIN_EXTRA_VERSION})
@@ -149,20 +149,14 @@ link_directories(
 )
 
 ###############################################################################
-# Config Files
-###############################################################################
-configure_file(gplugin.pc.in ${CMAKE_BINARY_DIR}/gplugin.pc @ONLY)
-configure_file(gplugin-uninstalled.pc.in ${CMAKE_BINARY_DIR}/gplugin-uninstalled.pc @ONLY)
-
-###############################################################################
 # Subdirectories
 ###############################################################################
 add_subdirectory(gplugin)
 add_subdirectory(gplugin-gtk)
 add_subdirectory(plugins)
 add_subdirectory(po)
-add_subdirectory(tests)
 
+add_subdirectory(lua)
 add_subdirectory(perl)
 add_subdirectory(python)
 
@@ -170,8 +164,5 @@ add_subdirectory(python)
 # Install stuff
 ###############################################################################
 # documentation
-install(FILES ChangeLog INSTALL README DESTINATION share/doc/gplugin)
-
-# pkg-config files
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gplugin.pc DESTINATION lib/pkgconfig)
+install(FILES ChangeLog INSTALL README HACKING DESTINATION share/doc/gplugin)
 

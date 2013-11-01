@@ -25,7 +25,7 @@ test_full(void) {
 	GPluginPlugin *plugin = NULL;
 	GPluginPluginInfo *info = NULL;
 	GError *error = NULL;
-	const gchar *id = "gplugin-python/basic-plugin";
+	const gchar *id = "gplugin-lua/basic-plugin";
 	gchar **authors = NULL;
 	const gchar * const r_authors[] = { "author1", NULL };
 	gint i;
@@ -37,7 +37,7 @@ test_full(void) {
 	g_assert(info != NULL);
 
 	g_assert_cmpstr(id, ==, gplugin_plugin_info_get_id(info));
-	g_assert_cmpuint(0x01020304, ==,
+	g_assert_cmpuint(0x01000000, ==,
 	                 gplugin_plugin_info_get_abi_version(info));
 	g_assert_cmpstr("basic plugin", ==, gplugin_plugin_info_get_name(info));
 
@@ -77,7 +77,7 @@ test_load_failed(void) {
 	GError *error = NULL;
 	gboolean ret = FALSE;
 
-	plugin = gplugin_manager_find_plugin("gplugin-python/load-failed");
+	plugin = gplugin_manager_find_plugin("gplugin-lua/load-failed");
 	g_assert(plugin != NULL);
 
 	ret = gplugin_manager_load_plugin(plugin, &error);
@@ -95,7 +95,7 @@ test_load_exception(void) {
 	GError *error = NULL;
 	gboolean ret = FALSE;
 
-	plugin = gplugin_manager_find_plugin("gplugin-python/load-exception");
+	plugin = gplugin_manager_find_plugin("gplugin-lua/load-exception");
 	g_assert(plugin != NULL);
 
 	ret = gplugin_manager_load_plugin(plugin, &error);
@@ -113,7 +113,7 @@ test_unload_failed(void) {
 	GError *error = NULL;
 	gboolean ret = FALSE;
 
-	plugin = gplugin_manager_find_plugin("gplugin-python/unload-failed");
+	plugin = gplugin_manager_find_plugin("gplugin-lua/unload-failed");
 	g_assert(plugin != NULL);
 
 	ret = gplugin_manager_load_plugin(plugin, &error);
@@ -135,7 +135,7 @@ static void
 test_dependencies(void) {
 	GPluginPlugin *plugin = NULL;
 	GPluginPluginInfo *info = NULL;
-	const gchar *id = "gplugin-python/dependent-plugin";
+	const gchar *id = "gplugin-lua/dependent-plugin";
 	gchar **deps = NULL;
 	const gchar * const r_deps[] = { "dep1", "dep2", NULL };
 	gint i;
@@ -167,16 +167,16 @@ main(gint argc, gchar **argv) {
 
 	g_setenv("GI_TYPELIB_PATH", GI_TYPELIB_PATH, TRUE);
 
-	gplugin_manager_append_path(PYTHON_LOADER_DIR);
-	gplugin_manager_append_path(PYTHON_PLUGIN_DIR);
+	gplugin_manager_append_path(LUA_LOADER_DIR);
+	gplugin_manager_append_path(LUA_PLUGIN_DIR);
 
 	gplugin_manager_refresh();
 
-	g_test_add_func("/loaders/python/full", test_full);
-	g_test_add_func("/loaders/python/load-failed", test_load_failed);
-	g_test_add_func("/loaders/python/load-exception", test_load_exception);
-	g_test_add_func("/loaders/python/unload-failed", test_unload_failed);
-	g_test_add_func("/loaders/python/dependencies", test_dependencies);
+	g_test_add_func("/loaders/lua/full", test_full);
+	g_test_add_func("/loaders/lua/load-failed", test_load_failed);
+	g_test_add_func("/loaders/lua/load-exception", test_load_exception);
+	g_test_add_func("/loaders/lua/unload-failed", test_unload_failed);
+	g_test_add_func("/loaders/lua/dependencies", test_dependencies);
 
 	return g_test_run();
 }

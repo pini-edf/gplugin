@@ -18,27 +18,32 @@
 #include <gplugin-native.h>
 
 G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_plugin_query(GError **error) {
-	const gchar * const dependencies[] = {
-		"gplugin/basic-native-plugin",
+gplugin_query(GError **error) {
+	const gchar * const authors[] = {
+		"author",
 		NULL
 	};
 
 	return gplugin_plugin_info_new(
-		"gplugin/dependent-native-plugin",
+		"gplugin/basic-native-plugin",
 		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-		"dependencies", dependencies,
+		"name", "name",
+		"version", "version",
+		"summary", "summary",
+		"description", "description",
+		"authors", authors,
+		"website", "website",
 		NULL
 	);
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_plugin_load(GPluginNativePlugin *plugin, GError **error) {
+gplugin_load(GPluginNativePlugin *plugin, GError **error) {
 	return TRUE;
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_plugin_unload(GPluginNativePlugin *plugin, GError **error) {
+gplugin_unload(GPluginNativePlugin *plugin, GError **error) {
 	return TRUE;
 }
 

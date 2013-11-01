@@ -57,10 +57,10 @@ if(BUILD_PYTHON)
 		)
 
 		install(TARGETS gplugin-python DESTINATION lib/gplugin)
-
-		add_subdirectory(tests)
 	else(PYTHONLIBS_FOUND)
 		message(FATAL_ERROR "Failed to find the Python libraries")
 	endif(PYTHONLIBS_FOUND)
 endif(BUILD_PYTHON)
+
+add_subdirectory(tests)
 

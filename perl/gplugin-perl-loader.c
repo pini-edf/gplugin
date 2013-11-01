@@ -26,16 +26,6 @@
 #undef _
 #include <glib/gi18n.h>
 
-#define GPLUGIN_PERL_LOADER_GET_PRIVATE(obj) \
-	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_PERL_LOADER, GPluginPerlLoaderPrivate))
-
-/******************************************************************************
- * Typedefs
- *****************************************************************************/
-typedef struct {
-	gint dummy;
-} GPluginPerlLoaderPrivate;
-
 /******************************************************************************
  * Globals
  *****************************************************************************/
@@ -111,12 +101,9 @@ gplugin_perl_loader_uninit_perl(void) {
  *****************************************************************************/
 static void
 gplugin_perl_loader_class_init(GPluginPerlLoaderClass *klass) {
-	GObjectClass *obj_class = G_OBJECT_CLASS(klass);
 	GPluginLoaderClass *loader_class = GPLUGIN_LOADER_CLASS(klass);
 
 	parent_class = g_type_class_peek_parent(klass);
-
-	g_type_class_add_private(klass, sizeof(GPluginPerlLoaderPrivate));
 
 	loader_class->supported_extensions = g_slist_append(NULL, "pl");
 	loader_class->query = gplugin_perl_loader_query;
