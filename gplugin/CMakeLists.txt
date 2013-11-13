@@ -10,6 +10,7 @@ set(GPLUGIN_HEADERS
 	gplugin-core.h
 	gplugin-loader.h
 	gplugin-manager.h
+	gplugin-options.h
 	gplugin-plugin.h
 	gplugin-plugin-info.h
 )
@@ -19,6 +20,7 @@ set(GPLUGIN_SOURCES
 	gplugin-plugin.c
 	gplugin-loader.c
 	gplugin-manager.c
+	gplugin-options.c
 	gplugin-plugin-info.c
 	gplugin-private.c
 	gplugin-version.c

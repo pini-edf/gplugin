@@ -29,19 +29,10 @@
  *****************************************************************************/
 static gint verbosity = 0;
 static gboolean show_internal = FALSE;
-static gchar **paths = NULL;
-static gboolean add_default_paths = TRUE;
 
 /******************************************************************************
  * Helpers
  *****************************************************************************/
-static gboolean
-no_default_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
-	add_default_paths = FALSE;
-
-	return TRUE;
-}
-
 static gboolean
 verbosity_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
 	verbosity++;
@@ -219,17 +210,9 @@ output_plugins(GList *plugins) {
  *****************************************************************************/
 static GOptionEntry entries[] = {
 	{
-		"no-default-paths", 'D', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
-		no_default_cb, N_("Do not search the default plugin paths"),
-		NULL,
-	}, {
 		"internal", 'i', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
 		internal_cb, N_("Show internal plugins"),
 		NULL,
-	}, {
-		"path", 'p', 0, G_OPTION_ARG_STRING_ARRAY,
-		&paths, N_("Additional path to look for plugins"),
-		"PATH",
 	}, {
 		"verbose", 'v', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
 		verbosity_cb, N_("Increase verbosity"),
@@ -247,6 +230,7 @@ gint
 main(gint argc, gchar **argv) {
 	GError *error = NULL;
 	GOptionContext *ctx = NULL;
+	GOptionGroup *group = NULL;
 	gint i = 0, ret = 0;
 
 	gplugin_init();
@@ -254,6 +238,10 @@ main(gint argc, gchar **argv) {
 	ctx = g_option_context_new("PLUGIN-ID...");
 	g_option_context_set_translation_domain(ctx, GETTEXT_PACKAGE);
 	g_option_context_add_main_entries(ctx, entries, NULL);
+
+	group = gplugin_get_option_group();
+	g_option_context_add_group(ctx, group);
+
 	g_option_context_parse(ctx, &argc, &argv, &error);
 	g_option_context_free(ctx);
 
@@ -265,17 +253,6 @@ main(gint argc, gchar **argv) {
 		gplugin_uninit();
 
 		return EXIT_FAILURE;
-	}
-
-	/* add the default gplugin paths unless asked not to */
-	if(add_default_paths)
-		gplugin_manager_add_default_paths();
-
-	/* now add any paths the user provided */
-	if(paths) {
-		/* go through the paths and add them to the plugin manager */
-		for(i = 0; paths[i]; i++)
-			gplugin_manager_prepend_path(paths[i]);
 	}
 
 	gplugin_manager_refresh();
