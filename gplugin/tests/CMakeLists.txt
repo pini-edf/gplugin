@@ -23,6 +23,7 @@ macro(add_gtest target)
 endmacro(add_gtest)
 
 add_gtest(test-core)
+add_gtest(test-option-group)
 add_gtest(test-plugin-manager-paths)
 add_gtest(test-plugin-info)
 add_gtest(test-signals)
