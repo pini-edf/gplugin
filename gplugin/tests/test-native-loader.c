@@ -288,6 +288,65 @@ test_load_on_query_fail(void) {
 }
 
 /******************************************************************************
+ * Test dynamic types
+ *****************************************************************************/
+static void
+test_use_dynamic_type(void) {
+	GPluginPlugin *provider = NULL, *user = NULL;
+	GPluginPluginState state;
+	GError *error = NULL;
+
+	gplugin_manager_append_path(TEST_DYNAMIC_DIR);
+	gplugin_manager_refresh();
+
+	provider = gplugin_manager_find_plugin("gplugin/dynamic-type-provider");
+
+	g_assert(provider);
+	g_assert(gplugin_manager_load_plugin(provider, &error));
+	g_assert_no_error(error);
+
+	state = gplugin_plugin_get_state(provider);
+	g_assert_cmpint(state, ==, GPLUGIN_PLUGIN_STATE_LOADED);
+
+	user = gplugin_manager_find_plugin("gplugin/dynamic-type-user");
+
+	g_assert(user);
+	g_assert(gplugin_manager_load_plugin(user, &error));
+	g_assert_no_error(error);
+
+	state = gplugin_plugin_get_state(user);
+	g_assert_cmpint(state, ==, GPLUGIN_PLUGIN_STATE_LOADED);
+}
+
+static void
+test_unuse_dynamic_type(void) {
+	GPluginPlugin *provider = NULL, *user = NULL;
+	GPluginPluginState state;
+	GError *error = NULL;
+
+	gplugin_manager_append_path(TEST_DYNAMIC_DIR);
+	gplugin_manager_refresh();
+
+	user = gplugin_manager_find_plugin("gplugin/dynamic-type-user");
+
+	g_assert(user);
+	g_assert(gplugin_manager_unload_plugin(user, &error));
+	g_assert_no_error(error);
+
+	state = gplugin_plugin_get_state(user);
+	g_assert_cmpint(state, ==, GPLUGIN_PLUGIN_STATE_QUERIED);
+
+	provider = gplugin_manager_find_plugin("gplugin/dynamic-type-provider");
+
+	g_assert(provider);
+	g_assert(gplugin_manager_unload_plugin(provider, &error));
+	g_assert_no_error(error);
+
+	state = gplugin_plugin_get_state(provider);
+	g_assert_cmpint(state, ==, GPLUGIN_PLUGIN_STATE_QUERIED);
+}
+
+/******************************************************************************
  * Main
  *****************************************************************************/
 gint
@@ -322,6 +381,12 @@ main(gint argc, gchar **argv) {
 	                test_load_on_query);
 	g_test_add_func("/loaders/native/load-on-query-fail",
 	                test_load_on_query_fail);
+
+	/* test dynamic types */
+	g_test_add_func("/loaders/native/use-dynamic-type",
+	                test_use_dynamic_type);
+	g_test_add_func("/loaders/native/unuse-dynamic-type",
+	                test_unuse_dynamic_type);
 
 	return g_test_run();
 }
