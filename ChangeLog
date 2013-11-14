@@ -1,3 +1,7 @@
+0.0.11:
+  * Added gplugin_get_option_group which implements options for adding paths
+    as well as not adding the default paths.
+
 0.0.10: 2013/11/01
   * Got the gplugin-gtk stuff working for the most part
   * Implemented the Lua loader
