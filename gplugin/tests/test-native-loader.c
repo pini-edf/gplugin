@@ -291,7 +291,7 @@ test_load_on_query_fail(void) {
  * Test dynamic types
  *****************************************************************************/
 static void
-test_use_dynamic_type(void) {
+test_dynamic_type(void) {
 	GPluginPlugin *provider = NULL, *user = NULL;
 	GPluginPluginState state;
 	GError *error = NULL;
@@ -316,17 +316,8 @@ test_use_dynamic_type(void) {
 
 	state = gplugin_plugin_get_state(user);
 	g_assert_cmpint(state, ==, GPLUGIN_PLUGIN_STATE_LOADED);
-}
 
-static void
-test_unuse_dynamic_type(void) {
-	GPluginPlugin *provider = NULL, *user = NULL;
-	GPluginPluginState state;
-	GError *error = NULL;
-
-	gplugin_manager_append_path(TEST_DYNAMIC_DIR);
-	gplugin_manager_refresh();
-
+	/* now unload the plugin */
 	user = gplugin_manager_find_plugin("gplugin/dynamic-type-user");
 
 	g_assert(user);
@@ -358,18 +349,18 @@ main(gint argc, gchar **argv) {
 
 	gplugin_init();
 
-	g_test_add_func("/loaders/native/load", test_basic_plugin_load);
-	g_test_add_func("/loaders/native/load_dependent",
+	g_test_add_func("/loaders/native/load/basic", test_basic_plugin_load);
+	g_test_add_func("/loaders/native/load/dependent",
 	                test_dependent_plugin_load);
-	g_test_add_func("/loaders/native/load_broken_dependent",
+	g_test_add_func("/loaders/native/load/broken_dependent",
 	                test_broken_depend_plugin_load);
 
 	/* bad plugin tests */
-	g_test_add_func("/loaders/native/query-error",
+	g_test_add_func("/loaders/native/error/query",
 	                test_query_error);
-	g_test_add_func("/loaders/native/load-error",
+	g_test_add_func("/loaders/native/error/load",
 	                test_load_error);
-	g_test_add_func("/loaders/native/unload-error",
+	g_test_add_func("/loaders/native/error/unload",
 	                test_unload_error);
 
 	/* test plugins with id collisions */
@@ -377,16 +368,14 @@ main(gint argc, gchar **argv) {
 	                test_id_collision);
 
 	/* test the load on query flag */
-	g_test_add_func("/loaders/native/load-on-query",
+	g_test_add_func("/loaders/native/load-on-query/pass",
 	                test_load_on_query);
-	g_test_add_func("/loaders/native/load-on-query-fail",
+	g_test_add_func("/loaders/native/load-on-query/fail",
 	                test_load_on_query_fail);
 
 	/* test dynamic types */
-	g_test_add_func("/loaders/native/use-dynamic-type",
-	                test_use_dynamic_type);
-	g_test_add_func("/loaders/native/unuse-dynamic-type",
-	                test_unuse_dynamic_type);
+	g_test_add_func("/loaders/native/dynamic-type",
+	                test_dynamic_type);
 
 	return g_test_run();
 }
