@@ -318,18 +318,12 @@ test_dynamic_type(void) {
 	g_assert_cmpint(state, ==, GPLUGIN_PLUGIN_STATE_LOADED);
 
 	/* now unload the plugin */
-	user = gplugin_manager_find_plugin("gplugin/dynamic-type-user");
-
-	g_assert(user);
 	g_assert(gplugin_manager_unload_plugin(user, &error));
 	g_assert_no_error(error);
 
 	state = gplugin_plugin_get_state(user);
 	g_assert_cmpint(state, ==, GPLUGIN_PLUGIN_STATE_QUERIED);
 
-	provider = gplugin_manager_find_plugin("gplugin/dynamic-type-provider");
-
-	g_assert(provider);
 	g_assert(gplugin_manager_unload_plugin(provider, &error));
 	g_assert_no_error(error);
 
