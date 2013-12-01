@@ -313,6 +313,8 @@ gplugin_manager_real_unregister_loader(GPluginManager *manager,
 static void
 gplugin_manager_real_refresh(GPluginManager *manager) {
 	GNode *root = NULL;
+	GList *error_messages = NULL, *l = NULL;
+	gchar *error_message = NULL;
 	guint errors = 0;
 
 	/* build a tree of all possible plugins */
@@ -322,6 +324,13 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 
 	while(manager->refresh_needed) {
 		GNode *dir = NULL;
+
+		if(error_messages) {
+			for(l = error_messages; l; l = l->next)
+				g_free(l->data);
+			g_list_free(error_messages);
+			error_messages = NULL;
+		}
 
 		manager->refresh_needed = FALSE;
 
@@ -382,9 +391,12 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 					if(plugin == NULL || error) {
 						errors++;
 
-						g_warning(_("failed to query '%s' with loader '%s': %s"),
-					              filename, G_OBJECT_TYPE_NAME(loader),
-						          (error) ? error->message : _("Unknown"));
+						error_message =
+							g_strdup_printf(_("failed to query '%s' with " \
+							                  "loader '%s': %s"), filename,
+							                  G_OBJECT_TYPE_NAME(loader),
+							                  (error) ? error->message : _("Unknown"));
+						error_messages = g_list_prepend(error_messages, error_message);
 
 						if(error)
 							g_error_free(error);
@@ -439,8 +451,12 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 					GSList *l = NULL;
 
 					/* throw a warning if the info->id is NULL */
-					if(id == NULL)
-						g_warning(_("Plugin %s has a NULL id."),  real_filename);
+					if(id == NULL) {
+						error_message =
+							g_strdup_printf(_("Plugin %s has a NULL id."),
+							                real_filename);
+						error_messages = g_list_prepend(error_messages, error_message);
+					}
 
 					/* now insert into our view */
 					g_hash_table_insert(manager->plugins_filename_view,
@@ -468,9 +484,11 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 						                                    &error);
 
 						if(!loaded) {
-							g_warning(_("failed to load %s during query: %s"),
-							          filename,
-							          (error) ? error->message : _("unknown"));
+							error_message =
+								g_strdup_printf(_("failed to load %s during query: %s"),
+								                filename,
+								                (error) ? error->message : _("Unknown"));
+							error_messages = g_list_prepend(error_messages, error_message);
 
 							errors++;
 
@@ -495,6 +513,16 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 				g_free(filename);
 			}
 		}
+	}
+
+	if(error_messages) {
+		error_messages = g_list_reverse(error_messages);
+		for(l = error_messages; l; l = l->next) {
+			g_warning("%s", (gchar *)l->data);
+			g_free(l->data);
+		}
+
+		g_list_free(error_messages);
 	}
 
 	/* free the file tree */
