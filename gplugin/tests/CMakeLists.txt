@@ -6,6 +6,7 @@ endmacro(add_test_plugin)
 
 add_subdirectory(plugins)
 add_subdirectory(bad-plugins)
+add_subdirectory(dynamic-type)
 add_subdirectory(id-collision)
 add_subdirectory(load-fail)
 
@@ -41,12 +42,15 @@ add_dependencies(test-native-loader
 	id-collision2
 	load-on-query
 	load-on-query-fail
+	dynamic-type-provider
+	dynamic-type-user
 )
 
 add_gtest(test-version-compare)
 
 add_definitions(-DTEST_DIR="${CMAKE_CURRENT_BINARY_DIR}/plugins/")
 add_definitions(-DTEST_BAD_DIR="${CMAKE_CURRENT_BINARY_DIR}/bad-plugins/")
+add_definitions(-DTEST_DYNAMIC_DIR="${CMAKE_CURRENT_BINARY_DIR}/dynamic-type/")
 add_definitions(-DTEST_ID_DIR="${CMAKE_CURRENT_BINARY_DIR}/id-collision/")
 add_definitions(-DTEST_LOAD_DIR="${CMAKE_CURRENT_BINARY_DIR}/load-fail/")
 

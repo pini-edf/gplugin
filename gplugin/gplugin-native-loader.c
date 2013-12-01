@@ -34,7 +34,7 @@
  *****************************************************************************/
 static gpointer
 gplugin_native_loader_lookup_symbol(GModule *module,
-                                           const gchar *name, GError **error)
+                                    const gchar *name, GError **error)
 {
 	gpointer symbol = NULL;
 
@@ -77,8 +77,8 @@ gplugin_native_loader_open(const gchar *filename, GError **error) {
  *****************************************************************************/
 static GPluginPlugin *
 gplugin_native_loader_query(GPluginLoader *loader,
-                                   const gchar *filename,
-                                   GError **error)
+                            const gchar *filename,
+                            GError **error)
 {
 	GPluginPlugin *plugin = NULL;
 	const GPluginPluginInfo *info = NULL;
@@ -94,8 +94,8 @@ gplugin_native_loader_query(GPluginLoader *loader,
 
 	/* now look for the query symbol */
 	query = gplugin_native_loader_lookup_symbol(module,
-	                                                   GPLUGIN_QUERY_SYMBOL,
-	                                                   error);
+	                                            GPLUGIN_QUERY_SYMBOL,
+	                                            error);
 	if((query == NULL) || (error && *error)) {
 		g_module_close(module);
 		return NULL;
@@ -103,8 +103,8 @@ gplugin_native_loader_query(GPluginLoader *loader,
 
 	/* now look for the load symbol */
 	load = gplugin_native_loader_lookup_symbol(module,
-	                                                  GPLUGIN_LOAD_SYMBOL,
-	                                                  error);
+	                                           GPLUGIN_LOAD_SYMBOL,
+	                                           error);
 	if(error && *error) {
 		g_module_close(module);
 		return NULL;
@@ -112,8 +112,8 @@ gplugin_native_loader_query(GPluginLoader *loader,
 
 	/* now look for the unload symbol */
 	unload = gplugin_native_loader_lookup_symbol(module,
-	                                                    GPLUGIN_UNLOAD_SYMBOL,
-	                                                    error);
+	                                             GPLUGIN_UNLOAD_SYMBOL,
+	                                             error);
 	if(error && *error) {
 		g_module_close(module);
 		return NULL;
@@ -170,24 +170,78 @@ gplugin_native_loader_query(GPluginLoader *loader,
 
 static gboolean
 gplugin_native_loader_load(GPluginLoader *loader,
-                                  GPluginPlugin *plugin,
-                                  GError **error)
+                           GPluginPlugin *plugin,
+                           GError **error)
 {
+	GPluginNativePluginLoadFunc func;
+
 	g_return_val_if_fail(plugin != NULL, FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), FALSE);
 
-	return gplugin_native_plugin_use(GPLUGIN_NATIVE_PLUGIN(plugin), error);
+	/* get the function */
+	g_object_get(G_OBJECT(plugin), "load-func", &func, NULL);
+
+	/* validate the function */
+	if(func == NULL) {
+		const char *filename = gplugin_plugin_get_filename(plugin);
+
+		g_warning(_("load function for %s is NULL"), filename);
+
+		return FALSE;
+	}
+
+	/* now call the function */
+	if(!func(GPLUGIN_NATIVE_PLUGIN(plugin), error)) {
+		if(error && *error == NULL)
+			*error = g_error_new(GPLUGIN_DOMAIN, 0, _("unknown failure"));
+
+		g_warning(_("Plugin load function returned FALSE: %s"),
+		          (error) ? (*error)->message : _("unknown failure"));
+
+		return FALSE;
+	}
+
+	gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOADED);
+
+	return TRUE;
 }
 
 static gboolean
 gplugin_native_loader_unload(GPluginLoader *loader,
-                                    GPluginPlugin *plugin,
-                                    GError **error)
+                             GPluginPlugin *plugin,
+                             GError **error)
 {
+	GPluginNativePluginUnloadFunc func;
+
 	g_return_val_if_fail(plugin != NULL, FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), FALSE);
 
-	return gplugin_native_plugin_unuse(GPLUGIN_NATIVE_PLUGIN(plugin), error);
+	/* get the function */
+	g_object_get(G_OBJECT(plugin), "unload-func", &func, NULL);
+
+	/* validate the function */
+	if(func == NULL) {
+		const char *filename = gplugin_plugin_get_filename(plugin);
+
+		g_warning(_("unload function for %s is NULL"), filename);
+
+		return FALSE;
+	}
+
+	/* now call the function */
+	if(!func(GPLUGIN_NATIVE_PLUGIN(plugin), error)) {
+		if(error && *error)
+			*error = g_error_new(GPLUGIN_DOMAIN, 0, _("unknown failure"));
+
+		g_warning(_("Plugin unload function returned FALSE: %s"),
+		          (error) ? (*error)->message : _("unknown failure"));
+
+		return FALSE;
+	}
+
+	gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_QUERIED);
+
+	return TRUE;
 }
 
 static void
