@@ -201,8 +201,6 @@ gplugin_native_loader_load(GPluginLoader *loader,
 		return FALSE;
 	}
 
-	gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOADED);
-
 	return TRUE;
 }
 
@@ -238,8 +236,6 @@ gplugin_native_loader_unload(GPluginLoader *loader,
 
 		return FALSE;
 	}
-
-	gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_QUERIED);
 
 	return TRUE;
 }

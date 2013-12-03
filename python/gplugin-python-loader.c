@@ -190,19 +190,13 @@ gplugin_python_loader_load(GPluginLoader *loader,
 	Py_DECREF(pyplugin);
 
 	*error = gplugin_python_exception_to_gerror();
-	if(*error) {
-		gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
-
+	if(*error)
 		return FALSE;
-	}
 
 	ret = PyObject_IsTrue(result);
 	Py_DECREF(result);
 
-	if(ret) {
-		gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOADED);
-	} else {
-		gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
+	if(!ret) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     _("Failed to load plugin"));
@@ -238,9 +232,7 @@ gplugin_python_loader_unload(GPluginLoader *loader,
 	ret = PyObject_IsTrue(result);
 	Py_DECREF(result);
 
-	if(ret) {
-		gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_QUERIED);
-	} else {
+	if(!ret) {
 		if(error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     _("Failed to unload plugin"));
