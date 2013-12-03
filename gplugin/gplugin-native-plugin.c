@@ -364,35 +364,7 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin, GError **error) {
 
 	priv->use_count++;
 	if(priv->use_count == 1) {
-		GPluginNativePluginLoadFunc func;
 		GSList *l = NULL;
-
-		if(priv->load_func == NULL) {
-			GPluginPluginInfo *info = NULL;
-			priv->use_count--;
-
-			info = gplugin_plugin_get_info(GPLUGIN_PLUGIN(plugin));
-
-			g_warning(_("load function for %s is NULL"),
-			          gplugin_plugin_info_get_name(info));
-
-			g_object_unref(G_OBJECT(info));
-
-			return FALSE;
-		}
-
-		func = (GPluginNativePluginLoadFunc)priv->load_func;
-		if(!func(plugin, error)) {
-			if (error && *error == NULL)
-				*error = g_error_new(GPLUGIN_DOMAIN, 0, _("unknown"));
-
-			g_warning(_("Plugin load function return FALSE : %s"),
-			          error ? (*error)->message : _("unknown"));
-
-			priv->use_count--;
-
-			return FALSE;
-		}
 
 		for(l = priv->type_infos; l; l = l->next) {
 			GPluginNativePluginTypeInfo *info =
@@ -417,9 +389,6 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin, GError **error) {
 				return FALSE;
 			}
 		}
-
-		gplugin_plugin_set_state(GPLUGIN_PLUGIN(plugin),
-		                         GPLUGIN_PLUGIN_STATE_LOADED);
 	}
 
 	return TRUE;
@@ -450,35 +419,7 @@ gplugin_native_plugin_unuse(GPluginNativePlugin *plugin, GError **error) {
 	priv->use_count--;
 
 	if(priv->use_count == 0) {
-		GPluginNativePluginUnloadFunc func = NULL;
 		GSList *l = NULL;
-
-		if(priv->unload_func == NULL) {
-			GPluginPluginInfo *info = NULL;
-			priv->use_count++;
-
-			info = gplugin_plugin_get_info(GPLUGIN_PLUGIN(plugin));
-
-			g_warning(_("unload function for %s is NULL"),
-			          gplugin_plugin_info_get_name(info));
-
-			g_object_unref(G_OBJECT(info));
-
-			return FALSE;
-		}
-
-		func = (GPluginNativePluginUnloadFunc)priv->unload_func;
-		if(!func(plugin, error)) {
-			if (error && *error == NULL)
-				*error = g_error_new(GPLUGIN_DOMAIN, 0, _("unknown"));
-
-			g_warning(_("Plugin unload function returned FALSE : %s"),
-			          error ? (*error)->message : _("unknown"));
-
-			priv->use_count++;
-
-			return FALSE;
-		}
 
 		for(l = priv->type_infos; l; l = l->next) {
 			GPluginNativePluginTypeInfo *info =
@@ -486,9 +427,6 @@ gplugin_native_plugin_unuse(GPluginNativePlugin *plugin, GError **error) {
 
 			info->loaded = FALSE;
 		}
-
-		gplugin_plugin_set_state(GPLUGIN_PLUGIN(plugin),
-		                         GPLUGIN_PLUGIN_STATE_QUERIED);
 	}
 
 	return TRUE;

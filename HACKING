@@ -1,10 +1,11 @@
 GPlugin uses hgflow[1] for development.  All development takes place on the
-develop branch which leaves default to be a clean branching point.  All long
+develop branch which leaves default to be a stable release clone.  All long
 term feature/bug fix work should take place on a feature branch that when
 closed, gets merged to develop.
 
-Release fork from develop and create a new branch for any testing/bug fixes.
-When a release is deemed done, it's merged into default.
+Releases are forked from develop and create a new branch for any testing/bug
+fixes.  When a release is deemed done, it's merged back into develop and into
+default.  hgflow takes care of all of this for us.
 
 [1] https://bitbucket.org/yujiewu/hgflow
 
