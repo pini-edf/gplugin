@@ -357,7 +357,7 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 						gplugin_plugin_get_state(plugin);
 
 					/* The plugin is in our "view", check it's state.  If it's
-					 * probed or loaded, move on to the next one.
+					 * queried or loaded, move on to the next one.
 					 */
 					if(state == GPLUGIN_PLUGIN_STATE_QUERIED ||
 					   state == GPLUGIN_PLUGIN_STATE_LOADED)
@@ -597,6 +597,8 @@ gplugin_manager_real_load_plugin(GPluginManager *manager,
 			                     gplugin_plugin_get_filename(plugin));
 		}
 
+		gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
+
 		return FALSE;
 	}
 
@@ -651,6 +653,8 @@ gplugin_manager_real_load_plugin(GPluginManager *manager,
 
 				g_object_unref(G_OBJECT(info));
 
+				gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
+
 				return FALSE;
 			}
 		}
@@ -669,14 +673,22 @@ gplugin_manager_real_load_plugin(GPluginManager *manager,
 			                     gplugin_plugin_get_filename(plugin));
 		}
 
+		gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
+
 		return FALSE;
 	}
 
 	g_signal_emit(manager, signals[SIG_LOADING], 0, plugin, error, &ret);
-	if(!ret)
+	if(!ret) {
+		gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
+
 		return ret;
+	}
 
 	ret = gplugin_loader_load_plugin(loader, plugin, error);
+	gplugin_plugin_set_state(plugin, (ret) ? GPLUGIN_PLUGIN_STATE_LOADED :
+	                                         GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
+
 	g_signal_emit(manager, signals[SIG_LOADED], 0, plugin);
 
 	return ret;
@@ -710,8 +722,11 @@ gplugin_manager_real_unload_plugin(GPluginManager *manager,
 		return ret;
 
 	ret = gplugin_loader_unload_plugin(loader, plugin, error);
+	if(ret) {
+		gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_QUERIED);
 
-	g_signal_emit(manager, signals[SIG_UNLOADED], 0, plugin, error);
+		g_signal_emit(manager, signals[SIG_UNLOADED], 0, plugin, error);
+	}
 
 	return ret;
 }

@@ -427,9 +427,6 @@ gplugin_native_plugin_unuse(GPluginNativePlugin *plugin, GError **error) {
 
 			info->loaded = FALSE;
 		}
-
-		gplugin_plugin_set_state(GPLUGIN_PLUGIN(plugin),
-		                         GPLUGIN_PLUGIN_STATE_QUERIED);
 	}
 
 	return TRUE;
