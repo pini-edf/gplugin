@@ -22,9 +22,6 @@ macro(add_gtest target)
 	list(APPEND TESTS ${_output_name})
 endmacro(add_gtest)
 
-add_executable(test-gplugin-loader test-loader.c)
-target_link_libraries(test-gplugin-loader ${GLIB_LIBRARIES} gplugin)
-
 add_gtest(test-core)
 add_gtest(test-option-group)
 add_gtest(test-plugin-manager-paths)

@@ -66,29 +66,8 @@ static GPluginTestLoaderFunction test_functions[] = {
 	{ NULL },
 };
 
-static gboolean
-gplugin_test_loader_envvar_cb(const gchar *n, const gchar *v, gpointer d,
-                              GError **error)
-{
-	gchar **parts = g_strsplit(v, "=", 2);
-	g_setenv(parts[0], parts[1], TRUE);
-	g_strfreev(parts);
-
-	return TRUE;
-}
-
-static GOptionEntry entries[] = {
-	{
-		"envvar", 'e', 0, G_OPTION_ARG_CALLBACK,
-		gplugin_test_loader_envvar_cb, N_("Set environment variable"),
-		NULL,
-	}, {
-		NULL
-	},
-};
-
-static void
-gplugin_test_loader_add_tests(const gchar *short_name) {
+void
+gplugin_loader_tests_add_tests(const gchar *short_name) {
 	gint i = 0;
 
 	for(i = 0; test_functions[i].path; i++) {
@@ -100,50 +79,4 @@ gplugin_test_loader_add_tests(const gchar *short_name) {
 	}
 }
 
-gint
-main(gint argc, gchar **argv) {
-	GError *error = NULL;
-	GOptionContext *ctx = NULL;
-	gint ret = 0;
-
-	g_test_init(&argc, &argv, NULL);
-	gplugin_init();
-
-	ctx = g_option_context_new("LOADER_SHORT_NAME");
-	g_option_context_set_translation_domain(ctx, GETTEXT_PACKAGE);
-	g_option_context_set_ignore_unknown_options(ctx, TRUE);
-	g_option_context_add_main_entries(ctx, entries, NULL);
-	g_option_context_add_group(ctx, gplugin_get_option_group());
-	g_option_context_parse(ctx, &argc, &argv, &error);
-	g_option_context_free(ctx);
-
-
-	if(error) {
-		fprintf(stderr, "%s\n", error->message);
-
-		g_error_free(error);
-
-		gplugin_uninit();
-
-		return EXIT_FAILURE;
-	}
-
-	if(argc != 2) {
-		fprintf(stderr, "You must specify a shortname for the loader\n");
-
-		gplugin_uninit();
-
-		return EXIT_FAILURE;
-	}
-
-	gplugin_manager_refresh();
-
-	gplugin_test_loader_add_tests(argv[1]);
-
-	ret = g_test_run();
-
-	gplugin_uninit();
-
-	return ret;
-}
 
