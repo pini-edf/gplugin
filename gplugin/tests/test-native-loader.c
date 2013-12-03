@@ -101,7 +101,7 @@ test_basic_plugin_load(void) {
 		g_assert(gplugin_manager_unload_plugin(plugin, &error));
 
 		state = gplugin_plugin_get_state(plugin);
-		g_assert_cmpint(state, !=, GPLUGIN_PLUGIN_STATE_LOADED);
+		g_assert_cmpint(state, ==, GPLUGIN_PLUGIN_STATE_QUERIED);
 	}
 
 	/* make sure the free function works too */
