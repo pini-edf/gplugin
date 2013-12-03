@@ -3,6 +3,8 @@
     as well as not adding the default paths.
   * Fixed an issue with dependencies in native plugins.
   * Fixed some use count issues in native plugins.
+  * GPluginManager now manages the the states for plugins so the loaders don't
+    have to.
 
 0.0.10: 2013/11/01
   * Got the gplugin-gtk stuff working for the most part
