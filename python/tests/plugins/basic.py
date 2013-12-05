@@ -4,7 +4,7 @@ from gi.repository import GPlugin
 
 def gplugin_query():
     return GPlugin.PluginInfo(
-        id='gplugin-python/basic-plugin',
+        id='gplugin/python-basic-plugin',
         abi_version=0x01020304,
         name='basic plugin',
         authors=['author1'],

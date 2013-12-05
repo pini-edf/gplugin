@@ -36,22 +36,149 @@ typedef struct {
  *****************************************************************************/
 static void
 gplugin_test_loader_full(gconstpointer d) {
+	GPluginPlugin *plugin = NULL;
+	GPluginPluginInfo *info = NULL;
+	GError *error = NULL;
+	gchar *id = NULL;
+	gchar **authors = NULL;
+	const gchar * const r_authors[] = { "author1", NULL };
+	gint i;
+
+	id = g_strdup_printf("gplugin/%s-basic-plugin", (const gchar *)d);
+	plugin = gplugin_manager_find_plugin(id);
+	g_assert(plugin != NULL);
+
+	info = gplugin_plugin_get_info(plugin);
+	g_assert(info != NULL);
+
+	g_assert_cmpstr(gplugin_plugin_info_get_id(info), ==, id);
+	g_free(id);
+
+	g_assert_cmpuint(gplugin_plugin_info_get_abi_version(info), ==,
+	                 0x01020304);
+	g_assert_cmpstr(gplugin_plugin_info_get_name(info), ==, "basic plugin");
+
+	authors = (gchar **)gplugin_plugin_info_get_authors(info);
+	for(i = 0; r_authors[i]; i++)
+		g_assert_cmpstr(authors[i], ==, r_authors[i]);
+
+	g_assert_cmpstr(gplugin_plugin_info_get_category(info), ==, "test");
+	g_assert_cmpstr(gplugin_plugin_info_get_version(info), ==, "version");
+	g_assert_cmpstr(gplugin_plugin_info_get_license_id(info), ==, "license");
+	g_assert_cmpstr(gplugin_plugin_info_get_summary(info), ==, "summary");
+	g_assert_cmpstr(gplugin_plugin_info_get_description(info), ==,
+	                "description");
+	g_assert_cmpstr(gplugin_plugin_info_get_website(info), ==, "website");
+
+	g_object_unref(G_OBJECT(info));
+
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_QUERIED);
+
+	gplugin_manager_load_plugin(plugin, &error);
+	g_assert_no_error(error);
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOADED);
+
+	gplugin_manager_unload_plugin(plugin, &error);
+	g_assert_no_error(error);
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_QUERIED);
+
+	g_object_unref(G_OBJECT(plugin));
 }
 
 static void
 gplugin_test_loader_load_failed(gconstpointer d) {
+	GPluginPlugin *plugin = NULL;
+	GError *error = NULL;
+	gchar *id = NULL;
+	gboolean ret = FALSE;
+
+	id = g_strdup_printf("gplugin/%s-load-failed", (const gchar *)d);
+	plugin = gplugin_manager_find_plugin(id);
+	g_free(id);
+	g_assert(plugin != NULL);
+
+	ret = gplugin_manager_load_plugin(plugin, &error);
+	g_assert(ret == FALSE);
+	g_assert_error(error, GPLUGIN_DOMAIN, 0);
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
+
+	g_object_unref(G_OBJECT(plugin));
 }
 
 static void
 gplugin_test_loader_load_exception(gconstpointer d) {
+	GPluginPlugin *plugin = NULL;
+	GError *error = NULL;
+	gchar *id = NULL;
+	gboolean ret = FALSE;
+
+	id = g_strdup_printf("gplugin/%s-load-exception", (const gchar *)d);
+	plugin = gplugin_manager_find_plugin(id);
+	g_free(id);
+	g_assert(plugin != NULL);
+
+	ret = gplugin_manager_load_plugin(plugin, &error);
+	g_assert(ret == FALSE);
+	g_assert_error(error, GPLUGIN_DOMAIN, 0);
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
+
+	g_object_unref(G_OBJECT(plugin));
 }
 
 static void
 gplugin_test_loader_unload_failed(gconstpointer d) {
+	GPluginPlugin *plugin = NULL;
+	GError *error = NULL;
+	gchar *id = NULL;
+	gboolean ret = FALSE;
+
+	id = g_strdup_printf("gplugin/%s-unload-failed", (const gchar *)d);
+	plugin = gplugin_manager_find_plugin(id);
+	g_free(id);
+	g_assert(plugin != NULL);
+
+	ret = gplugin_manager_load_plugin(plugin, &error);
+	g_assert(ret != FALSE);
+	g_assert_no_error(error);
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOADED);
+
+	ret = gplugin_manager_unload_plugin(plugin, &error);
+	g_assert(ret != TRUE);
+	g_assert_error(error, GPLUGIN_DOMAIN, 0);
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOADED);
+
+	g_object_unref(G_OBJECT(plugin));
 }
 
 static void
 gplugin_test_loader_dependencies(gconstpointer d) {
+	GPluginPlugin *plugin = NULL;
+	GPluginPluginInfo *info = NULL;
+	gchar *id = NULL;
+	gchar **deps = NULL;
+	const gchar * const r_deps[] = { "dependency1", "dependency2", NULL };
+	gint i = 0;
+
+	id = g_strdup_printf("gplugin/%s-dependent-plugin", (const gchar *)d);
+	plugin = gplugin_manager_find_plugin(id);
+	g_free(id);
+	g_assert(plugin != NULL);
+
+	info = gplugin_plugin_get_info(plugin);
+	g_assert(info != NULL);
+
+	deps = (gchar **)gplugin_plugin_info_get_dependencies(info);
+	for(i = 0; r_deps[i]; i++)
+		g_assert_cmpstr(r_deps[i], ==, deps[i]);
+
+	g_object_unref(G_OBJECT(plugin));
 }
 
 /******************************************************************************
@@ -79,4 +206,19 @@ gplugin_loader_tests_add_tests(const gchar *short_name) {
 	}
 }
 
+void
+gplugin_loader_tests_main(const gchar *loader_dir, const gchar *plugin_dir,
+                          const gchar *short_name)
+{
+	gplugin_init();
+
+	g_setenv("GI_TYPELIB_PATH", GI_TYPELIB_PATH, TRUE);
+
+	gplugin_manager_append_path(loader_dir);
+	gplugin_manager_append_path(plugin_dir);
+
+	gplugin_manager_refresh();
+
+	gplugin_loader_tests_add_tests(short_name);
+}
 

@@ -20,10 +20,8 @@ local GPlugin = lgi.GPlugin
 
 function gplugin_query()
 	return GPlugin.PluginInfo {
-		id="gplugin-lua/dependent-plugin",
-		abi_version=0x01020304,
-		name="dependent plugin",
-		dependencies={"dep1", "dep2"},
+		id="gplugin/lua-dependent-plugin",
+		dependencies={"dependency1", "dependency2"},
 	}
 end
 
