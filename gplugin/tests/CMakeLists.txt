@@ -1,16 +1,11 @@
+###############################################################################
+# Macros
+###############################################################################
 macro(add_test_plugin plugin)
 	add_library(${plugin} MODULE ${plugin}.c)
 	set_target_properties(${plugin} PROPERTIES PREFIX "")
 	target_link_libraries(${plugin} ${GLIB_LIBRARIES} gplugin)
 endmacro(add_test_plugin)
-
-add_subdirectory(plugins)
-add_subdirectory(bad-plugins)
-add_subdirectory(dynamic-type)
-add_subdirectory(id-collision)
-
-add_subdirectory(load-on-query-pass)
-add_subdirectory(load-on-query-fail)
 
 macro(add_gtest target)
 	add_executable(${target} ${target}.c)
@@ -25,15 +20,40 @@ macro(add_gtest target)
 	list(APPEND TESTS ${_output_name})
 endmacro(add_gtest)
 
+###############################################################################
+# Subdirectories
+###############################################################################
+add_subdirectory(plugins)
+add_subdirectory(bad-plugins)
+add_subdirectory(dynamic-type)
+add_subdirectory(id-collision)
+add_subdirectory(load-on-query-pass)
+add_subdirectory(load-on-query-fail)
+
+###############################################################################
+# Tests
+###############################################################################
+
+#######################################
+# Simple Tests (single file)
+#######################################
 add_gtest(test-core)
 add_gtest(test-option-group)
 add_gtest(test-plugin-manager-paths)
 add_gtest(test-plugin-info)
 add_gtest(test-signals)
+add_gtest(test-version-compare)
 
+#######################################
+# Dynamic Type
+#######################################
 add_gtest(test-dynamic-type)
 add_dependencies(test-dynamic-type dynamic-type-provider dynamic-type-user)
+add_definitions(-DTEST_DYNAMIC_DIR="${CMAKE_CURRENT_BINARY_DIR}/dynamic-type/")
 
+#######################################
+# ID Collision
+#######################################
 add_gtest(test-id-collision)
 add_dependencies(test-id-collision id-collision1 id-collision2)
 
@@ -62,15 +82,13 @@ add_dependencies(test-native-loader
 	unload-failed
 )
 target_link_libraries(test-native-loader gplugin-loader-tests)
-
-add_gtest(test-version-compare)
-
 add_definitions(-DTEST_DIR="${CMAKE_CURRENT_BINARY_DIR}/plugins/")
 add_definitions(-DTEST_BAD_DIR="${CMAKE_CURRENT_BINARY_DIR}/bad-plugins/")
-add_definitions(-DTEST_DYNAMIC_DIR="${CMAKE_CURRENT_BINARY_DIR}/dynamic-type/")
 add_definitions(-DTEST_ID_DIR="${CMAKE_CURRENT_BINARY_DIR}/id-collision/")
-add_definitions(-DTEST_LOAD_DIR="${CMAKE_CURRENT_BINARY_DIR}/load-fail/")
 
+###############################################################################
+# GTester Stuff
+###############################################################################
 set(GTESTER_TESTS "${TESTS}")
 set(GTESTER_LOG "testgplugin.xml")
 set(GTESTER_JUNIT "testgplugin-junit.xml")
