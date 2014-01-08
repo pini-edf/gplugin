@@ -448,7 +448,8 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 						gplugin_plugin_get_info(plugin);
 
 					const gchar *id = gplugin_plugin_info_get_id(info);
-					GSList *l = NULL;
+					GSList *l = NULL, *ll = NULL;
+					gboolean seen = FALSE;
 
 					/* throw a warning if the info->id is NULL */
 					if(id == NULL) {
@@ -467,10 +468,17 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 					 * plugin to it before updating it.
 					 */
 					l = g_hash_table_lookup(manager->plugins, id);
-					l = g_slist_prepend(l, g_object_ref(plugin));
-					g_hash_table_insert(manager->plugins, g_strdup(id), l);
+					for(ll = l; ll; ll = ll->next) {
+						GPluginPlugin *splugin = GPLUGIN_PLUGIN(ll->data);
+						const gchar *sfilename = gplugin_plugin_get_filename(splugin);
 
-					g_object_unref(G_OBJECT(info));
+						if(!g_strcmp0(real_filename, sfilename))
+							seen = TRUE;
+					}
+					if(!seen) {
+						l = g_slist_prepend(l, g_object_ref(plugin));
+						g_hash_table_insert(manager->plugins, g_strdup(id), l);
+					}
 
 					/* check if the plugin is supposed to be loaded on query,
 					 * and if so, load it.
@@ -508,6 +516,9 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 							manager->refresh_needed = TRUE;
 						}
 					}
+
+					g_object_unref(G_OBJECT(info));
+
 				}
 
 				g_free(filename);
