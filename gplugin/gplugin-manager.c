@@ -409,15 +409,9 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 					}
 
 					/* if the plugin instance is good, then break out of this
-					 * loop.  If errors is greater than 0, set
-					 * manager->refresh_needed to TRUE to try a last ditch
-					 * effort to load failed plugins.
+					 * loop.
 					 */
 					if(plugin != NULL && GPLUGIN_IS_PLUGIN(plugin)) {
-						if(errors > 0) {
-							errors = 0;
-							manager->refresh_needed = TRUE;
-						}
 						break;
 					}
 
