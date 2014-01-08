@@ -1,5 +1,9 @@
 0.0.12:
   * Added a static library to make it easier to test loaders.
+  * Moved the native loader to the loader-testing static library
+  * Overhauled the native loader tests
+  * Fixed a bug where in certain conditions a load-on-query plugin that failed
+    to load, would get it's info tracked twice.
 
 0.0.11: 2013/12/02
   * Added gplugin_get_option_group which implements options for adding paths
