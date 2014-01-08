@@ -1,3 +1,5 @@
+0.0.13:
+
 0.0.12: 2014/01/08
   * Added a static library to make it easier to test loaders.
   * Moved the native loader to the loader-testing static library
