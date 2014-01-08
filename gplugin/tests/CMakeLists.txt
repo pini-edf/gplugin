@@ -8,7 +8,9 @@ add_subdirectory(plugins)
 add_subdirectory(bad-plugins)
 add_subdirectory(dynamic-type)
 add_subdirectory(id-collision)
-add_subdirectory(load-fail)
+
+add_subdirectory(load-on-query-pass)
+add_subdirectory(load-on-query-fail)
 
 macro(add_gtest target)
 	add_executable(${target} ${target}.c)
@@ -29,22 +31,37 @@ add_gtest(test-plugin-manager-paths)
 add_gtest(test-plugin-info)
 add_gtest(test-signals)
 
+add_gtest(test-dynamic-type)
+add_dependencies(test-dynamic-type dynamic-type-provider dynamic-type-user)
+
+add_gtest(test-id-collision)
+add_dependencies(test-id-collision id-collision1 id-collision2)
+
+#######################################
+# Load On Query
+#######################################
+add_gtest(test-load-on-query)
+add_dependencies(test-load-on-query load-on-query-pass load-on-query-fail)
+add_definitions(
+	-DTEST_LOAD_ON_QUERY_PASS_DIR="${CMAKE_CURRENT_BINARY_DIR}/load-on-query-pass"
+	-DTEST_LOAD_ON_QUERY_FAIL_DIR="${CMAKE_CURRENT_BINARY_DIR}/load-on-query-fail"
+)
+
+#######################################
+# Native Loader
+#######################################
 add_gtest(test-native-loader)
 add_dependencies(test-native-loader
 	basic-plugin
 	dependent-plugin
 	broken-dependent-plugin
-	multiple-authors
 	query-error
-	load-error
-	unload-error
-	id-collision1
-	id-collision2
-	load-on-query
-	load-on-query-fail
-	dynamic-type-provider
-	dynamic-type-user
+
+	load-exception
+	load-failed
+	unload-failed
 )
+target_link_libraries(test-native-loader gplugin-loader-tests)
 
 add_gtest(test-version-compare)
 

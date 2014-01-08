@@ -20,7 +20,7 @@
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_query(GError **error) {
 	return gplugin_plugin_info_new(
-		"gplugin/test-unload-error",
+		"gplugin/native-load-exception",
 		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
 		NULL
 	);
@@ -28,14 +28,11 @@ gplugin_query(GError **error) {
 
 G_MODULE_EXPORT gboolean
 gplugin_load(GPluginNativePlugin *plugin, GError **error) {
-	return TRUE;
+	return FALSE;
 }
 
 G_MODULE_EXPORT gboolean
 gplugin_unload(GPluginNativePlugin *plugin, GError **error) {
-	if(error)
-		*error = g_error_new(GPLUGIN_DOMAIN, 0, "expected error");
-
-	return FALSE;
+	return TRUE;
 }
 

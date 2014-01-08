@@ -63,6 +63,7 @@ typedef struct {
 	void (*append_path)(GPluginManager *manager, const gchar *path);
 	void (*prepend_path)(GPluginManager *manager, const gchar *path);
 	void (*remove_path)(GPluginManager *manager, const gchar *path);
+	void (*remove_paths)(GPluginManager *manager);
 
 	GList *(*get_paths)(GPluginManager *manager);
 
@@ -189,6 +190,11 @@ gplugin_manager_real_remove_path(GPluginManager *manager,
 
 	if(link)
 		g_queue_delete_link(manager->paths, link);
+}
+
+static void
+gplugin_manager_real_remove_paths(GPluginManager *manager) {
+	g_queue_clear(manager->paths);
 }
 
 static GList *
@@ -787,6 +793,7 @@ gplugin_manager_class_init(GPluginManagerClass *klass) {
 	manager_class->append_path = gplugin_manager_real_append_path;
 	manager_class->prepend_path = gplugin_manager_real_prepend_path;
 	manager_class->remove_path = gplugin_manager_real_remove_path;
+	manager_class->remove_paths = gplugin_manager_real_remove_paths;
 	manager_class->get_paths = gplugin_manager_real_get_paths;
 
 	manager_class->register_loader =
@@ -998,6 +1005,24 @@ gplugin_manager_remove_path(const gchar *path) {
 
 	if(klass && klass->remove_path)
 		klass->remove_path(manager, path);
+}
+
+/**
+ * gplugin_manager_remove_paths:
+ *
+ * Clears all paths that are set to search for plugins.
+ */
+void
+gplugin_manager_remove_paths(void) {
+	GPluginManager *manager = GPLUGIN_MANAGER_INSTANCE;
+	GPluginManagerClass *klass = NULL;
+
+	g_return_if_fail(GPLUGIN_IS_MANAGER(manager));
+
+	klass = GPLUGIN_MANAGER_GET_CLASS(manager);
+
+	if(klass && klass->remove_paths)
+		klass->remove_paths(manager);
 }
 
 /**
