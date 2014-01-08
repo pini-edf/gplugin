@@ -19,18 +19,9 @@
 
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_query(GError **error) {
-	const gchar * const authors[] = {
-		"author1",
-		"author2",
-		"author3",
-		"author4",
-		NULL
-	};
-
-	return g_object_new(GPLUGIN_TYPE_PLUGIN_INFO,
-		"id", "gplugin/multiple-authors",
-		"abi-version", GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-		"authors", authors,
+	return gplugin_plugin_info_new(
+		"gplugin/native-unload-failed",
+		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
 		NULL
 	);
 }
@@ -42,6 +33,9 @@ gplugin_load(GPluginNativePlugin *plugin, GError **error) {
 
 G_MODULE_EXPORT gboolean
 gplugin_unload(GPluginNativePlugin *plugin, GError **error) {
-	return TRUE;
+	if(error)
+		*error = g_error_new(GPLUGIN_DOMAIN, 0, "expected error");
+
+	return FALSE;
 }
 

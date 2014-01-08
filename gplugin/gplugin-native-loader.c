@@ -195,9 +195,6 @@ gplugin_native_loader_load(GPluginLoader *loader,
 		if(error && *error == NULL)
 			*error = g_error_new(GPLUGIN_DOMAIN, 0, _("unknown failure"));
 
-		g_warning(_("Plugin load function returned FALSE: %s"),
-		          (error) ? (*error)->message : _("unknown failure"));
-
 		return FALSE;
 	}
 
@@ -230,9 +227,6 @@ gplugin_native_loader_unload(GPluginLoader *loader,
 	if(!func(GPLUGIN_NATIVE_PLUGIN(plugin), error)) {
 		if(error && *error)
 			*error = g_error_new(GPLUGIN_DOMAIN, 0, _("unknown failure"));
-
-		g_warning(_("Plugin unload function returned FALSE: %s"),
-		          (error && *error) ? (*error)->message : _("unknown failure"));
 
 		return FALSE;
 	}

@@ -29,6 +29,12 @@ gplugin_query(GError **error) {
 
 G_MODULE_EXPORT gboolean
 gplugin_load(GPluginNativePlugin *plugin, GError **error) {
+	static int count = 1;
+	gchar *message = g_strdup_printf("called %d times", count++);
+
+	*error = g_error_new(GPLUGIN_DOMAIN, 0, message);
+	g_free(message);
+
 	return FALSE;
 }
 

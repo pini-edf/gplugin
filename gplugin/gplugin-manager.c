@@ -63,6 +63,7 @@ typedef struct {
 	void (*append_path)(GPluginManager *manager, const gchar *path);
 	void (*prepend_path)(GPluginManager *manager, const gchar *path);
 	void (*remove_path)(GPluginManager *manager, const gchar *path);
+	void (*remove_paths)(GPluginManager *manager);
 
 	GList *(*get_paths)(GPluginManager *manager);
 
@@ -189,6 +190,11 @@ gplugin_manager_real_remove_path(GPluginManager *manager,
 
 	if(link)
 		g_queue_delete_link(manager->paths, link);
+}
+
+static void
+gplugin_manager_real_remove_paths(GPluginManager *manager) {
+	g_queue_clear(manager->paths);
 }
 
 static GList *
@@ -409,15 +415,9 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 					}
 
 					/* if the plugin instance is good, then break out of this
-					 * loop.  If errors is greater than 0, set
-					 * manager->refresh_needed to TRUE to try a last ditch
-					 * effort to load failed plugins.
+					 * loop.
 					 */
 					if(plugin != NULL && GPLUGIN_IS_PLUGIN(plugin)) {
-						if(errors > 0) {
-							errors = 0;
-							manager->refresh_needed = TRUE;
-						}
 						break;
 					}
 
@@ -448,7 +448,8 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 						gplugin_plugin_get_info(plugin);
 
 					const gchar *id = gplugin_plugin_info_get_id(info);
-					GSList *l = NULL;
+					GSList *l = NULL, *ll = NULL;
+					gboolean seen = FALSE;
 
 					/* throw a warning if the info->id is NULL */
 					if(id == NULL) {
@@ -467,10 +468,17 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 					 * plugin to it before updating it.
 					 */
 					l = g_hash_table_lookup(manager->plugins, id);
-					l = g_slist_prepend(l, g_object_ref(plugin));
-					g_hash_table_insert(manager->plugins, g_strdup(id), l);
+					for(ll = l; ll; ll = ll->next) {
+						GPluginPlugin *splugin = GPLUGIN_PLUGIN(ll->data);
+						const gchar *sfilename = gplugin_plugin_get_filename(splugin);
 
-					g_object_unref(G_OBJECT(info));
+						if(!g_strcmp0(real_filename, sfilename))
+							seen = TRUE;
+					}
+					if(!seen) {
+						l = g_slist_prepend(l, g_object_ref(plugin));
+						g_hash_table_insert(manager->plugins, g_strdup(id), l);
+					}
 
 					/* check if the plugin is supposed to be loaded on query,
 					 * and if so, load it.
@@ -508,6 +516,9 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 							manager->refresh_needed = TRUE;
 						}
 					}
+
+					g_object_unref(G_OBJECT(info));
+
 				}
 
 				g_free(filename);
@@ -793,6 +804,7 @@ gplugin_manager_class_init(GPluginManagerClass *klass) {
 	manager_class->append_path = gplugin_manager_real_append_path;
 	manager_class->prepend_path = gplugin_manager_real_prepend_path;
 	manager_class->remove_path = gplugin_manager_real_remove_path;
+	manager_class->remove_paths = gplugin_manager_real_remove_paths;
 	manager_class->get_paths = gplugin_manager_real_get_paths;
 
 	manager_class->register_loader =
@@ -1004,6 +1016,24 @@ gplugin_manager_remove_path(const gchar *path) {
 
 	if(klass && klass->remove_path)
 		klass->remove_path(manager, path);
+}
+
+/**
+ * gplugin_manager_remove_paths:
+ *
+ * Clears all paths that are set to search for plugins.
+ */
+void
+gplugin_manager_remove_paths(void) {
+	GPluginManager *manager = GPLUGIN_MANAGER_INSTANCE;
+	GPluginManagerClass *klass = NULL;
+
+	g_return_if_fail(GPLUGIN_IS_MANAGER(manager));
+
+	klass = GPLUGIN_MANAGER_GET_CLASS(manager);
+
+	if(klass && klass->remove_paths)
+		klass->remove_paths(manager);
 }
 
 /**

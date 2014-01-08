@@ -1,6 +1,6 @@
 add_test_plugin(basic-plugin)
 add_test_plugin(dependent-plugin)
 add_test_plugin(broken-dependent-plugin)
-add_test_plugin(multiple-authors)
-add_test_plugin(load-on-query)
-
+add_test_plugin(load-failed)
+add_test_plugin(load-exception)
+add_test_plugin(unload-failed)

@@ -20,16 +20,18 @@
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_query(GError **error) {
 	const gchar * const authors[] = {
-		"author",
+		"author1",
 		NULL
 	};
 
 	return gplugin_plugin_info_new(
-		"gplugin/basic-native-plugin",
-		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-		"name", "name",
+		"gplugin/native-basic-plugin",
+		0x01020304,
+		"name", "basic plugin",
+		"category", "test",
 		"version", "version",
 		"summary", "summary",
+		"license-id", "license",
 		"description", "description",
 		"authors", authors,
 		"website", "website",
