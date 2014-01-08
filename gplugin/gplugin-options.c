@@ -80,6 +80,8 @@ gplugin_options_post_parse_cb(GOptionContext *ctx, GOptionGroup *group,
  * g_option_context_add_group(), if you are using g_option_context_parse() to
  * parse your commandline arguments.
  *
+ * GPlugin must be initialized before you call this function.
+ *
  * Return Value: (transfer full): a #GOptionGroup for the commandline arguments
  *                                recognized by GPlugin.
  */

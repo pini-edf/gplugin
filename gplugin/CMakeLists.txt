@@ -4,6 +4,7 @@
 add_definitions(
 	-DGPLUGIN_COMPILATION
 	-DG_LOG_DOMAIN="GPlugin"
+	-DGI_TYPELIB_PATH="${CMAKE_CURRENT_BINARY_DIR}"
 )
 
 set(GPLUGIN_HEADERS
@@ -183,6 +184,14 @@ gettextize_pot_file(
 ###############################################################################
 add_executable(gplugin-query gplugin-query.c)
 target_link_libraries(gplugin-query ${GLIB_LIBRARIES} gplugin)
+
+###############################################################################
+# loader-tests static library
+###############################################################################
+add_library(gplugin-loader-tests STATIC
+	gplugin-loader-tests.c
+	gplugin-loader-tests.h
+)
 
 ###############################################################################
 # GObject Introspection

@@ -17,7 +17,6 @@ endmacro(add_python_gtest)
 add_definitions(
 	-DPYTHON_LOADER_DIR="${CMAKE_BINARY_DIR}/python"
 	-DPYTHON_PLUGIN_DIR="${CMAKE_CURRENT_SOURCE_DIR}/plugins"
-	-DGI_TYPELIB_PATH="${CMAKE_BINARY_DIR}/gplugin"
 )
 
 include_directories(
@@ -27,6 +26,7 @@ include_directories(
 )
 
 add_python_gtest(test-python-loader)
+target_link_libraries(test-python-loader gplugin-loader-tests)
 
 # we can't see the symbols in gplugin-python externally, so use the static
 # version for testing

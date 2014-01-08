@@ -4,10 +4,8 @@ from gi.repository import GPlugin
 
 def gplugin_query():
     return GPlugin.PluginInfo(
-        id='gplugin-python/dependent-plugin',
-        abi_version=0x01020304,
-        name='dependent plugin',
-        dependencies=['dep1', 'dep2'],
+        id='gplugin/python-dependent-plugin',
+        dependencies=['dependency1', 'dependency2'],
     )
 
 def gplugin_load(plugin):

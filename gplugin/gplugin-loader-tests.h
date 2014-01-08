@@ -15,17 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef GPLUGIN_LOADER_TESTS_H
+#define GPLUGIN_LOADER_TESTS_H
+
 #include <glib.h>
-#include <gplugin.h>
+#include <glib-object.h>
 
-#include <gplugin/gplugin-loader-tests.h>
+G_BEGIN_DECLS
 
-gint
-main(gint argc, gchar **argv) {
-	g_test_init(&argc, &argv, NULL);
+void gplugin_loader_tests_add_tests(const gchar *short_name);
+void gplugin_loader_tests_main(const gchar *loader_dir, const gchar *plugin_dir, const gchar *short_name);
 
-	gplugin_loader_tests_main(LUA_LOADER_DIR, LUA_PLUGIN_DIR, "lua");
+G_END_DECLS
 
-	return g_test_run();
-}
+#endif /* GPLUGIN_OPTIONS_H */
 
