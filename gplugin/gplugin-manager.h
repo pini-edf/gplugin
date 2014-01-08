@@ -34,6 +34,7 @@ G_BEGIN_DECLS
 void gplugin_manager_append_path(const gchar *path);
 void gplugin_manager_prepend_path(const gchar *path);
 void gplugin_manager_remove_path(const gchar *path);
+void gplugin_manager_remove_paths(void);
 
 void gplugin_manager_add_default_paths(void);
 void gplugin_manager_add_app_paths(const gchar *prefix, const gchar *appname);

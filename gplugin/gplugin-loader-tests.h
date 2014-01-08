@@ -14,28 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <gplugin.h>
-#include <gplugin-native.h>
 
-G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_query(GError **error) {
-	return gplugin_plugin_info_new(
-		"gplugin/test-unload-error",
-		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-		NULL
-	);
-}
+#ifndef GPLUGIN_LOADER_TESTS_H
+#define GPLUGIN_LOADER_TESTS_H
 
-G_MODULE_EXPORT gboolean
-gplugin_load(GPluginNativePlugin *plugin, GError **error) {
-	return TRUE;
-}
+#include <glib.h>
+#include <glib-object.h>
 
-G_MODULE_EXPORT gboolean
-gplugin_unload(GPluginNativePlugin *plugin, GError **error) {
-	if(error)
-		*error = g_error_new(GPLUGIN_DOMAIN, 0, "expected error");
+G_BEGIN_DECLS
 
-	return FALSE;
-}
+void gplugin_loader_tests_add_tests(const gchar *short_name);
+void gplugin_loader_tests_main(const gchar *loader_dir, const gchar *plugin_dir, const gchar *short_name);
+
+G_END_DECLS
+
+#endif /* GPLUGIN_OPTIONS_H */
 

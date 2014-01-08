@@ -136,7 +136,7 @@ test_gplugin_manager_signals_normal(void) {
 	gplugin_manager_append_path(TEST_DIR);
 	gplugin_manager_refresh();
 
-	plugin = gplugin_manager_find_plugin("gplugin/basic-native-plugin");
+	plugin = gplugin_manager_find_plugin("gplugin/native-basic-plugin");
 	gplugin_manager_load_plugin(plugin, &error);
 	g_assert_no_error(error);
 	g_assert(data.loading);
@@ -181,7 +181,7 @@ test_gplugin_manager_signals_loading_stopped(void) {
 	gplugin_manager_append_path(TEST_DIR);
 	gplugin_manager_refresh();
 
-	plugin = gplugin_manager_find_plugin("gplugin/basic-native-plugin");
+	plugin = gplugin_manager_find_plugin("gplugin/native-basic-plugin");
 	gplugin_manager_load_plugin(plugin, &error);
 	g_assert_error(error, GPLUGIN_DOMAIN, 0);
 	g_assert(data.loading);
@@ -223,7 +223,7 @@ test_gplugin_manager_signals_unloading_stopped(void) {
 	gplugin_manager_append_path(TEST_DIR);
 	gplugin_manager_refresh();
 
-	plugin = gplugin_manager_find_plugin("gplugin/basic-native-plugin");
+	plugin = gplugin_manager_find_plugin("gplugin/native-basic-plugin");
 	gplugin_manager_load_plugin(plugin, &error);
 	g_assert_no_error(error);
 	g_assert(data.loading);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2013 Gary Kramlich <grim@reaperworld.com>
+ * Copyright (C) 2011-2014 Gary Kramlich <grim@reaperworld.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,19 +15,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <glib.h>
+#include <stdlib.h>
+
 #include <gplugin.h>
+#include <gplugin-native.h>
+
+#include <glib.h>
 
 #include <gplugin/gplugin-loader-tests.h>
+
+/******************************************************************************
+ * Tests
+ *****************************************************************************/
+static void
+test_id_collision(void) {
+	GSList *plugins = NULL;
+
+	gplugin_manager_append_path(TEST_ID_DIR);
+	gplugin_manager_refresh();
+
+	plugins = gplugin_manager_find_plugins("gplugin/id-collision");
+	g_assert(plugins);
+
+	g_assert(g_slist_length(plugins) == 2);
+
+	gplugin_manager_free_plugin_list(plugins);
+}
 
 /******************************************************************************
  * Main
  *****************************************************************************/
 gint
 main(gint argc, gchar **argv) {
+
 	g_test_init(&argc, &argv, NULL);
 
-	gplugin_loader_tests_main(PYTHON_LOADER_DIR, PYTHON_PLUGIN_DIR, "python");
+	gplugin_init();
+
+	g_test_add_func("/loaders/native/id-collision",
+	                test_id_collision);
 
 	return g_test_run();
 }

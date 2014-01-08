@@ -20,12 +20,13 @@
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_query(GError **error) {
 	const gchar * const dependencies[] = {
-		"gplugin/basic-native-plugin",
+		"dependency1",
+		"dependency2",
 		NULL
 	};
 
 	return gplugin_plugin_info_new(
-		"gplugin/dependent-native-plugin",
+		"gplugin/native-dependent-plugin",
 		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
 		"dependencies", dependencies,
 		NULL

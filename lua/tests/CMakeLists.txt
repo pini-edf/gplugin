@@ -18,10 +18,10 @@ endmacro(add_lua_gtest)
 add_definitions(
 	-DLUA_LOADER_DIR="${CMAKE_BINARY_DIR}/lua"
 	-DLUA_PLUGIN_DIR="${CMAKE_CURRENT_SOURCE_DIR}/plugins"
-	-DGI_TYPELIB_PATH="${CMAKE_BINARY_DIR}/gplugin"
 )
 
 add_lua_gtest(test-lua-loader)
+target_link_libraries(test-lua-loader gplugin-loader-tests)
 
 set(GTESTER_LUA_TESTS "${LUA_TESTS}")
 set(GTESTER_LUA_LOG "test-gplugin-lua.xml")

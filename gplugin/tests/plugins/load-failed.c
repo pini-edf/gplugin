@@ -19,29 +19,19 @@
 
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_query(GError **error) {
-	const gchar * const authors[] = {
-		"author1",
-		NULL
-	};
-
 	return gplugin_plugin_info_new(
-		"gplugin/native-basic-plugin",
-		0x01020304,
-		"name", "basic plugin",
-		"category", "test",
-		"version", "version",
-		"summary", "summary",
-		"license-id", "license",
-		"description", "description",
-		"authors", authors,
-		"website", "website",
+		"gplugin/native-load-failed",
+		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
 		NULL
 	);
 }
 
 G_MODULE_EXPORT gboolean
 gplugin_load(GPluginNativePlugin *plugin, GError **error) {
-	return TRUE;
+	if(error)
+		*error = g_error_new(GPLUGIN_DOMAIN, 0, "expected error");
+
+	return FALSE;
 }
 
 G_MODULE_EXPORT gboolean

@@ -20,7 +20,7 @@ local GPlugin = lgi.GPlugin
 
 function gplugin_query()
 	return GPlugin.PluginInfo {
-		id="gplugin-lua/load-failed",
+		id="gplugin/lua-load-failed",
 	}
 end
 

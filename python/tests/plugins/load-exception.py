@@ -4,7 +4,7 @@ from gi.repository import GPlugin
 
 def gplugin_query():
     return GPlugin.PluginInfo(
-        id="gplugin-python/load-exception",
+        id="gplugin/python-load-exception",
     )
 
 

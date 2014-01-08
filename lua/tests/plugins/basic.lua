@@ -20,8 +20,8 @@ local GPlugin = lgi.GPlugin
 
 function gplugin_query()
 	return GPlugin.PluginInfo {
-		id = "gplugin-lua/basic-plugin",
-		abi_version = 0x01000000,
+		id = "gplugin/lua-basic-plugin",
+		abi_version = 0x01020304,
 		name = "basic plugin",
 		category = "test",
 		version = "version",
