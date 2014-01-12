@@ -123,8 +123,8 @@ gplugin_loader_unload_plugin(GPluginLoader *loader,
 }
 
 /**
- * gplugin_loader_get_supported_extensions:
- * @loader: #GPluginLoader instance
+ * gplugin_loader_class_get_supported_extensions:
+ * @klass: #GPluginLoader instance
  *
  * Returns a #GSList of string for which extensions the loader supports.
  *
@@ -132,16 +132,11 @@ gplugin_loader_unload_plugin(GPluginLoader *loader,
  *               extensions that the loader supports.
  */
 GSList *
-gplugin_loader_get_supported_extensions(const GPluginLoader *loader) {
-	GPluginLoaderClass *klass = NULL;
+gplugin_loader_class_get_supported_extensions(const GPluginLoaderClass *klass) {
+	g_return_val_if_fail(GPLUGIN_IS_LOADER_CLASS(klass), NULL);
 
-	g_return_val_if_fail(loader != NULL, NULL);
-	g_return_val_if_fail(GPLUGIN_IS_LOADER(loader), NULL);
-
-	klass = GPLUGIN_LOADER_GET_CLASS(loader);
-
-	if(klass && klass->supported_extensions)
-		return klass->supported_extensions(loader);
+	if(klass->supported_extensions)
+		return klass->supported_extensions(klass);
 
 	return NULL;
 }

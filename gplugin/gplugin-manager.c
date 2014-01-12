@@ -230,7 +230,9 @@ gplugin_manager_real_register_loader(GPluginManager *manager,
 		return;
 	}
 
-	for(l = lo_class->supported_extensions; l; l = l->next) {
+	for(l = gplugin_loader_class_get_supported_extensions(lo_class);
+	    l; l = l->next)
+	{
 		GSList *existing = NULL, *ll = NULL;
 		const gchar *ext = (const gchar *)l->data;
 
@@ -277,7 +279,8 @@ gplugin_manager_real_unregister_loader(GPluginManager *manager,
 	if(!klass)
 		return;
 
-	for(exts = klass->supported_extensions; exts; exts = exts->next) {
+	for(exts = gplugin_loader_class_get_supported_extensions(klass);
+	    exts; exts = exts->next) {
 		GSList *los = NULL;
 		GSList *l = NULL;
 		const gchar *ext = NULL;

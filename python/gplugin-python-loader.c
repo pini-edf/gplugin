@@ -45,6 +45,11 @@ static GType type_real = 0;
 /******************************************************************************
  * GPluginLoaderInterface API
  *****************************************************************************/
+static GSList *
+gplugin_python_loader_class_supported_extensions(const GPluginLoaderClass *klass) {
+	return g_slist_append(NULL, "py");
+}
+
 static GPluginPlugin *
 gplugin_python_loader_query(GPluginLoader *loader,
                                    const gchar *filename,
@@ -343,7 +348,8 @@ gplugin_python_loader_class_init(GPluginPythonLoaderClass *klass) {
 
 	obj_class->finalize = gplugin_python_loader_finalize;
 
-	loader_class->supported_extensions = g_slist_append(NULL, "py");
+	loader_class->supported_extensions =
+		gplugin_python_loader_class_supported_extensions;
 	loader_class->query = gplugin_python_loader_query;
 	loader_class->load = gplugin_python_loader_load;
 	loader_class->unload = gplugin_python_loader_unload;

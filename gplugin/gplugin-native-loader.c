@@ -75,6 +75,11 @@ gplugin_native_loader_open(const gchar *filename, GError **error) {
 /******************************************************************************
  * GPluginLoaderInterface API
  *****************************************************************************/
+static GSList *
+gplugin_native_loader_class_supported_extensions(const GPluginLoaderClass *klass) {
+	return g_slist_append(NULL, G_MODULE_SUFFIX);
+}
+
 static GPluginPlugin *
 gplugin_native_loader_query(GPluginLoader *loader,
                             const gchar *filename,
@@ -239,7 +244,8 @@ gplugin_native_loader_class_init(GPluginNativeLoaderClass *klass) {
 	GPluginLoaderClass *loader_class =
 		GPLUGIN_LOADER_CLASS(klass);
 
-	loader_class->supported_extensions = g_slist_append(NULL, G_MODULE_SUFFIX);
+	loader_class->supported_extensions =
+		gplugin_native_loader_class_supported_extensions;
 	loader_class->query = gplugin_native_loader_query;
 	loader_class->load = gplugin_native_loader_load;
 	loader_class->unload = gplugin_native_loader_unload;

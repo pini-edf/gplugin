@@ -28,7 +28,7 @@
 #define GPLUGIN_LOADER(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GPLUGIN_TYPE_LOADER, GPluginLoader))
 #define GPLUGIN_LOADER_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), GPLUGIN_TYPE_LOADER, GPluginLoaderClass))
 #define GPLUGIN_IS_LOADER(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), GPLUGIN_TYPE_LOADER))
-#define GPLUGIN_IS_LOADER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST((klass), GPLUGIN_TYPE_LOADER))
+#define GPLUGIN_IS_LOADER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), GPLUGIN_TYPE_LOADER))
 #define GPLUGIN_LOADER_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), GPLUGIN_TYPE_LOADER, GPluginLoaderClass))
 
 typedef struct _GPluginLoader          GPluginLoader;
@@ -51,7 +51,7 @@ struct _GPluginLoader {
 struct _GPluginLoaderClass {
 	GObjectClass gparent;
 
-	GSList *supported_extensions;
+	GSList *(*supported_extensions)(const GPluginLoaderClass *klass);
 
 	GPluginPlugin *(*query)(GPluginLoader *loader, const gchar *filename, GError **error);
 
@@ -67,6 +67,8 @@ struct _GPluginLoaderClass {
 G_BEGIN_DECLS
 
 GType gplugin_loader_get_type(void);
+
+GSList *gplugin_loader_class_get_supported_extensions(const GPluginLoaderClass *klass);
 
 GPluginPlugin *gplugin_loader_query_plugin(GPluginLoader *loader, const gchar *filename, GError **error);
 
