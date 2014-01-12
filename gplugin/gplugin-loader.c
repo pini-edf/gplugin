@@ -100,7 +100,7 @@ gplugin_loader_load_plugin(GPluginLoader *loader,
  * gplugin_loader_unload_plugin:
  * @loader: #GPluginLoader instance performing the unload
  * @plugin: #GPluginPlugin instance to unload
- * error: return location for a GError, or NULL
+ * @error: return location for a GError, or NULL
  *
  * Return value: TRUE if @plugin was unloaded successfully, FALSE otherwise
  */
@@ -120,5 +120,29 @@ gplugin_loader_unload_plugin(GPluginLoader *loader,
 		return klass->unload(loader, plugin, error);
 
 	return FALSE;
+}
+
+/**
+ * gplugin_loader_get_supported_extensions:
+ * @loader: #GPluginLoader instance
+ *
+ * Returns a #GSList of string for which extensions the loader supports.
+ *
+ * Return value: (element-type utf8) (transfer container): A #GSList of
+ *               extensions that the loader supports.
+ */
+GSList *
+gplugin_loader_get_supported_extensions(const GPluginLoader *loader) {
+	GPluginLoaderClass *klass = NULL;
+
+	g_return_val_if_fail(loader != NULL, NULL);
+	g_return_val_if_fail(GPLUGIN_IS_LOADER(loader), NULL);
+
+	klass = GPLUGIN_LOADER_GET_CLASS(loader);
+
+	if(klass && klass->supported_extensions)
+		return klass->supported_extensions(loader);
+
+	return NULL;
 }
 
