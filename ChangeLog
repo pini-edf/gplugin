@@ -1,4 +1,5 @@
 0.0.13:
+  * Removed the gplugin-native API from the gobject-introspection repository.
 
 0.0.12: 2014/01/08
   * Added a static library to make it easier to test loaders.
