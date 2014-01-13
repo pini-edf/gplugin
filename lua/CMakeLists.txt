@@ -24,9 +24,9 @@ if(BUILD_LUA)
 
 	set_target_properties(gplugin-lua PROPERTIES PREFIX "")
 
-	include_directories(${LUA_INCLUDE_DIR})
+	include_directories(${LUA51_INCLUDE_DIRS})
 	target_link_libraries(gplugin-lua
-		${LUA_LIBRARIES}
+		${LUA51_LIBRARIES}
 		gplugin
 	)
 
