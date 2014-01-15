@@ -193,6 +193,8 @@ add_library(gplugin-loader-tests STATIC
 	gplugin-loader-tests.h
 )
 
+target_link_libraries(gplugin-loader-tests gplugin)
+
 ###############################################################################
 # GObject Introspection
 ###############################################################################
