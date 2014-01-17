@@ -194,9 +194,11 @@ gplugin_python_loader_load(GPluginLoader *loader,
 	result = PyObject_CallFunctionObjArgs(load, pyplugin, NULL);
 	Py_DECREF(pyplugin);
 
-	*error = gplugin_python_exception_to_gerror();
-	if(*error)
-		return FALSE;
+	if(error) {
+		*error = gplugin_python_exception_to_gerror();
+		if(*error)
+			return FALSE;
+	}
 
 	ret = PyObject_IsTrue(result);
 	Py_DECREF(result);
