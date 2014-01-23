@@ -129,6 +129,32 @@ test_gplugin_version_0_0_0__0_0_1(void) {
 	g_assert(gplugin_version_compare("0.0.0", "0.1.0", NULL) == 1);
 }
 
+/* major-minor tests */
+static void test_gplugin_version_1_0__0_1(void) {
+	g_assert_cmpint(gplugin_version_compare("1.0", "0.1", NULL), ==, -1);
+}
+
+static void test_gplugin_version_1_0__1_0(void) {
+	g_assert_cmpint(gplugin_version_compare("1.0", "1.0", NULL), ==, 0);
+}
+
+static void test_gplugin_version_0_1__1_0(void) {
+	g_assert_cmpint(gplugin_version_compare("0.1", "1.0", NULL), ==, 1);
+}
+
+/* major tests */
+static void test_gplugin_version_1__0(void) {
+	g_assert_cmpint(gplugin_version_compare("1", "0", NULL), ==, -1);
+}
+
+static void test_gplugin_version_1__1(void) {
+	g_assert_cmpint(gplugin_version_compare("1", "1", NULL), ==, 0);
+}
+
+static void test_gplugin_version_0__1(void) {
+	g_assert_cmpint(gplugin_version_compare("0", "1", NULL), ==, 1);
+}
+
 /******************************************************************************
  * Main
  *****************************************************************************/
@@ -173,6 +199,22 @@ main(gint argc, gchar **argv) {
 	                test_gplugin_version_0_0_1__0_0_1);
 	g_test_add_func("/version-check/0_0_0__0_0_1",
 	                test_gplugin_version_0_0_0__0_0_1);
+
+	/* major-minor */
+	g_test_add_func("/version-check/1_0__0_1",
+	                test_gplugin_version_1_0__0_1);
+	g_test_add_func("/version-check/1_0__1_0",
+	                test_gplugin_version_1_0__1_0);
+	g_test_add_func("/version-check/0_1__1_0",
+	                test_gplugin_version_0_1__1_0);
+
+	/* major */
+	g_test_add_func("/version-check/1__0",
+	                test_gplugin_version_1__0);
+	g_test_add_func("/version-check/1__1",
+	                test_gplugin_version_1__1);
+	g_test_add_func("/version-check/0__1",
+	                test_gplugin_version_0__1);
 
 	return g_test_run();
 }

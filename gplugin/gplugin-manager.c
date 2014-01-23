@@ -113,6 +113,8 @@ G_DEFINE_TYPE(GPluginManager, gplugin_manager, G_TYPE_OBJECT);
  *****************************************************************************/
 GPluginManager *instance = NULL;
 static guint signals[N_SIGNALS] = {0, };
+const gchar *dependency_pattern = "^(?P<id>.+?)((?P<op>\\<=|\\<|==|=|\\>=|\\>)(?P<version>.+))?$";
+GRegex *dependency_regex = NULL;
 
 /******************************************************************************
  * Helpers
@@ -586,15 +588,127 @@ gplugin_manager_real_list_plugins(GPluginManager *manager) {
 }
 
 static gboolean
+gplugin_manager_load_dependencies(GPluginPlugin *plugin,
+                                  const GPluginPluginInfo *info,
+                                  GError **error)
+{
+	const gchar * const *dependencies = NULL;
+	gint i = 0;
+
+	/* now walk through any dependencies the plugin has and load them.  If they
+	 * fail to load we need to fail as well.
+	 */
+	dependencies = gplugin_plugin_info_get_dependencies(info);
+	if(dependencies != NULL) {
+		gboolean all_found = TRUE;
+
+		for(i = 0; dependencies[i]; i++) {
+			gboolean found = FALSE;
+			gchar **ors = NULL;
+			gint o = 0;
+
+			ors = g_strsplit(dependencies[i], "|", 0);
+			for(o = 0; ors[o]; o++) {
+				GMatchInfo *match = NULL;
+				GSList *matches = NULL, *m = NULL;
+				gchar *oid = NULL, *oop = NULL, *over = NULL;
+
+				if(!g_regex_match(dependency_regex, ors[o], 0, &match)) {
+					continue;
+				}
+
+				/* grab the or'd id, op, and version */
+				oid = g_match_info_fetch_named(match, "id");
+				oop = g_match_info_fetch_named(match, "op");
+				over = g_match_info_fetch_named(match, "version");
+
+				/* free the match info */
+				g_match_info_free(match);
+
+				/* now look for a plugin matching the id */
+				matches = gplugin_manager_find_plugins(oid);
+				if(matches == NULL)
+					continue;
+
+				/* now iterate the matches and check if we need to check their
+				 * version.
+				 */
+				for(m = matches; m; m = m->next) {
+					GPluginPlugin *dplugin = g_object_ref(G_OBJECT(m->data));
+					gboolean ret = FALSE;
+
+					if(oop && over) {
+						/* we need to check the version, so grab the info to
+						 * get the version and check it.
+						 */
+						GPluginPluginInfo *dinfo = NULL;
+						const gchar *dver = NULL;
+						gboolean satisfied = FALSE;
+						gint res = 0;
+
+						dinfo = gplugin_plugin_get_info(dplugin);
+						dver = gplugin_plugin_info_get_version(dinfo);
+
+						res = gplugin_version_compare(dver, over, error);
+						g_object_unref(G_OBJECT(dinfo));
+
+						if(res < 0) {
+							/* dver is greather than over */
+							if(g_strcmp0(oop, ">") == 0)
+								satisfied = TRUE;
+						} else if(res == 0) {
+							/* dver is equal to over */
+							if(g_strcmp0(oop, ">=") == 0 ||
+							   g_strcmp0(oop, "<=") == 0 ||
+							   g_strcmp0(oop, "=") == 0 ||
+							   g_strcmp0(oop, "==") == 0)
+							{
+								satisfied = TRUE;
+							}
+						} else if(res > 0) {
+							if(g_strcmp0(oop, "<") == 0)
+								satisfied = TRUE;
+						}
+
+						if(satisfied)
+							found = TRUE;
+					}
+
+					ret = gplugin_manager_load_plugin(dplugin, error);
+
+					g_object_unref(G_OBJECT(dplugin));
+
+					if(ret) {
+						found = TRUE;
+						break;
+					}
+				}
+
+				if(found)
+					break;
+			}
+			g_strfreev(ors);
+
+			if(!found)
+				all_found = FALSE;
+		}
+
+		if(!all_found) {
+			return FALSE;
+		}
+	}
+
+	return TRUE;
+}
+
+static gboolean
 gplugin_manager_real_load_plugin(GPluginManager *manager,
-                                        GPluginPlugin *plugin,
-                                        GError **error)
+                                 GPluginPlugin *plugin,
+                                 GError **error)
 {
 	const GPluginPluginInfo *info = NULL;
 	GPluginLoader *loader = NULL;
-	const gchar * const *dependencies = NULL;
 	gboolean ret = TRUE;
-	gint i = 0;
 
 	g_return_val_if_fail(GPLUGIN_IS_PLUGIN(plugin), FALSE);
 
@@ -616,62 +730,10 @@ gplugin_manager_real_load_plugin(GPluginManager *manager,
 		return FALSE;
 	}
 
-	/* now walk through any dependencies the plugin has and load them.  If they
-	 * fail to load we need to fail as well.
-	 */
-	dependencies = gplugin_plugin_info_get_dependencies(info);
-	if(dependencies != NULL) {
-		for(i = 0; dependencies[i]; i++) {
-			GSList *matches = NULL, *m = NULL;
-			gboolean ret = FALSE;
+	if(!gplugin_manager_load_dependencies(plugin, info, error)) {
+		g_object_unref(G_OBJECT(info));
 
-			matches = gplugin_manager_find_plugins(dependencies[i]);
-
-			/* make sure we got at least 1 match */
-			if(matches == NULL) {
-				if(error) {
-					*error = g_error_new(GPLUGIN_DOMAIN, 0,
-					                     _("Failed to find plugin %s which %s "
-					                     "depends on"),
-					                     dependencies[i],
-					                     gplugin_plugin_get_filename(plugin));
-				}
-
-				g_object_unref(G_OBJECT(info));
-
-				return FALSE;
-			}
-
-			for(m = matches; m; m = m->next) {
-				GPluginPlugin *plugin = g_object_ref(G_OBJECT(m->data));
-
-				ret = gplugin_manager_load_plugin(plugin, error);
-
-				g_object_unref(G_OBJECT(plugin));
-
-				if(ret == TRUE)
-					break;
-			}
-
-			if(ret == FALSE) {
-				if(error) {
-					if (*error == NULL) {
-						*error = g_error_new(GPLUGIN_DOMAIN, 0,
-							                 _("Plugin did not give a reason."));
-					}
-
-					g_prefix_error(error,
-					               _("Found at least one dependency with the id %s, "
-					               "but failed to load it: "), dependencies[i]);
-				}
-
-				g_object_unref(G_OBJECT(info));
-
-				gplugin_plugin_set_state(plugin, GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
-
-				return FALSE;
-			}
-		}
+		return FALSE;
 	}
 
 	g_object_unref(G_OBJECT(info));
@@ -953,10 +1015,14 @@ gplugin_manager_private_init(void) {
 	instance = g_object_new(GPLUGIN_TYPE_MANAGER, NULL);
 
 	gplugin_manager_register_loader(GPLUGIN_TYPE_NATIVE_LOADER);
+
+	dependency_regex = g_regex_new(dependency_pattern, 0, 0, NULL);
 }
 
 void
 gplugin_manager_private_uninit(void) {
+	g_regex_unref(dependency_regex);
+
 	g_object_unref(G_OBJECT(instance));
 }
 

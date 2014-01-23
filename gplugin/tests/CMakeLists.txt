@@ -29,6 +29,7 @@ add_subdirectory(dynamic-type)
 add_subdirectory(id-collision)
 add_subdirectory(load-on-query-pass)
 add_subdirectory(load-on-query-fail)
+add_subdirectory(versioned-dependencies)
 
 ###############################################################################
 # Tests
@@ -65,6 +66,27 @@ add_dependencies(test-load-on-query load-on-query-pass load-on-query-fail)
 add_definitions(
 	-DTEST_LOAD_ON_QUERY_PASS_DIR="${CMAKE_CURRENT_BINARY_DIR}/load-on-query-pass"
 	-DTEST_LOAD_ON_QUERY_FAIL_DIR="${CMAKE_CURRENT_BINARY_DIR}/load-on-query-fail"
+)
+
+#######################################
+# Versioned Dependencies
+#######################################
+add_gtest(test-versioned-dependencies)
+add_dependencies(test-versioned-dependencies
+	super-dependent
+	no-version
+	exact1
+	exact2
+	greater
+	greater-equal
+	less
+	less-equal
+	bar
+	baz
+	fez
+)
+add_definitions(
+	-DTEST_VERSIONED_DEPENDENCY_DIR="${CMAKE_CURRENT_BINARY_DIR}/versioned-dependencies"
 )
 
 #######################################
