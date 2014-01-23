@@ -44,6 +44,58 @@ test_load_with_dependencies(void) {
 
 	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
 	                GPLUGIN_PLUGIN_STATE_LOADED);
+	g_object_unref(G_OBJECT(plugin));
+
+	/* now make sure each dependent plugin that's available was loaded */
+	plugin = gplugin_manager_find_plugin("gplugin/test-no-version");
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOADED);
+	g_object_unref(G_OBJECT(plugin));
+
+	plugin = gplugin_manager_find_plugin("gplugin/test-exact1");
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOADED);
+	g_object_unref(G_OBJECT(plugin));
+
+	plugin = gplugin_manager_find_plugin("gplugin/test-exact2");
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOADED);
+	g_object_unref(G_OBJECT(plugin));
+
+	plugin = gplugin_manager_find_plugin("gplugin/test-greater");
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOADED);
+	g_object_unref(G_OBJECT(plugin));
+
+	plugin = gplugin_manager_find_plugin("gplugin/test-greater-equal");
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOADED);
+	g_object_unref(G_OBJECT(plugin));
+
+	plugin = gplugin_manager_find_plugin("gplugin/test-less");
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOADED);
+	g_object_unref(G_OBJECT(plugin));
+
+	plugin = gplugin_manager_find_plugin("gplugin/test-less-equal");
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOADED);
+	g_object_unref(G_OBJECT(plugin));
+
+	plugin = gplugin_manager_find_plugin("gplugin/bar");
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOADED);
+	g_object_unref(G_OBJECT(plugin));
+
+	plugin = gplugin_manager_find_plugin("gplugin/baz");
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOADED);
+	g_object_unref(G_OBJECT(plugin));
+
+	plugin = gplugin_manager_find_plugin("gplugin/fez");
+	g_assert_cmpint(gplugin_plugin_get_state(plugin), ==,
+	                GPLUGIN_PLUGIN_STATE_LOADED);
+	g_object_unref(G_OBJECT(plugin));
 }
 
 /******************************************************************************

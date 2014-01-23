@@ -20,7 +20,7 @@
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_query(GError **error) {
 	return gplugin_plugin_info_new(
-		"gplugin/test-fez",
+		"gplugin/fez",
 		0x04030201,
 		"version", "1.8",
 		NULL
