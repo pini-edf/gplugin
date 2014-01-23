@@ -27,9 +27,9 @@
  *****************************************************************************/
 GRegex *regex = NULL;
 
-static const gchar *version_pattern = "^(?P<major>\\d+)\\." \
+static const gchar *version_pattern = "^(?P<major>\\d+)(\\." \
                                       "(?P<minor>\\d+)" \
-                                      "(\\.(?P<micro>\\d+)(?P<extra>.*))?$";
+                                      "(\\.(?P<micro>\\d+)(?P<extra>.*))?)?$";
 
 
 /******************************************************************************
@@ -77,21 +77,21 @@ gplugin_version_parser(const gchar *v, gint *major, gint *minor, gint *micro,
 	/* grab the major version */
 	if(major) {
 		temp = g_match_info_fetch_named(info, "major");
-		*major = atoi(temp);
+		*major = (temp) ? atoi(temp) : 0;
 		g_free(temp);
 	}
 
 	/* grab the minor version */
 	if(minor) {
 		temp = g_match_info_fetch_named(info, "minor");
-		*minor = atoi(temp);
+		*minor = (temp) ? atoi(temp) : 0;
 		g_free(temp);
 	}
 
 	/* grab the micro version */
 	if(micro) {
 		temp = g_match_info_fetch_named(info, "micro");
-		*micro = atoi(temp);
+		*micro = (temp) ? atoi(temp) : 0;
 		g_free(temp);
 	}
 

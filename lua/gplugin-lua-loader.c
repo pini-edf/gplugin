@@ -82,6 +82,11 @@ _gplugin_lua_loader_load_unload_plugin(GPluginLoader *loader,
 /******************************************************************************
  * GPluginLoaderInterface API
  *****************************************************************************/
+static GSList *
+gplugin_lua_loader_class_supported_extensions(const GPluginLoaderClass *klass) {
+	return g_slist_append(NULL, "lua");
+}
+
 static GPluginPlugin *
 gplugin_lua_loader_query(GPluginLoader *loader, const gchar *filename,
                          GError **error)
@@ -171,7 +176,8 @@ gplugin_lua_loader_class_init(GPluginLuaLoaderClass *klass) {
 
 	parent_class = g_type_class_peek_parent(klass);
 
-	loader_class->supported_extensions = g_slist_append(NULL, "lua");
+	loader_class->supported_extensions =
+		gplugin_lua_loader_class_supported_extensions;
 	loader_class->query = gplugin_lua_loader_query;
 	loader_class->load = gplugin_lua_loader_load;
 	loader_class->unload = gplugin_lua_loader_unload;

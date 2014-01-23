@@ -1,3 +1,7 @@
+0.0.13: 2014/01/23
+  * Removed the gplugin-native API from the gobject-introspection repository.
+  * Added support for versions in plugin dependencies as well as OR's.
+
 0.0.12: 2014/01/08
   * Added a static library to make it easier to test loaders.
   * Moved the native loader to the loader-testing static library

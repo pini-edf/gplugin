@@ -38,6 +38,11 @@ static PerlInterpreter *my_perl = NULL;
 /******************************************************************************
  * GPluginLoaderInterface API
  *****************************************************************************/
+static GSList *
+gplugin_perl_loader_class_supported_extensions(const GPluginLoaderClass *klass) {
+	return g_slist_append(NULL, "pl");
+}
+
 static GPluginPlugin *
 gplugin_perl_loader_query(GPluginLoader *loader,
                                    const gchar *filename,
@@ -105,7 +110,8 @@ gplugin_perl_loader_class_init(GPluginPerlLoaderClass *klass) {
 
 	parent_class = g_type_class_peek_parent(klass);
 
-	loader_class->supported_extensions = g_slist_append(NULL, "pl");
+	loader_class->supported_extensions =
+		gplugin_perl_loader_class_supported_extensions;
 	loader_class->query = gplugin_perl_loader_query;
 	loader_class->load = gplugin_perl_loader_load;
 	loader_class->unload = gplugin_perl_loader_unload;

@@ -193,6 +193,8 @@ add_library(gplugin-loader-tests STATIC
 	gplugin-loader-tests.h
 )
 
+target_link_libraries(gplugin-loader-tests gplugin)
+
 ###############################################################################
 # GObject Introspection
 ###############################################################################
@@ -215,7 +217,6 @@ if(BUILD_GIR)
 			COMPILER_ARGS --includedir=${CMAKE_CURRENT_SOURCE_DIR}
 			SYMBOL_PREFIXES gplugin
 			SOURCES ${GPLUGIN_SOURCES} ${GPLUGIN_HEADERS}
-			        ${GPLUGIN_NATIVE_SOURCES} ${GPLUGIN_NATIVE_HEADERS}
 			BUILT_SOURCES ${GPLUGIN_PUBLIC_BUILT_SOURCES}
 			              ${GPLUGIN_PUBLIC_BUILT_HEADERS}
 		)
