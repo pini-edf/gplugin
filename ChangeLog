@@ -1,4 +1,4 @@
-0.0.13:
+0.0.13: 2014/01/23
   * Removed the gplugin-native API from the gobject-introspection repository.
   * Added support for versions in plugin dependencies as well as OR's.
 
