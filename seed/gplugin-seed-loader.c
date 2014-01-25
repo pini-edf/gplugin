@@ -148,7 +148,7 @@ gplugin_seed_loader_query(GPluginLoader *loader, const gchar *filename,
 	}
 
 	/* now convert the JavaScript PluginInfo into the C version */
-	info = GPLUGIN_PLUGIN_INFO(seed_value_to_object(ctx, sinfo, exp));
+	info = GPLUGIN_PLUGIN_INFO(seed_value_to_object(ctx, sinfo, &exp));
 	if(exp != NULL) {
 		if(error) {
 			gchar *message = seed_exception_get_message(ctx, exp);
@@ -246,7 +246,7 @@ gplugin_seed_loader_load_unload(GPluginLoader *loader,
 	}
 
 	/* finally check what the plugins function returned */
-	ret = seed_value_to_boolean(ctx, sret, exp);
+	ret = seed_value_to_boolean(ctx, sret, &exp);
 	if(exp) {
 		if(error) {
 			gchar *message = seed_exception_get_message(ctx, exp);
