@@ -18,7 +18,7 @@ project(gplugin C)
 
 set(GPLUGIN_MAJOR_VERSION 0)
 set(GPLUGIN_MINOR_VERSION 0)
-set(GPLUGIN_MICRO_VERSION 13)
+set(GPLUGIN_MICRO_VERSION 14)
 set(GPLUGIN_EXTRA_VERSION)
 
 set(GPLUGIN_VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.${GPLUGIN_MICRO_VERSION}${GPLUGIN_EXTRA_VERSION})
@@ -159,6 +159,7 @@ add_subdirectory(po)
 add_subdirectory(lua)
 add_subdirectory(perl)
 add_subdirectory(python)
+add_subdirectory(seed)
 
 ###############################################################################
 # Install stuff
