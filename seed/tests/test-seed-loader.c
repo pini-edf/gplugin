@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 Gary Kramlich <grim@reaperworld.com>
+ * Copyright (C) 2011-2013 Gary Kramlich <grim@reaperworld.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,29 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-var GPlugin = imports.gi.GPlugin;
 
-function gplugin_query() {
-	return new GPlugin.PluginInfo({
-		id: "gplugin/seed-basic-plugin",
-		abi_version: 0x01020304,
-		name: "basic plugin",
-		authors: ['author1'],
-		category: 'test',
-		version: 'version',
-		license_id: 'license',
-		summary: 'summary',
-		website: 'website',
-		description: 'description'
-	});
-};
+#include <glib.h>
+#include <gplugin.h>
 
-function gplugin_load(plugin) {
-	return true;
-};
+#include <gplugin/gplugin-loader-tests.h>
 
-function gplugin_unload(plugin) {
-	return false;
-};
+gint
+main(gint argc, gchar **argv) {
+	g_test_init(&argc, &argv, NULL);
 
+	gplugin_loader_tests_main(SEED_LOADER_DIR, SEED_PLUGIN_DIR, "seed");
+
+	return g_test_run();
+}
 
