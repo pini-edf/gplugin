@@ -148,7 +148,7 @@ gplugin_seed_loader_query(GPluginLoader *loader, const gchar *filename,
 	}
 
 	/* now convert the JavaScript PluginInfo into the C version */
-	info = seed_value_to_object(ctx, sinfo, exp);
+	info = GPLUGIN_PLUGIN_INFO(seed_value_to_object(ctx, sinfo, exp));
 	if(exp != NULL) {
 		if(error) {
 			gchar *message = seed_exception_get_message(ctx, exp);
@@ -188,17 +188,92 @@ gplugin_seed_loader_query(GPluginLoader *loader, const gchar *filename,
 }
 
 static gboolean
+gplugin_seed_loader_load_unload(GPluginLoader *loader,
+                                GPluginPlugin *plugin,
+                                const gchar *function,
+                                GError **error)
+{
+	SeedContext ctx = NULL;
+	SeedException exp = NULL;
+	SeedObject func = NULL;
+	SeedValue args[1];
+	SeedValue sret = NULL;
+	gboolean ret = FALSE;
+
+	g_return_val_if_fail(GPLUGIN_IS_SEED_PLUGIN(plugin), FALSE);
+
+	g_object_get(G_OBJECT(plugin),
+	             "context", &ctx,
+	             function, &func,
+	             NULL);
+
+	/* make sure we got the context and the function */
+	if(ctx == NULL || func == NULL) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "Plugin is in an unknown state");
+		}
+
+		return FALSE;
+	}
+
+	/* convert the plugin into a SeedObject */
+	args[0] = seed_value_from_object(ctx, G_OBJECT(plugin), exp);
+	if(exp) {
+		if(error) {
+			gchar *message = seed_exception_get_message(ctx, exp);
+
+			*error = g_error_new(GPLUGIN_DOMAIN, 0, "%s", message);
+
+			g_free(message);
+		}
+
+		return FALSE;
+	}
+
+	/* now call the function */
+	sret = seed_object_call(ctx, func, NULL, 1, args, exp);
+	if(exp != NULL) {
+		if(error) {
+			gchar *message = seed_exception_get_message(ctx, exp);
+
+			*error = g_error_new(GPLUGIN_DOMAIN, 0, "%s", message);
+
+			g_free(message);
+		}
+
+		return FALSE;
+	}
+
+	/* finally check what the plugins function returned */
+	ret = seed_value_to_boolean(ctx, sret, exp);
+	if(exp) {
+		if(error) {
+			gchar *message = seed_exception_get_message(ctx, exp);
+
+			*error = g_error_new(GPLUGIN_DOMAIN, 0, "%s", message);
+
+			g_free(message);
+		}
+
+		return FALSE;
+	}
+
+	return ret;
+}
+
+static gboolean
 gplugin_seed_loader_load(GPluginLoader *loader, GPluginPlugin *plugin,
                          GError **error)
 {
-	return FALSE;
+	return gplugin_seed_loader_load_unload(loader, plugin, "load", error);
 }
 
 static gboolean
 gplugin_seed_loader_unload(GPluginLoader *loader, GPluginPlugin *plugin,
                            GError **error)
 {
-	return FALSE;
+	return gplugin_seed_loader_load_unload(loader, plugin, "unload", error);
 }
 
 /******************************************************************************
