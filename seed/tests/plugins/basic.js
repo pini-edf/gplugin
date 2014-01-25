@@ -36,7 +36,7 @@ function gplugin_load(plugin) {
 };
 
 function gplugin_unload(plugin) {
-	return false;
+	return true;
 };
 
 
