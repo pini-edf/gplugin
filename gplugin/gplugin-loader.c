@@ -17,6 +17,8 @@
 
 #include <gplugin/gplugin-loader.h>
 
+#include <gplugin/gplugin-core.h>
+
 /******************************************************************************
  * API
  *****************************************************************************/
@@ -52,7 +54,7 @@ gplugin_loader_get_type(void) {
  */
 GPluginPlugin *
 gplugin_loader_query_plugin(GPluginLoader *loader,
-                                   const gchar *filename, GError **error)
+                            const gchar *filename, GError **error)
 {
 	GPluginLoaderClass *klass = NULL;
 
@@ -79,9 +81,10 @@ gplugin_loader_query_plugin(GPluginLoader *loader,
  */
 gboolean
 gplugin_loader_load_plugin(GPluginLoader *loader,
-                                  GPluginPlugin *plugin, GError **error)
+                           GPluginPlugin *plugin, GError **error)
 {
 	GPluginLoaderClass *klass = NULL;
+	gboolean ret = FALSE;
 
 	g_return_val_if_fail(loader != NULL, FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_LOADER(loader), FALSE);
@@ -91,9 +94,14 @@ gplugin_loader_load_plugin(GPluginLoader *loader,
 	klass = GPLUGIN_LOADER_GET_CLASS(loader);
 
 	if(klass && klass->load)
-		return klass->load(loader, plugin, error);
+		ret = klass->load(loader, plugin, error);
 
-	return FALSE;
+	if(!ret && error && *error == NULL) {
+		*error = g_error_new(GPLUGIN_DOMAIN, 0,
+		                     "Failed to load plugin : unknown");
+	}
+
+	return ret;
 }
 
 /**
@@ -106,9 +114,10 @@ gplugin_loader_load_plugin(GPluginLoader *loader,
  */
 gboolean
 gplugin_loader_unload_plugin(GPluginLoader *loader,
-                                    GPluginPlugin *plugin, GError **error)
+                             GPluginPlugin *plugin, GError **error)
 {
 	GPluginLoaderClass *klass = NULL;
+	gboolean ret = FALSE;
 
 	g_return_val_if_fail(loader != NULL, FALSE);
 	g_return_val_if_fail(GPLUGIN_IS_LOADER(loader), FALSE);
@@ -117,9 +126,14 @@ gplugin_loader_unload_plugin(GPluginLoader *loader,
 	klass = GPLUGIN_LOADER_GET_CLASS(loader);
 
 	if(klass && klass->unload)
-		return klass->unload(loader, plugin, error);
+		ret = klass->unload(loader, plugin, error);
 
-	return FALSE;
+	if(!ret && error && *error == NULL) {
+		*error = g_error_new(GPLUGIN_DOMAIN, 0,
+		                     "Failed to unload plugin : unknown");
+	}
+
+	return ret;
 }
 
 /**
