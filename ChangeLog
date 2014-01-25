@@ -1,4 +1,5 @@
 0.0.14:
+  * Added the Seed JavaScript loader.
 
 0.0.13: 2014/01/23
   * Removed the gplugin-native API from the gobject-introspection repository.
