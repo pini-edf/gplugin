@@ -32,5 +32,5 @@ if(BUILD_GJS)
 	install(TARGETS gplugin-gjs DESTINATION lib/gplugin)
 endif(BUILD_GJS)
 
-#add_subdirectory(tests)
+add_subdirectory(tests)
 
