@@ -313,7 +313,7 @@ gplugin_python_loader_init_python(void) {
 	PySys_SetArgv(1, (gchar **)argv);
 	PyRun_SimpleString("import sys; sys.path.pop(0)\n");
 #else
-	PySys_SetArgv(1, (gchar **)argv);
+	PySys_SetArgvEx(1, (gchar **)argv, 0);
 #endif
 
 	/* initialize pygobject */
