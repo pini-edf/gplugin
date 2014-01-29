@@ -5,7 +5,7 @@ option(
 )
 
 if(BUILD_PYTHON)
-	set(Python_ADDITIONAL_VERSIONS "2.7")
+	set(Python_ADDITIONAL_VERSIONS "3.3 2.7")
 
 	find_package(PythonLibs)
 
