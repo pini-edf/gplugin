@@ -32,6 +32,7 @@ if(BUILD_LUA)
 		COPY_FILE ${CMAKE_CURRENT_BINARY_DIR}/gplugin-lua-test-lgi
 	)
 	if(NOT ${LUA_LGI_COMPILE})
+		message(STATUS ${OUTPUT})
 		message(FATAL_ERROR "Failed to compile the lua-lgi test")
 	endif(NOT ${LUA_LGI_COMPILE})
 
