@@ -1,4 +1,6 @@
 0.0.15:
+  * Fixed issue #45 (Elliott Sales de Andrade)
+  * Updated some unit tests for deprecation in Glib 2.38 (Elliott Sales de Andrade)
 
 0.0.14: 2014/01/25
   * Added the Seed JavaScript loader.
