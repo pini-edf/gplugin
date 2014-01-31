@@ -342,15 +342,7 @@ gplugin_python_loader_init_python(void) {
 
 #else /* PY_MAJOR_VERSION >= 3 */
 
-	/* setup sys.path according to
-	 * http://docs.python.org/2/c-api/init.html#PySys_SetArgvEx
-	 */
-#if PY_VERSION_HEX < 0x02060600
-	PySys_SetArgv(1, (gchar **)argv);
-	PyRun_SimpleString("import sys; sys.path.pop(0)\n");
-#else
 	PySys_SetArgvEx(1, (gchar **)argv, 0);
-#endif
 
 #endif /* PY_MAJOR_VERSION >= 3 */
 
