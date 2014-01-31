@@ -25,10 +25,18 @@
  * filename to module tests
  *****************************************************************************/
 static void
+test_filename_to_module_NULL_subprocess(void) {
+	gplugin_python_filename_to_module(NULL);
+}
+
+static void
 test_filename_to_module_NULL(void) {
-	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
-		gplugin_python_filename_to_module(NULL);
-	}
+#if GLIB_CHECK_VERSION(2,38,0)
+	g_test_trap_subprocess("/loaders/python/utils/filename_to_module/NULL/subprocess", 0, 0);
+#else
+	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR))
+		test_filename_to_module_NULL_subprocess();
+#endif
 
 	g_test_trap_assert_failed();
 }
@@ -61,6 +69,10 @@ main(gint argc, gchar **argv) {
 	/* tests */
 	g_test_add_func("/loaders/python/utils/filename_to_module/NULL",
 	                test_filename_to_module_NULL);
+#if GLIB_CHECK_VERSION(2,38,0)
+	g_test_add_func("/loaders/python/utils/filename_to_module/NULL/subprocess",
+	                test_filename_to_module_NULL_subprocess);
+#endif
 	g_test_add_func("/loaders/python/utils/filename_to_module/empty",
 	                test_filename_to_module_empty);
 	g_test_add_func("/loaders/python/utils/filename_to_module/no-extension",

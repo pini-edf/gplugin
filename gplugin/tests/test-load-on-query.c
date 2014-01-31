@@ -43,7 +43,7 @@ test_load_on_query(void) {
 }
 
 static void
-test_load_on_query_fail(void) {
+test_load_on_query_fail_subprocess(void) {
 	/* this test is very simple since we can't get the exact error condition
 	 * that we want.
 	 *
@@ -53,12 +53,20 @@ test_load_on_query_fail(void) {
 	 * plugin stored twice.  This has been fixed in the code, but it has to be
 	 * looked for manually.
 	 */
-	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
-		gplugin_manager_remove_paths();
-		gplugin_manager_append_path(TEST_DIR);
-		gplugin_manager_append_path(TEST_LOAD_ON_QUERY_FAIL_DIR);
-		gplugin_manager_refresh();
-	}
+	gplugin_manager_remove_paths();
+	gplugin_manager_append_path(TEST_DIR);
+	gplugin_manager_append_path(TEST_LOAD_ON_QUERY_FAIL_DIR);
+	gplugin_manager_refresh();
+}
+
+static void
+test_load_on_query_fail(void) {
+#if GLIB_CHECK_VERSION(2,38,0)
+	g_test_trap_subprocess("/loaders/native/load-on-query/fail/subprocess", 0, 0);
+#else
+	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR))
+		test_load_on_query_fail_subprocess();
+#endif
 
 	g_test_trap_assert_stderr("*failed to load*during query*");
 }
@@ -78,6 +86,10 @@ main(gint argc, gchar **argv) {
 	                test_load_on_query);
 	g_test_add_func("/loaders/native/load-on-query/fail",
 	                test_load_on_query_fail);
+#if GLIB_CHECK_VERSION(2,38,0)
+	g_test_add_func("/loaders/native/load-on-query/fail/subprocess",
+	                test_load_on_query_fail_subprocess);
+#endif
 
 	return g_test_run();
 }
