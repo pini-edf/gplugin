@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <Python.h>
+
 #include <gplugin/gplugin.h>
 
 #include "gplugin-python-utils.h"
 
 #include <string.h>
-
-#include <Python.h>
 
 gchar *
 gplugin_python_filename_to_module(const gchar *filename) {
