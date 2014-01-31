@@ -49,7 +49,7 @@ test_gplugin_version_null__1_2_3(void) {
 #if GLIB_CHECK_VERSION(2,38,0)
 	g_test_trap_subprocess("/version-check/null__1_2_3/subprocess", 0, 0);
 #else
-	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
+	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR))
 		test_gplugin_version_null__1_2_3_subprocess();
 #endif
 
@@ -91,7 +91,7 @@ test_gplugin_version_abc__1_2_3(void) {
 #if GLIB_CHECK_VERSION(2,38,0)
 	g_test_trap_subprocess("/version-check/abc__1_2_3/subprocess", 0, 0);
 #else
-	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
+	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR))
 		test_gplugin_version_abc__1_2_3_subprocess();
 #endif
 
