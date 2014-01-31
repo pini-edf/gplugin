@@ -16,9 +16,15 @@ if(BUILD_LUA)
 		gplugin-lua-plugin.h
 	)
 
-	pkg_check_modules(LUA51 REQUIRED lua5.1>=5.1.0)
+	pkg_check_modules(LUA lua>=5.2.0)
+	if(NOT LUA_FOUND)
+		pkg_check_modules(LUA lua-5.1>=5.1.0)
+		if(NOT LUA_FOUND)
+			pkg_check_modules(LUA REQUIRED lua5.1>=5.1.0)
+		endif(NOT LUA_FOUND)
+	endif(NOT LUA_FOUND)
 
-	include_directories(${LUA51_INCLUDE_DIRS})
+	include_directories(${LUA_INCLUDE_DIRS})
 
 	message(STATUS "checking for lua module 'lgi'")
 
@@ -27,8 +33,8 @@ if(BUILD_LUA)
 		${CMAKE_CURRENT_BINARY_DIR}
 		${CMAKE_CURRENT_SOURCE_DIR}/gplugin-lua-test-lgi.c
 		CMAKE_FLAGS
-			-DINCLUDE_DIRECTORIES:STRING=${LUA51_INCLUDE_DIRS}
-			-DLINK_LIBRARIES:STRING=${LUA51_LIBRARIES}
+			-DINCLUDE_DIRECTORIES:STRING=${LUA_INCLUDE_DIRS}
+			-DLINK_LIBRARIES:STRING=${LUA_LIBRARIES}
 		OUTPUT_VARIABLE OUTPUT
 		COPY_FILE ${CMAKE_CURRENT_BINARY_DIR}/gplugin-lua-test-lgi
 	)
@@ -59,7 +65,7 @@ if(BUILD_LUA)
 	set_target_properties(gplugin-lua PROPERTIES PREFIX "")
 
 	target_link_libraries(gplugin-lua
-		${LUA51_LIBRARIES}
+		${LUA_LIBRARIES}
 		gplugin
 	)
 
