@@ -28,6 +28,7 @@
 #include <glib-object.h>
 
 #include <gplugin/gplugin-plugin.h>
+#include <gplugin/gplugin-plugin-info.h>
 
 G_BEGIN_DECLS
 
@@ -37,6 +38,8 @@ void gplugin_manager_private_init(void);
 void gplugin_manager_private_uninit(void);
 
 gboolean gplugin_boolean_accumulator(GSignalInvocationHint *hint, GValue *return_accu, const GValue *handler_return, gpointer data);
+
+gboolean gplugin_plugin_info_get_bind_local(const GPluginPluginInfo *info);
 
 G_END_DECLS
 

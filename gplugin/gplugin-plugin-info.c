@@ -34,6 +34,8 @@ typedef struct {
 	gboolean internal;
 	gboolean load_on_query;
 
+	gboolean bind_local;
+
 	gchar *name;
 
 	gchar *version;
@@ -63,6 +65,7 @@ enum {
 	PROP_ABI_VERSION,
 	PROP_INTERNAL,
 	PROP_LOQ,
+	PROP_BIND_LOCAL,
 	PROP_NAME,
 	PROP_VERSION,
 	PROP_VERSION_FUNC,
@@ -116,6 +119,15 @@ gplugin_plugin_info_set_load_on_query(GPluginPluginInfo *info, gboolean loq) {
 	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
 	priv->load_on_query = loq;
+}
+
+static void
+gplugin_plugin_info_set_bind_local(GPluginPluginInfo *info,
+                                   gboolean bind_local)
+{
+	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	priv->bind_local = bind_local;
 }
 
 static void
@@ -269,6 +281,10 @@ gplugin_plugin_info_get_property(GObject *obj, guint param_id, GValue *value,
 			g_value_set_boolean(value,
 			                    gplugin_plugin_info_get_load_on_query(info));
 			break;
+		case PROP_BIND_LOCAL:
+			g_value_set_boolean(value,
+			                    gplugin_plugin_info_get_bind_local(info));
+			break;
 		case PROP_NAME:
 			g_value_set_string(value, gplugin_plugin_info_get_name(info));
 			break;
@@ -339,6 +355,10 @@ gplugin_plugin_info_set_property(GObject *obj, guint param_id,
 		case PROP_LOQ:
 			gplugin_plugin_info_set_load_on_query(info,
 			                                      g_value_get_boolean(value));
+			break;
+		case PROP_BIND_LOCAL:
+			gplugin_plugin_info_set_bind_local(info,
+			                                   g_value_get_boolean(value));
 			break;
 		case PROP_NAME:
 			gplugin_plugin_info_set_name(info, g_value_get_string(value));
@@ -494,6 +514,20 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		g_param_spec_boolean("load-on-query", "load-on-query",
 		                     "Whether or not the plugin should be loaded when "
 		                     "queried",
+		                     FALSE,
+		                     G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
+		                     G_PARAM_STATIC_STRINGS));
+
+	/**
+	 * GPluginPluginInfo:bind-local:
+	 *
+	 * Determines whether the plugin should be have it's symbols bound locally.
+	 *
+	 * Note: This should only be used by the native plugin loader.
+	 */
+	g_object_class_install_property(obj_class, PROP_BIND_LOCAL,
+		g_param_spec_boolean("bind-local", "bind-local",
+		                     "Whether symbols should be bound locally",
 		                     FALSE,
 		                     G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
 		                     G_PARAM_STATIC_STRINGS));
@@ -1004,5 +1038,26 @@ gplugin_plugin_info_get_dependencies(const GPluginPluginInfo *info) {
 	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
 	return (const gchar * const *)priv->dependencies;
+}
+
+/**
+ * gplugin_plugin_info_get_bind_local:
+ * @info: #GPluginPluginInfo instance
+ *
+ * This function is only used by the native plugin loader.
+ *
+ * Return value: TRUE if the plugin has requested to be loaded with it's
+ *               symbols bound locally, FALSE if they should bind be bound
+ *               globally.
+ */
+gboolean
+gplugin_plugin_info_get_bind_local(const GPluginPluginInfo *info) {
+	GPluginPluginInfoPrivate *priv = NULL;
+
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_INFO(info), FALSE);
+
+	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	return priv->bind_local;
 }
 
