@@ -30,6 +30,7 @@ add_subdirectory(id-collision)
 add_subdirectory(load-on-query-pass)
 add_subdirectory(load-on-query-fail)
 add_subdirectory(versioned-dependencies)
+add_subdirectory(bind-local)
 
 ###############################################################################
 # Tests
@@ -107,6 +108,13 @@ target_link_libraries(test-native-loader gplugin-loader-tests)
 add_definitions(-DTEST_DIR="${CMAKE_CURRENT_BINARY_DIR}/plugins/")
 add_definitions(-DTEST_BAD_DIR="${CMAKE_CURRENT_BINARY_DIR}/bad-plugins/")
 add_definitions(-DTEST_ID_DIR="${CMAKE_CURRENT_BINARY_DIR}/id-collision/")
+
+###############################################################################
+# Bind Local
+###############################################################################
+add_gtest(test-bind-local)
+add_dependencies(test-bind-local bind-local)
+add_definitions(-DTEST_BIND_LOCAL_DIR="${CMAKE_CURRENT_BINARY_DIR}/bind-local/")
 
 ###############################################################################
 # GTester Stuff

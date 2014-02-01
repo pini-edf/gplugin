@@ -55,20 +55,28 @@ test_broken_depend_plugin_load(void) {
  * Test bad plugins
  *****************************************************************************/
 static void
-test_query_error(void) {
+test_query_error_subprocess(void) {
 	GPluginPlugin *plugin = NULL;
 
-	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
-		/* add the test directory to the plugin manager's search paths */
-		gplugin_manager_append_path(TEST_BAD_DIR);
+	/* add the test directory to the plugin manager's search paths */
+	gplugin_manager_append_path(TEST_BAD_DIR);
 
-		/* refresh the plugin manager */
-		gplugin_manager_refresh();
+	/* refresh the plugin manager */
+	gplugin_manager_refresh();
 
-		/* find the query-error plugin */
-		plugin = gplugin_manager_find_plugin("gplugin/query-error");
-		g_assert(plugin == NULL);
-	}
+	/* find the query-error plugin */
+	plugin = gplugin_manager_find_plugin("gplugin/query-error");
+	g_assert(plugin == NULL);
+}
+
+static void
+test_query_error(void) {
+#if GLIB_CHECK_VERSION(2,38,0)
+	g_test_trap_subprocess("/loaders/native/error/query/subprocess", 0, 0);
+#else
+	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR))
+		test_query_error_subprocess();
+#endif
 
 	g_test_trap_assert_failed();
 }
@@ -91,6 +99,10 @@ main(gint argc, gchar **argv) {
 	/* bad plugin tests */
 	g_test_add_func("/loaders/native/error/query",
 	                test_query_error);
+#if GLIB_CHECK_VERSION(2,38,0)
+	g_test_add_func("/loaders/native/error/query/subprocess",
+	                test_query_error_subprocess);
+#endif
 
 	return g_test_run();
 }

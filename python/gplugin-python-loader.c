@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <Python.h>
+
 #include "gplugin-python-loader.h"
 
 #include "gplugin-python-plugin.h"
@@ -23,7 +25,6 @@
 #include <glib/gi18n.h>
 
 #include <pygobject.h>
-#include <Python.h>
 
 #define GPLUGIN_PYTHON_LOADER_GET_PRIVATE(obj) \
 	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_PYTHON_LOADER, GPluginPythonLoaderPrivate))
