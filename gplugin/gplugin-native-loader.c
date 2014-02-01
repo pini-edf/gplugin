@@ -16,6 +16,7 @@
  */
 
 #include <gplugin/gplugin-core.h>
+#include <gplugin/gplugin-private.h>
 
 #include <gplugin/gplugin-native-loader.h>
 #include <gplugin/gplugin-native-plugin.h>
@@ -54,10 +55,12 @@ gplugin_native_loader_lookup_symbol(GModule *module,
 }
 
 static GModule *
-gplugin_native_loader_open(const gchar *filename, GError **error) {
+gplugin_native_loader_open(const gchar *filename, GModuleFlags flags,
+                           GError **error)
+{
 	GModule *module = NULL;
 
-	module = g_module_open(filename, 0);
+	module = g_module_open(filename, flags);
 	if(module)
 		return module;
 
@@ -80,6 +83,37 @@ gplugin_native_loader_class_supported_extensions(const GPluginLoaderClass *klass
 	return g_slist_append(NULL, G_MODULE_SUFFIX);
 }
 
+static GPluginPluginInfo *
+gplugin_native_loader_open_and_query(const gchar *filename,
+                                     GModule **module,
+                                     GModuleFlags flags,
+                                     GPluginNativePluginQueryFunc *query,
+                                     GError **error)
+{
+	GPluginPluginInfo *info = NULL;
+
+	*module = gplugin_native_loader_open(filename, flags, error);
+	if((*module == NULL) || (error && *error))
+		return NULL;
+
+	*query = gplugin_native_loader_lookup_symbol(*module, GPLUGIN_QUERY_SYMBOL,
+	                                             error);
+
+	if((*query == NULL) || (error && *error)) {
+		g_module_close(*module);
+		return NULL;
+	}
+
+	info = ((GPluginNativePluginQueryFunc)(*query))(error);
+	if(error && *error) {
+		g_module_close(*module);
+
+		return NULL;
+	}
+
+	return info;
+}
+
 static GPluginPlugin *
 gplugin_native_loader_query(GPluginLoader *loader,
                             const gchar *filename,
@@ -92,18 +126,39 @@ gplugin_native_loader_query(GPluginLoader *loader,
 	GPluginNativePluginUnloadFunc unload = NULL;
 	GModule *module = NULL;
 
-	/* open the file via gmodule */
-	module = gplugin_native_loader_open(filename, error);
-	if(!module)
-		return NULL;
-
-	/* now look for the query symbol */
-	query = gplugin_native_loader_lookup_symbol(module,
-	                                            GPLUGIN_QUERY_SYMBOL,
+	info = gplugin_native_loader_open_and_query(filename, &module, 0, &query,
 	                                            error);
-	if((query == NULL) || (error && *error)) {
-		g_module_close(module);
+	if(!GPLUGIN_IS_PLUGIN_INFO(info)) {
+		if(module)
+			g_module_close(module);
+
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     _("the query function did not return a "
+			                       "GPluginPluginInfo instance"));
+		}
+
 		return NULL;
+	}
+
+	if(gplugin_plugin_info_get_bind_local(info)) {
+		g_module_close(module);
+		g_object_unref(G_OBJECT(info));
+
+		info = gplugin_native_loader_open_and_query(filename, &module,
+		                                            G_MODULE_BIND_LOCAL,
+		                                            &query, error);
+		if(!GPLUGIN_IS_PLUGIN_INFO(info)) {
+			g_module_close(module);
+
+			if(error) {
+				*error = g_error_new(GPLUGIN_DOMAIN, 0,
+				                     _("the query function did not return a "
+				                       "GPluginPluginInfo instance"));
+			}
+
+			return NULL;
+		}
 	}
 
 	/* now look for the load symbol */
@@ -112,6 +167,7 @@ gplugin_native_loader_query(GPluginLoader *loader,
 	                                           error);
 	if(error && *error) {
 		g_module_close(module);
+		g_object_unref(G_OBJECT(info));
 		return NULL;
 	}
 
@@ -121,28 +177,7 @@ gplugin_native_loader_query(GPluginLoader *loader,
 	                                             error);
 	if(error && *error) {
 		g_module_close(module);
-		return NULL;
-	}
-
-	/* now we have all of our symbols, so let's see if this plugin will return a
-	 * valid GPluginPluginInfo structure
-	 */
-	info = ((GPluginNativePluginQueryFunc)(query))(error);
-	if(error && *error) {
-		g_module_close(module);
-
-		return NULL;
-	}
-
-	if(!GPLUGIN_IS_PLUGIN_INFO(info)) {
-		g_module_close(module);
-
-		if(error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     _("the query function did not return a "
-			                       "GPluginPluginInfo instance"));
-		}
-
+		g_object_unref(G_OBJECT(info));
 		return NULL;
 	}
 
