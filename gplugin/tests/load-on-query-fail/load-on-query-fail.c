@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2013 Gary Kramlich <grim@reaperworld.com>
+ * Copyright (C) 2011-2014 Gary Kramlich <grim@reaperworld.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,10 +30,8 @@ gplugin_query(GError **error) {
 G_MODULE_EXPORT gboolean
 gplugin_load(GPluginNativePlugin *plugin, GError **error) {
 	static int count = 1;
-	gchar *message = g_strdup_printf("called %d times", count++);
 
-	*error = g_error_new(GPLUGIN_DOMAIN, 0, message);
-	g_free(message);
+	*error = g_error_new(GPLUGIN_DOMAIN, 0, "called %d times", count++);
 
 	return FALSE;
 }
