@@ -9,7 +9,7 @@ GPlugin depends on the following at a bare minimum:
 
 A full build (enabled by default) depends on the following:
 	gtk-3
-	python-dev, python-pi-dev
+	python-dev, python-gi-dev
 	liblua5.1-0-dev, lua-lgi
 	libseed-gtk3-dev
 	xsltproc
