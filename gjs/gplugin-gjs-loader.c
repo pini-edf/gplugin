@@ -20,6 +20,8 @@
 
 #include <glib/gi18n.h>
 
+#include <gjs/gjs.h>
+
 /******************************************************************************
  * Globals
  *****************************************************************************/
@@ -42,6 +44,19 @@ static GPluginPlugin *
 gplugin_gjs_loader_query(GPluginLoader *loader, const gchar *filename,
                           GError **error)
 {
+	GjsContext *context = NULL;
+	JSContext *jsctx = NULL;
+	JSObject *global = NULL;
+
+	context = gjs_context_new();
+
+	if(gjs_context_eval_file(context, filename, NULL, error)) {
+		return NULL;
+	}
+
+	jsctx = gjs_context_get_native_context(context);
+	global = JS_GetGlobalObject(jsctx);
+
 	return NULL;
 }
 

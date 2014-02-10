@@ -30,6 +30,8 @@ typedef struct _GPluginGjsPluginClass       GPluginGjsPluginClass;
 #include <gplugin.h>
 #include <gplugin-native.h>
 
+#include <gjs/gjs.h>
+
 struct _GPluginGjsPlugin {
 	GPluginPlugin parent;
 };
@@ -47,6 +49,8 @@ G_BEGIN_DECLS
 
 void gplugin_gjs_plugin_register(GPluginNativePlugin *plugin);
 GType gplugin_gjs_plugin_get_type(void);
+
+GjsContext *gplugin_gjs_plugin_get_context(const GPluginGjsPlugin *plugin);
 
 G_END_DECLS
 
