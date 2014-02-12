@@ -41,10 +41,10 @@ struct _GPluginNativePluginPrivate {
 	gpointer load_func;
 	gpointer unload_func;
 
-	guint use_count;
-
 	GSList *type_infos;
 	GSList *interface_infos;
+
+	guint use_count;
 };
 
 struct _GPluginNativePluginTypeInfo {
