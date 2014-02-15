@@ -10,6 +10,10 @@ option(
 	"On"
 )
 
+if(BUILD_PYTHON2 AND BUILD_PYTHON3)
+	message(FATAL_ERROR "You cannot enable both Python 2.7 and Python 3.x plugin loaders.")
+endif(BUILD_PYTHON2 AND BUILD_PYTHON3)
+
 if(BUILD_PYTHON2 OR BUILD_PYTHON3)
 	set(GPLUGIN_PYTHON_SOURCES
 		gplugin-python-core.c
