@@ -296,19 +296,14 @@ gplugin_python_loader_init_gettext(void) {
 static gboolean
 gplugin_python_loader_init_python(void) {
 	const gchar *program = NULL;
-#if PY_MAJOR_VERSION >= 3
 	wchar_t *argv[] = { NULL, NULL };
 	size_t len;
-#else
-	const gchar *argv[] = { "", NULL };
-#endif
 
 	/* Initializes Python */
 	if(!Py_IsInitialized())
 		Py_InitializeEx(FALSE);
 
 	program = g_get_prgname();
-#if PY_MAJOR_VERSION >= 3
 	program = program ? program : "";
 	len = mbstowcs(NULL, program, 0);
 	if(len == (size_t)-1) {
@@ -322,12 +317,7 @@ gplugin_python_loader_init_python(void) {
 		g_warning("Could not convert program name to wchar_t string.");
 		return FALSE;
 	}
-#else
-	if(program)
-		argv[0] = program;
-#endif
 
-#if PY_MAJOR_VERSION >= 3
 	/* setup sys.path according to
 	 * http://docs.python.org/3/c-api/init.html#PySys_SetArgvEx
 	 */
@@ -339,12 +329,6 @@ gplugin_python_loader_init_python(void) {
 	PySys_SetArgvEx(1, argv, 0);
 	g_free(argv[0]);
 #endif
-
-#else /* PY_MAJOR_VERSION >= 3 */
-
-	PySys_SetArgvEx(1, (gchar **)argv, 0);
-
-#endif /* PY_MAJOR_VERSION >= 3 */
 
 	/* initialize pygobject */
 	if(gplugin_python_loader_init_pygobject()) {

@@ -1,55 +1,40 @@
-if(BUILD_PYTHON2 OR BUILD_PYTHON3)
+if(BUILD_PYTHON)
 
-macro(add_python_gtest target version)
-	add_executable(${target}${version} ${target}.c)
-	target_link_libraries(${target}${version}
-		${GLIB_LIBRARIES} ${PYTHON${version}_LIBRARIES} ${PYGOBJECT_LIBRARIES} gplugin)
-	add_dependencies(${target}${version} gplugin-python${version})
+macro(add_python_gtest target)
+	add_executable(${target} ${target}.c)
+	target_link_libraries(${target}
+		${GLIB_LIBRARIES} ${PYTHON3_LIBRARIES} ${PYGOBJECT_LIBRARIES} gplugin)
+	add_dependencies(${target} gplugin-python)
 
-	get_target_property(_output_name ${target}${version} RUNTIME_OUTPUT_NAME)
+	get_target_property(_output_name ${target} RUNTIME_OUTPUT_NAME)
 	if(NOT ${_output_name})
-		get_target_property(_output_name ${target}${version} LOCATION)
+		get_target_property(_output_name ${target} LOCATION)
 	endif(NOT ${_output_name})
 
 	list(APPEND PYTHON_TESTS ${_output_name})
 
-	set_property(TARGET ${target}${version} APPEND PROPERTY COMPILE_DEFINITIONS
+	set_property(TARGET ${target} APPEND PROPERTY COMPILE_DEFINITIONS
 		PYTHON_LOADER_DIR="${CMAKE_BINARY_DIR}/python"
 		PYTHON_PLUGIN_DIR="${CMAKE_CURRENT_SOURCE_DIR}/plugins"
 	)
 
-	set_property(TARGET ${target}${version} APPEND PROPERTY INCLUDE_DIRECTORIES
+	set_property(TARGET ${target} APPEND PROPERTY INCLUDE_DIRECTORIES
 		"${CMAKE_SOURCE_DIR}/python"
-		${PYTHON${version}_INCLUDE_DIRS}
+		${PYTHON3_INCLUDE_DIRS}
 		${PYGOBJECT_INCLUDE_DIRS}
 	)
 endmacro(add_python_gtest)
 
-if(BUILD_PYTHON2)
-	list(APPEND GPLUGIN_PYTHON_LOADER gplugin-python2)
+list(APPEND GPLUGIN_PYTHON_LOADER gplugin-python)
 
-	add_python_gtest(test-python-loader 2)
-	target_link_libraries(test-python-loader2 gplugin-loader-tests)
+add_python_gtest(test-python-loader)
+target_link_libraries(test-python-loader gplugin-loader-tests)
 
-	# we can't see the symbols in gplugin-python externally, so use the static
-	# version for testing
-	add_python_gtest(test-python-utils 2)
-	add_dependencies(test-python-utils2 gplugin-python2-static)
-	target_link_libraries(test-python-utils2 gplugin-python2-static)
-endif(BUILD_PYTHON2)
-
-if(BUILD_PYTHON3)
-	list(APPEND GPLUGIN_PYTHON_LOADER gplugin-python3)
-
-	add_python_gtest(test-python-loader 3)
-	target_link_libraries(test-python-loader3 gplugin-loader-tests)
-
-	# we can't see the symbols in gplugin-python externally, so use the static
-	# version for testing
-	add_python_gtest(test-python-utils 3)
-	add_dependencies(test-python-utils3 gplugin-python3-static)
-	target_link_libraries(test-python-utils3 gplugin-python3-static)
-endif(BUILD_PYTHON3)
+# we can't see the symbols in gplugin-python externally, so use the static
+# version for testing
+add_python_gtest(test-python-utils)
+add_dependencies(test-python-utils gplugin-python-static)
+target_link_libraries(test-python-utils gplugin-python-static)
 
 set(GTESTER_PYTHON_TESTS "${PYTHON_TESTS}")
 set(GTESTER_PYTHON_LOG "test-gplugin-python.xml")
@@ -76,5 +61,5 @@ add_custom_target(python-tests ALL
 	DEPENDS ${GTESTER_PYTHON_LOG} ${GTESTER_PYTHON_JUNIT} ${PYTHON_TESTS}
 )
 
-endif(BUILD_PYTHON2 OR BUILD_PYTHON3)
+endif(BUILD_PYTHON)
 
