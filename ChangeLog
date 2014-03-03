@@ -2,6 +2,7 @@
   * Added support to build against lua 5.2 (Elliott Sales de Andrade)
   * Fixed issue #45 (Elliott Sales de Andrade)
   * Updated some unit tests for deprecation in Glib 2.38 (Elliott Sales de Andrade)
+  * Moved the Python loader to Python3 only (Elliott Sales de Andrade)
 
 0.0.14: 2014/01/25
   * Added the Seed JavaScript loader.
