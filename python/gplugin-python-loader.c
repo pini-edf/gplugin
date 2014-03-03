@@ -33,8 +33,8 @@
  * Typedefs
  *****************************************************************************/
 typedef struct {
-	guint gc_id;
 	PyThreadState *py_thread_state;
+	guint gc_id;
 } GPluginPythonLoaderPrivate;
 
 /******************************************************************************
