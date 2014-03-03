@@ -20,7 +20,7 @@
 
 #include <glib/gi18n.h>
 
-#include <gjs/gjs.h>
+#include <gjs/gjs-module.h>
 
 /******************************************************************************
  * Globals
