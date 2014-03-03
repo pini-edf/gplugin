@@ -67,12 +67,9 @@ _gplugin_lua_loader_load_unload_plugin(GPluginLoader *loader,
 	ret = lua_toboolean(L, -1);
 	if(!ret) {
 		if(error) {
-			const gchar *message = _("Failed to load plugin");
-
-			if(!load)
-				message = _("Failed to unload plugin");
-
-			*error = g_error_new(GPLUGIN_DOMAIN, 0, message);
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     (load) ? _("Failed to load plugin") :
+			                              _("Failed to unload plugin"));
 		}
 	}
 

@@ -30,12 +30,6 @@
 typedef struct {
 	gchar *id;
 
-	guint32 abi_version;
-	gboolean internal;
-	gboolean load_on_query;
-
-	gboolean bind_local;
-
 	gchar *name;
 
 	gchar *version;
@@ -54,6 +48,12 @@ typedef struct {
 	gchar *website;
 
 	gchar **dependencies;
+
+	guint32 abi_version;
+	gboolean internal;
+	gboolean load_on_query;
+
+	gboolean bind_local;
 } GPluginPluginInfoPrivate;
 
 /******************************************************************************
