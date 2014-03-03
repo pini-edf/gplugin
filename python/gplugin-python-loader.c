@@ -296,24 +296,38 @@ gplugin_python_loader_init_gettext(void) {
 static gboolean
 gplugin_python_loader_init_python(void) {
 	const gchar *program = NULL;
-	const gchar *argv[] = { "", NULL };
+	wchar_t *argv[] = { NULL, NULL };
+	size_t len;
 
 	/* Initializes Python */
 	if(!Py_IsInitialized())
 		Py_InitializeEx(FALSE);
 
 	program = g_get_prgname();
-	if(program)
-		argv[0] = program;
+	program = program ? program : "";
+	len = mbstowcs(NULL, program, 0);
+	if(len == (size_t)-1) {
+		g_warning("Could not convert program name to wchar_t string.");
+		return FALSE;
+	}
+
+	argv[0] = g_new(wchar_t, len + 1);
+	len = mbstowcs(argv[0], program, len + 1);
+	if(len == (size_t)-1) {
+		g_warning("Could not convert program name to wchar_t string.");
+		return FALSE;
+	}
 
 	/* setup sys.path according to
-	 * http://docs.python.org/2/c-api/init.html#PySys_SetArgvEx
+	 * http://docs.python.org/3/c-api/init.html#PySys_SetArgvEx
 	 */
-#if PY_VERSION_HEX < 0x02060600
-	PySys_SetArgv(1, (gchar **)argv);
+#if PY_VERSION_HEX < 0x03010300
+	PySys_SetArgv(1, argv);
 	PyRun_SimpleString("import sys; sys.path.pop(0)\n");
+	g_free(argv[0]);
 #else
-	PySys_SetArgv(1, (gchar **)argv);
+	PySys_SetArgvEx(1, argv, 0);
+	g_free(argv[0]);
 #endif
 
 	/* initialize pygobject */

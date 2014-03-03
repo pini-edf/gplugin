@@ -57,7 +57,7 @@ gplugin_python_add_module_path(const gchar *module_path) {
 
 	sys_path = PySys_GetObject("path");
 
-	path = PyString_FromString(module_path);
+	path = PyUnicode_FromString(module_path);
 
 	if(PySequence_Contains(sys_path, path) == 0) {
 		PyList_Insert(sys_path, 0, path);
@@ -92,8 +92,8 @@ gplugin_python_exception_to_gerror(void) {
 	Py_DECREF(value);
 
 	error = g_error_new(GPLUGIN_DOMAIN, 0, "%s: %s",
-	                    PyString_AsString(type_name),
-	                    PyString_AsString(value_str));
+	                    PyUnicode_AsUTF8(type_name),
+	                    PyUnicode_AsUTF8(value_str));
 
 	Py_DECREF(type_name);
 	Py_DECREF(value_str);
