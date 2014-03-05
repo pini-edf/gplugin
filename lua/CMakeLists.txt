@@ -5,6 +5,10 @@ option(
 )
 
 if(BUILD_LUA)
+	if(NOT BUILD_GIR)
+		message(FATAL_ERROR "Lua plugin requires GObject Introspection.")
+	endif(NOT BUILD_GIR)
+
 	set(GPLUGIN_LUA_SOURCES
 		gplugin-lua-core.c
 		gplugin-lua-loader.c
