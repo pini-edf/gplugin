@@ -5,6 +5,10 @@ option(
 )
 
 if(BUILD_PERL)
+	if(NOT BUILD_GIR)
+		message(FATAL_ERROR "Perl plugin requires GObject Introspection.")
+	endif(NOT BUILD_GIR)
+
 	find_package(PerlLibs)
 
 	if(PERLLIBS_FOUND)

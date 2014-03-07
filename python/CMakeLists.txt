@@ -5,6 +5,10 @@ option(
 )
 
 if(BUILD_PYTHON)
+	if(NOT BUILD_GIR)
+		message(FATAL_ERROR "Python plugin requires GObject Introspection.")
+	endif(NOT BUILD_GIR)
+
 	set(GPLUGIN_PYTHON_SOURCES
 		gplugin-python-core.c
 		gplugin-python-loader.c

@@ -227,5 +227,7 @@ function(gobject_introspection _FIRST_ARG)
 		DESTINATION ${GIR_TYPELIBDIR}
 	)
 
+	string(TOUPPER ${GIR_LIBRARY} GIR_TARGET)
+	set(${GIR_TARGET}_GIR_TARGETS "gir ${GIR_FILENAME}" "typelib ${GIR_TYPELIB}" PARENT_SCOPE)
 endfunction(gobject_introspection)
 
