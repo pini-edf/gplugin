@@ -26,6 +26,11 @@ if(BUILD_PYTHON)
 
 	pkg_check_modules(PYGOBJECT REQUIRED pygobject-3.0>=3.0.0)
 
+	include_directories(
+		${PYTHON3_INCLUDE_DIRS}
+		${PYGOBJECT_INCLUDE_DIRS}
+	)
+
 	add_library(gplugin-python MODULE
 		${GPLUGIN_PYTHON_SOURCES}
 		${GPLUGIN_PYTHON_HEADERS}
@@ -37,11 +42,6 @@ if(BUILD_PYTHON)
 	)
 
 	set_target_properties(gplugin-python PROPERTIES PREFIX "")
-
-	set_property(TARGET gplugin-python gplugin-python-static APPEND PROPERTY INCLUDE_DIRECTORIES
-		${PYTHON3_INCLUDE_DIRS}
-		${PYGOBJECT_INCLUDE_DIRS}
-	)
 
 	target_link_libraries(gplugin-python
 		${PYTHON3_LIBRARIES}
