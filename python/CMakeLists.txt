@@ -27,6 +27,7 @@ if(BUILD_PYTHON)
 	pkg_check_modules(PYGOBJECT REQUIRED pygobject-3.0>=3.0.0)
 
 	include_directories(
+		${CMAKE_CURRENT_SOURCE_DIR}
 		${PYTHON3_INCLUDE_DIRS}
 		${PYGOBJECT_INCLUDE_DIRS}
 	)
