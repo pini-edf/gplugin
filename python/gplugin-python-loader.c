@@ -257,7 +257,17 @@ static gboolean
 gplugin_python_loader_init_pygobject(void) {
 	pygobject_init(3, 0, 0);
 	if(PyErr_Occurred()) {
-		g_warning("Failed to initialize PyGObject");
+		PyObject *type = NULL, *value = NULL, *obj = NULL;
+
+		PyErr_Fetch(&type, &value, NULL);
+		Py_DECREF(type);
+
+		obj = PyUnicode_AsUTF8String(value);
+		Py_DECREF(value);
+
+		g_warning("Failed to initialize PyGObject : %s", PyBytes_AsString(obj));
+		Py_DECREF(obj);
+
 		PyErr_Print();
 
 		return FALSE;
