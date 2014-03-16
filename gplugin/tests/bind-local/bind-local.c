@@ -20,20 +20,16 @@
 G_MODULE_EXPORT GPluginPluginInfo *
 gplugin_query(GError **error) {
 	return gplugin_plugin_info_new(
-		"gplugin/load-on-query-fail",
-		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-		"load-on-query", TRUE,
+		"gplugin/bind-local",
+		0x04030201,
+		"bind-local", TRUE,
 		NULL
 	);
 }
 
 G_MODULE_EXPORT gboolean
 gplugin_load(GPluginNativePlugin *plugin, GError **error) {
-	static int count = 1;
-
-	*error = g_error_new(GPLUGIN_DOMAIN, 0, "called %d times", count++);
-
-	return FALSE;
+	return TRUE;
 }
 
 G_MODULE_EXPORT gboolean

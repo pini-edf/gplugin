@@ -15,14 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <Python.h>
+
 #include "gplugin-python-plugin.h"
 
-/* _POSIX_C_SOURCE get's redefined in Python.h so we undef it to avoid the
- * compiler warning...
- */
-#undef _POSIX_C_SOURCE
 #include <pygobject.h>
-#include <Python.h>
 
 #define GPLUGIN_PYTHON_PLUGIN_GET_PRIVATE(obj) \
 	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_PYTHON_PLUGIN, GPluginPythonPluginPrivate))

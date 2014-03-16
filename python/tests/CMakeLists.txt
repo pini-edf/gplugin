@@ -3,7 +3,7 @@ if(BUILD_PYTHON)
 macro(add_python_gtest target)
 	add_executable(${target} ${target}.c)
 	target_link_libraries(${target}
-		${GLIB_LIBRARIES} ${PYTHON_LIBRARIES} ${PYGOBJECT_LIBS} gplugin)
+		${GLIB_LIBRARIES} ${PYTHON3_LIBRARIES} ${PYGOBJECT_LIBRARIES} gplugin)
 	add_dependencies(${target} gplugin-python)
 
 	get_target_property(_output_name ${target} RUNTIME_OUTPUT_NAME)
@@ -12,18 +12,20 @@ macro(add_python_gtest target)
 	endif(NOT ${_output_name})
 
 	list(APPEND PYTHON_TESTS ${_output_name})
+
+	set_property(TARGET ${target} APPEND PROPERTY COMPILE_DEFINITIONS
+		PYTHON_LOADER_DIR="${CMAKE_BINARY_DIR}/python"
+		PYTHON_PLUGIN_DIR="${CMAKE_CURRENT_SOURCE_DIR}/plugins"
+	)
+
+	set_property(TARGET ${target} APPEND PROPERTY INCLUDE_DIRECTORIES
+		"${CMAKE_SOURCE_DIR}/python"
+		${PYTHON3_INCLUDE_DIRS}
+		${PYGOBJECT_INCLUDE_DIRS}
+	)
 endmacro(add_python_gtest)
 
-add_definitions(
-	-DPYTHON_LOADER_DIR="${CMAKE_BINARY_DIR}/python"
-	-DPYTHON_PLUGIN_DIR="${CMAKE_CURRENT_SOURCE_DIR}/plugins"
-)
-
-include_directories(
-	"${CMAKE_SOURCE_DIR}/python"
-	${PYTHON_INCLUED_DIR}
-	${PYGOBJECT_INCLUDE_DIRS}
-)
+list(APPEND GPLUGIN_PYTHON_LOADER gplugin-python)
 
 add_python_gtest(test-python-loader)
 target_link_libraries(test-python-loader gplugin-loader-tests)
@@ -41,7 +43,7 @@ set(GTESTER_PYTHON_JUNIT "test-gplugin-python-junit.xml")
 add_custom_command(
 	COMMAND ${GTESTER} -k --verbose -o ${GTESTER_PYTHON_LOG} ${PYTHON_TESTS}
 	OUTPUT ${GTESTER_PYTHON_LOG}
-	DEPENDS gplugin gplugin-python
+	DEPENDS gplugin ${GPLUGIN_GIR_TARGETS} ${GPLUGIN_PYTHON_LOADER}
 	        ${PYTHON_TESTS} ${CMAKE_CURRENT_SOURCE_DIR}/plugins
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )

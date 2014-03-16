@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <Python.h>
+
 #include "gplugin-python-loader.h"
 
 #include "gplugin-python-plugin.h"
@@ -23,7 +25,6 @@
 #include <glib/gi18n.h>
 
 #include <pygobject.h>
-#include <Python.h>
 
 #define GPLUGIN_PYTHON_LOADER_GET_PRIVATE(obj) \
 	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GPLUGIN_TYPE_PYTHON_LOADER, GPluginPythonLoaderPrivate))
@@ -32,8 +33,8 @@
  * Typedefs
  *****************************************************************************/
 typedef struct {
-	guint gc_id;
 	PyThreadState *py_thread_state;
+	guint gc_id;
 } GPluginPythonLoaderPrivate;
 
 /******************************************************************************
@@ -256,8 +257,16 @@ static gboolean
 gplugin_python_loader_init_pygobject(void) {
 	pygobject_init(3, 0, 0);
 	if(PyErr_Occurred()) {
-		g_warning("Failed to initialize PyGObject");
-		PyErr_Print();
+		PyObject *type = NULL, *value = NULL, *tb = NULL, *obj = NULL;
+
+		PyErr_Fetch(&type, &value, &tb);
+		Py_DECREF(type);
+
+		obj = PyUnicode_AsUTF8String(value);
+		Py_DECREF(value);
+
+		g_warning("Failed to initialize PyGObject : %s", PyBytes_AsString(obj));
+		Py_DECREF(obj);
 
 		return FALSE;
 	}
@@ -295,24 +304,38 @@ gplugin_python_loader_init_gettext(void) {
 static gboolean
 gplugin_python_loader_init_python(void) {
 	const gchar *program = NULL;
-	const gchar *argv[] = { "", NULL };
+	wchar_t *argv[] = { NULL, NULL };
+	size_t len;
 
 	/* Initializes Python */
 	if(!Py_IsInitialized())
 		Py_InitializeEx(FALSE);
 
 	program = g_get_prgname();
-	if(program)
-		argv[0] = program;
+	program = program ? program : "";
+	len = mbstowcs(NULL, program, 0);
+	if(len == (size_t)-1) {
+		g_warning("Could not convert program name to wchar_t string.");
+		return FALSE;
+	}
+
+	argv[0] = g_new(wchar_t, len + 1);
+	len = mbstowcs(argv[0], program, len + 1);
+	if(len == (size_t)-1) {
+		g_warning("Could not convert program name to wchar_t string.");
+		return FALSE;
+	}
 
 	/* setup sys.path according to
-	 * http://docs.python.org/2/c-api/init.html#PySys_SetArgvEx
+	 * http://docs.python.org/3/c-api/init.html#PySys_SetArgvEx
 	 */
-#if PY_VERSION_HEX < 0x02060600
-	PySys_SetArgv(1, (gchar **)argv);
+#if PY_VERSION_HEX < 0x03010300
+	PySys_SetArgv(1, argv);
 	PyRun_SimpleString("import sys; sys.path.pop(0)\n");
+	g_free(argv[0]);
 #else
-	PySys_SetArgv(1, (gchar **)argv);
+	PySys_SetArgvEx(1, argv, 0);
+	g_free(argv[0]);
 #endif
 
 	/* initialize pygobject */

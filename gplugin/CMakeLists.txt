@@ -212,7 +212,7 @@ if(BUILD_GIR)
 			PACKAGES glib-2.0 gmodule-2.0 gobject-2.0
 			LIBRARY gplugin
 			QUIET
-			SCANNER_ARGS --add-include-path=${CMAKE_CURRENT_SOURCE_DIR} --warn-all
+			SCANNER_ARGS --add-include-path=${CMAKE_CURRENT_SOURCE_DIR}
 			             --include=GModule-2.0 --include=GObject-2.0
 			COMPILER_ARGS --includedir=${CMAKE_CURRENT_SOURCE_DIR}
 			SYMBOL_PREFIXES gplugin
@@ -220,6 +220,8 @@ if(BUILD_GIR)
 			BUILT_SOURCES ${GPLUGIN_PUBLIC_BUILT_SOURCES}
 			              ${GPLUGIN_PUBLIC_BUILT_HEADERS}
 		)
+		# For loader plugin tests dependencies
+		set(GPLUGIN_GIR_TARGETS ${GPLUGIN_GIR_TARGETS} PARENT_SCOPE)
 	endif(APPLE)
 endif(BUILD_GIR)
 

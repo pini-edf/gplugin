@@ -14,30 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <gplugin.h>
-#include <gplugin-native.h>
+#include <stdio.h>
 
-G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_query(GError **error) {
-	return gplugin_plugin_info_new(
-		"gplugin/load-on-query-fail",
-		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
-		"load-on-query", TRUE,
-		NULL
-	);
-}
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 
-G_MODULE_EXPORT gboolean
-gplugin_load(GPluginNativePlugin *plugin, GError **error) {
-	static int count = 1;
+int
+main(int argc, char *argv[]) {
+	lua_State *L = luaL_newstate();
+	int ret = 0;
 
-	*error = g_error_new(GPLUGIN_DOMAIN, 0, "called %d times", count++);
+	luaL_openlibs(L);
 
-	return FALSE;
-}
+	lua_getglobal(L, "require");
+	lua_pushstring(L, "lgi");
 
-G_MODULE_EXPORT gboolean
-gplugin_unload(GPluginNativePlugin *plugin, GError **error) {
-	return TRUE;
+	ret = lua_pcall(L, 1, 1, 0);
+
+	return ret;
 }
 

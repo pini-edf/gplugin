@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <Python.h>
+
 #include <gplugin/gplugin.h>
 
 #include "gplugin-python-utils.h"
 
 #include <string.h>
-
-#include <Python.h>
 
 gchar *
 gplugin_python_filename_to_module(const gchar *filename) {
@@ -57,7 +57,7 @@ gplugin_python_add_module_path(const gchar *module_path) {
 
 	sys_path = PySys_GetObject("path");
 
-	path = PyString_FromString(module_path);
+	path = PyUnicode_FromString(module_path);
 
 	if(PySequence_Contains(sys_path, path) == 0) {
 		PyList_Insert(sys_path, 0, path);
@@ -73,7 +73,7 @@ GError *
 gplugin_python_exception_to_gerror(void) {
 	GError *error = NULL;
 	PyObject *type = NULL, *value = NULL, *trace = NULL;
-	PyObject *type_name = NULL, *value_str = NULL;
+	PyObject *type_name = NULL, *value_str = NULL, *obj = NULL;
 
 	if(!PyErr_Occurred())
 		return NULL;
@@ -91,9 +91,18 @@ gplugin_python_exception_to_gerror(void) {
 	value_str = PyObject_Str(value);
 	Py_DECREF(value);
 
+	/* now decode the utf8 into a string we can use */
+	obj = PyUnicode_AsUTF8String(type_name);
+	Py_DECREF(type_name);
+	type_name = obj;
+
+	obj = PyUnicode_AsUTF8String(value_str);
+	Py_DECREF(value_str);
+	value_str = obj;
+
 	error = g_error_new(GPLUGIN_DOMAIN, 0, "%s: %s",
-	                    PyString_AsString(type_name),
-	                    PyString_AsString(value_str));
+	                    PyBytes_AsString(type_name),
+	                    PyBytes_AsString(value_str));
 
 	Py_DECREF(type_name);
 	Py_DECREF(value_str);

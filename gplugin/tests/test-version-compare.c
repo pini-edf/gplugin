@@ -22,60 +22,102 @@
  *****************************************************************************/
 /* bad versions */
 static void
+test_gplugin_version_null__null_subprocess(void) {
+	gplugin_version_compare(NULL, NULL, NULL);
+}
+
+static void
 test_gplugin_version_null__null(void) {
+#if GLIB_CHECK_VERSION(2,38,0)
+	g_test_trap_subprocess("/version-check/null__null/subprocess", 0, 0);
+#else
 	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR))
-		gplugin_version_compare(NULL, NULL, NULL);
+		test_gplugin_version_null__null_subprocess();
+#endif
 
 	g_test_trap_assert_failed();
 	g_test_trap_assert_stderr("*gplugin_version_compare*assertion*");
+}
+
+static void
+test_gplugin_version_null__1_2_3_subprocess(void) {
+	gplugin_version_compare(NULL, "1.2.3", NULL);
 }
 
 static void
 test_gplugin_version_null__1_2_3(void) {
+#if GLIB_CHECK_VERSION(2,38,0)
+	g_test_trap_subprocess("/version-check/null__1_2_3/subprocess", 0, 0);
+#else
 	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR))
-		gplugin_version_compare(NULL, "1.2.3", NULL);
+		test_gplugin_version_null__1_2_3_subprocess();
+#endif
 
 	g_test_trap_assert_failed();
 	g_test_trap_assert_stderr("*gplugin_version_compare*assertion*");
+}
+
+static void
+test_gplugin_version_1_2_3__null_subprocess(void) {
+	gplugin_version_compare("1.2.3", NULL, NULL);
 }
 
 static void
 test_gplugin_version_1_2_3__null(void) {
-	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
-		gplugin_version_compare("1.2.3", NULL, NULL);
-	}
+#if GLIB_CHECK_VERSION(2,38,0)
+	g_test_trap_subprocess("/version-check/1_2_3__null/subprocess", 0, 0);
+#else
+	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR))
+		test_gplugin_version_1_2_3__null_subprocess();
+#endif
 
 	g_test_trap_assert_failed();
 	g_test_trap_assert_stderr("*gplugin_version_compare*assertion*");
 }
 
 static void
-test_gplugin_version_abc__1_2_3(void) {
+test_gplugin_version_abc__1_2_3_subprocess(void) {
 	GError *error = NULL;
 	gint t = 0;
 
-	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
-		t = gplugin_version_compare("abc", "1.2.3", &error);
+	t = gplugin_version_compare("abc", "1.2.3", &error);
 
-		g_assert(t == 1);
-		g_assert_no_error(error);
-	}
+	g_assert(t == 1);
+	g_assert_no_error(error);
+}
+
+static void
+test_gplugin_version_abc__1_2_3(void) {
+#if GLIB_CHECK_VERSION(2,38,0)
+	g_test_trap_subprocess("/version-check/abc__1_2_3/subprocess", 0, 0);
+#else
+	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR))
+		test_gplugin_version_abc__1_2_3_subprocess();
+#endif
 
 	g_test_trap_assert_failed();
 	g_test_trap_assert_stderr("*assertion*");
 }
 
 static void
-test_gplugin_version_1_2_3__abc(void) {
+test_gplugin_version_1_2_3__abc_subprocess(void) {
 	GError *error = NULL;
 	gint t = 0;
 
-	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
-		t = gplugin_version_compare("1.2.3", "abc", &error);
+	t = gplugin_version_compare("1.2.3", "abc", &error);
 
-		g_assert(t == -1);
-		g_assert_no_error(error);
-	}
+	g_assert(t == -1);
+	g_assert_no_error(error);
+}
+
+static void
+test_gplugin_version_1_2_3__abc(void) {
+#if GLIB_CHECK_VERSION(2,38,0)
+	g_test_trap_subprocess("/version-check/1_2_3__abc/subprocess", 0, 0);
+#else
+	if(g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR))
+		test_gplugin_version_1_2_3__abc_subprocess();
+#endif
 
 	g_test_trap_assert_failed();
 	g_test_trap_assert_stderr("*assertion*");
@@ -175,6 +217,19 @@ main(gint argc, gchar **argv) {
 	                test_gplugin_version_abc__1_2_3);
 	g_test_add_func("/version-check/1_2_3__abc",
 	                test_gplugin_version_1_2_3__abc);
+
+#if GLIB_CHECK_VERSION(2,38,0)
+	g_test_add_func("/version-check/null__null/subprocess",
+	                test_gplugin_version_null__null_subprocess);
+	g_test_add_func("/version-check/null__1_2_3/subprocess",
+	                test_gplugin_version_null__1_2_3_subprocess);
+	g_test_add_func("/version-check/1_2_3__null/subprocess",
+	                test_gplugin_version_1_2_3__null_subprocess);
+	g_test_add_func("/version-check/abc__1_2_3/subprocess",
+	                test_gplugin_version_abc__1_2_3_subprocess);
+	g_test_add_func("/version-check/1_2_3__abc/subprocess",
+	                test_gplugin_version_1_2_3__abc_subprocess);
+#endif
 
 	/* major version */
 	g_test_add_func("/version-check/1_0_0__0_0_0",
