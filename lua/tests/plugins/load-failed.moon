@@ -16,6 +16,8 @@
 lgi = require 'lgi'
 GPlugin = lgi.GPlugin
 
+require("moonscript")
+
 gplugin_query = ->
 	return GPlugin:PluginInfo {
 		id: "gplugin/moon-load-failed"
