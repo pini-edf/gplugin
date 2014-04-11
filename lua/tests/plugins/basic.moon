@@ -16,7 +16,7 @@
 lgi = require 'lgi'
 GPlugin = lgi.GPlugin
 
-gplugin_query = ->
+global gplugin_query = ->
 	return GPlugin.PluginInfo {
 		id: "gplugin/moon-basic-plugin",
 		abi_version: 0x01020304,
@@ -30,10 +30,10 @@ gplugin_query = ->
 		website: "website"
 	}
 
-gplugin_load = ->
+global gplugin_load = ->
 	return true
 
 
-gplugin_unload = ->
+global gplugin_unload = ->
 	return true
 

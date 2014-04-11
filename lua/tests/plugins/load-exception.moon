@@ -16,17 +16,15 @@
 lgi = require 'lgi'
 GPlugin = lgi.GPlugin
 
-gplugin_query = ->
-	return GPlugin:PluginInfo {
+global gplugin_query = ->
+	return GPlugin.PluginInfo {
 		id: "gplugin/moon-load-exception"
 	}
 
-gplugin_load = ->
+global gplugin_load = ->
 	error("explode")
 	return false
 
 
-gplugin_unload = ->
+global gplugin_unload = ->
 	return false
-
-

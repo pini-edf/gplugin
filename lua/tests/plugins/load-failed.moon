@@ -16,18 +16,15 @@
 lgi = require 'lgi'
 GPlugin = lgi.GPlugin
 
-require("moonscript")
-
-gplugin_query = ->
-	return GPlugin:PluginInfo {
+global gplugin_query = ->
+	return GPlugin.PluginInfo {
 		id: "gplugin/moon-load-failed"
 	}
 
-gplugin_load = ->
+
+global gplugin_load = ->
 	return false
 
 
-gplugin_unload = ->
+global gplugin_unload = ->
 	return true
-
-
