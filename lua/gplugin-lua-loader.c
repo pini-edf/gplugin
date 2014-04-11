@@ -109,9 +109,11 @@ gplugin_lua_loader_query(GPluginLoader *loader, const gchar *filename,
 	/* check the extension to see if we need to load moonscript */
 	ext = g_utf8_strrchr(filename, -1, g_utf8_get_char("."));
 	if(ext && g_utf8_collate(ext, ".moon") == 0) {
+		g_message("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 		g_message("requiring moon");
 		lua_getglobal(L, "require");
 		lua_pushstring(L, "moonscript");
+
 		if(lua_pcall(L, 1, 1, 0) != 0) {
 			_gplugin_lua_error_to_gerror(L, error);
 
@@ -126,7 +128,6 @@ gplugin_lua_loader_query(GPluginLoader *loader, const gchar *filename,
 			return NULL;
 		}
 
-		/* move the loadfile field to the stack */
 		lua_getfield(L, -1, "loadfile");
 		lua_pushstring(L, filename);
 
@@ -155,12 +156,22 @@ gplugin_lua_loader_query(GPluginLoader *loader, const gchar *filename,
 		return NULL;
 	}
 
+	g_message("script has been run");
+
 	lua_getglobal(L, "gplugin_query");
+	if(lua_isnil(L, -1)) {
+		if(error)
+			*error = g_error_new(GPLUGIN_DOMAIN, 0, "no gplugin_query function found");
+
+		return NULL;
+	}
 	if(lua_pcall(L, 0, 1, 0) != 0) {
 		_gplugin_lua_error_to_gerror(L, error);
 
 		return NULL;
 	}
+
+	g_message("query has been called");
 
 	if(!lua_isuserdata(L, -1)) {
 		_gplugin_lua_error_to_gerror(L, error);

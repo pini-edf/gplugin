@@ -17,7 +17,7 @@ lgi = require 'lgi'
 GPlugin = lgi.GPlugin
 
 gplugin_query = ->
-	return GPlugin:PluginInfo {
+	return GPlugin.PluginInfo {
 		id: "gplugin/moon-basic-plugin",
 		abi_version: 0x01020304,
 		name: "basic plugin",
@@ -36,5 +36,4 @@ gplugin_load = ->
 
 gplugin_unload = ->
 	return true
-
 
