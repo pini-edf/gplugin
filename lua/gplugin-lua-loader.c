@@ -34,6 +34,19 @@ static GType type_real = 0;
 /******************************************************************************
  * Helpers
  *****************************************************************************/
+static void
+_gplugin_lua_error_to_gerror(lua_State *L, GError **error) {
+	const gchar *msg = NULL;
+
+	if(error == NULL)
+		return;
+
+	msg = lua_tostring(L, -1);
+
+	*error = g_error_new(GPLUGIN_DOMAIN, 0,
+	                     "%s", (msg) ? msg : "Unknown");
+}
+
 static gboolean
 _gplugin_lua_loader_load_unload_plugin(GPluginLoader *loader,
                                        GPluginPlugin *plugin,
@@ -41,36 +54,26 @@ _gplugin_lua_loader_load_unload_plugin(GPluginLoader *loader,
                                        gboolean load,
                                        GError **error)
 {
-	gboolean ret;
+	gboolean ret = TRUE;
 	lua_State *L = gplugin_lua_plugin_get_state(GPLUGIN_LUA_PLUGIN(plugin));
 
 	lua_getglobal(L, function);
 	lua_pushlightuserdata(L, plugin);
 	if(lua_pcall(L, 1, 1, 0) != 0) {
-		if(error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "%s", lua_tostring(L, -1));
-		}
+		_gplugin_lua_error_to_gerror(L, error);
 
 		return FALSE;
 	}
 
 	if(!lua_isboolean(L, -1)) {
-		if(error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "%s", lua_tostring(L, -1));
-		}
+		_gplugin_lua_error_to_gerror(L, error);
 
 		return FALSE;
 	}
 
-	ret = lua_toboolean(L, -1);
-	if(!ret) {
-		if(error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     (load) ? _("Failed to load plugin") :
-			                              _("Failed to unload plugin"));
-		}
+	if(!lua_toboolean(L, -1)) {
+		ret = FALSE;
+		_gplugin_lua_error_to_gerror(L, error);
 	}
 
 	return ret;
@@ -81,7 +84,12 @@ _gplugin_lua_loader_load_unload_plugin(GPluginLoader *loader,
  *****************************************************************************/
 static GSList *
 gplugin_lua_loader_class_supported_extensions(const GPluginLoaderClass *klass) {
-	return g_slist_append(NULL, "lua");
+	GSList *exts = NULL;
+
+	exts = g_slist_append(exts, "lua");
+	exts = g_slist_append(exts, "moon");
+
+	return exts;
 }
 
 static GPluginPlugin *
@@ -91,44 +99,68 @@ gplugin_lua_loader_query(GPluginLoader *loader, const gchar *filename,
 	GPluginPlugin *plugin = NULL;
 	GPluginPluginInfo *info = NULL;
 	lua_State *L = NULL;
-	gint ret;
+	gchar *ext = NULL;
 
 	L = luaL_newstate();
 	luaL_openlibs(L);
 
-	ret = luaL_loadfile(L, filename);
-	if(ret != 0) {
-		if(error)
-			*error = g_error_new(GPLUGIN_DOMAIN, 0, "Failed to load file %s",
-			                     filename);
-		return NULL;
+	/* check the extension to see if we need to load moonscript */
+	ext = g_utf8_strrchr(filename, -1, g_utf8_get_char("."));
+	if(ext && g_utf8_collate(ext, ".moon") == 0) {
+		lua_getglobal(L, "require");
+		lua_pushstring(L, "moonscript");
+
+		if(lua_pcall(L, 1, 1, 0) != 0) {
+			_gplugin_lua_error_to_gerror(L, error);
+
+			return NULL;
+		}
+
+		if(!lua_istable(L, -1)) {
+			if(error)
+				*error = g_error_new(GPLUGIN_DOMAIN, 0, "moonscript returned an unexpected value");
+
+			return NULL;
+		}
+
+		lua_getfield(L, -1, "loadfile");
+		lua_pushstring(L, filename);
+
+		if(lua_pcall(L, 1, 1, 0) != 0) {
+			_gplugin_lua_error_to_gerror(L, error);
+
+			return NULL;
+		}
+	} else {
+		if(luaL_loadfile(L, filename) != 0) {
+			_gplugin_lua_error_to_gerror(L, error);
+
+			return NULL;
+		}
 	}
 
 	/* run the script */
 	if(lua_pcall(L, 0, 0, 0) != 0) {
-		if(error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "%s", lua_tostring(L, -1));
-		}
+		_gplugin_lua_error_to_gerror(L, error);
 
 		return NULL;
 	}
 
 	lua_getglobal(L, "gplugin_query");
+	if(lua_isnil(L, -1)) {
+		if(error)
+			*error = g_error_new(GPLUGIN_DOMAIN, 0, "no gplugin_query function found");
+
+		return NULL;
+	}
 	if(lua_pcall(L, 0, 1, 0) != 0) {
-		if(error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "%s", lua_tostring(L, -1));
-		}
+		_gplugin_lua_error_to_gerror(L, error);
 
 		return NULL;
 	}
 
 	if(!lua_isuserdata(L, -1)) {
-		if(error) {
-			*error = g_error_new(GPLUGIN_DOMAIN, 0,
-			                     "islightuserdata %s", lua_tostring(L, -1));
-		}
+		_gplugin_lua_error_to_gerror(L, error);
 
 		return NULL;
 	}

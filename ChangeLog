@@ -1,5 +1,6 @@
 0.0.16:
   * Added luajit as the first Lua library to try to use.
+  * Added moonscript support to the Lua loader.
 
 0.0.15: 2014/03/15
   * Added support to build against lua 5.2 (Elliott Sales de Andrade)
