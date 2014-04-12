@@ -38,8 +38,6 @@ static void
 _gplugin_lua_error_to_gerror(lua_State *L, GError **error) {
 	const gchar *msg = NULL;
 
-	printf("error handler!!");
-
 	if(error == NULL)
 		return;
 
