@@ -65,7 +65,8 @@ test_gplugin_plugin_info_construction(void) {
 	gchar *id = NULL, *name = NULL, *version = NULL;
 	gchar *license_id = NULL, *license_text = NULL, *license_url = NULL;
 	gchar *icon = NULL, *summary = NULL, *description = NULL, *category = NULL;
-	gchar **authors = NULL, *website = NULL, **dependencies = NULL;
+	gchar *help = NULL, *website = NULL;
+	gchar **authors = NULL, **dependencies = NULL;
 	guint abi_version = 0;
 	gboolean internal = FALSE, load_on_query = FALSE;
 	const gchar * const r_authors[] = { "author", NULL };
@@ -86,6 +87,7 @@ test_gplugin_plugin_info_construction(void) {
 		"description", "description",
 		"category", "category",
 		"authors", r_authors,
+		"help", "help",
 		"website", "website",
 		"dependencies", r_dependencies,
 		NULL
@@ -108,6 +110,7 @@ test_gplugin_plugin_info_construction(void) {
 		"description", &description,
 		"category", &category,
 		"authors", &authors,
+		"help", &help,
 		"website", &website,
 		"dependencies", &dependencies,
 		NULL
@@ -128,6 +131,7 @@ test_gplugin_plugin_info_construction(void) {
 	test_string(category, "category");
 	test_stringv(authors, r_authors,
 	             (TestStringVFunc)gplugin_plugin_info_get_authors, info);
+	test_string(help, "help");
 	test_string(website, "website");
 	test_stringv(dependencies, r_dependencies,
 	             (TestStringVFunc)gplugin_plugin_info_get_dependencies, info);
@@ -160,7 +164,8 @@ test_gplugin_plugin_info_new_full(void) {
 	gchar *id = NULL, *name = NULL, *version = NULL;
 	gchar *license_id = NULL, *license_text = NULL, *license_url = NULL;
 	gchar *icon = NULL, *summary = NULL, *description = NULL, *category = NULL;
-	gchar **authors = NULL, *website = NULL, **dependencies = NULL;
+	gchar *website = NULL, *help = NULL;
+	gchar **authors = NULL, **dependencies = NULL;
 	guint abi_version = 0;
 	gboolean internal = FALSE, load_on_query = FALSE;
 	const gchar * const r_authors[] = { "author", NULL };
@@ -181,6 +186,7 @@ test_gplugin_plugin_info_new_full(void) {
 		"description", "description",
 		"category", "category",
 		"authors", r_authors,
+		"help", "help",
 		"website", "website",
 		"dependencies", r_dependencies,
 		NULL
@@ -203,6 +209,7 @@ test_gplugin_plugin_info_new_full(void) {
 		"description", &description,
 		"category", &category,
 		"authors", &authors,
+		"help", &help,
 		"website", &website,
 		"dependencies", &dependencies,
 		NULL
@@ -223,6 +230,7 @@ test_gplugin_plugin_info_new_full(void) {
 	test_string(category, "category");
 	test_stringv(authors, r_authors,
 	             (TestStringVFunc)gplugin_plugin_info_get_authors, info);
+	test_string(help, "help");
 	test_string(website, "website");
 	test_stringv(dependencies, r_dependencies,
 	             (TestStringVFunc)gplugin_plugin_info_get_dependencies, info);
