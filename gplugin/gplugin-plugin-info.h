@@ -82,6 +82,7 @@ const gchar * const *gplugin_plugin_info_get_authors(const GPluginPluginInfo *in
 const gchar *gplugin_plugin_info_get_website(const GPluginPluginInfo *info);
 const gchar * const *gplugin_plugin_info_get_dependencies(const GPluginPluginInfo *info);
 GPluginVersionCompareFunc gplugin_plugin_info_get_version_func(const GPluginPluginInfo *info);
+const gchar *gplugin_plugin_info_get_help(const GPluginPluginInfo *info);
 
 G_END_DECLS
 

@@ -45,6 +45,7 @@ typedef struct {
 	gchar *description;
 	gchar *category;
 	gchar **authors;
+	gchar *help;
 	gchar *website;
 
 	gchar **dependencies;
@@ -77,6 +78,7 @@ enum {
 	PROP_DESCRIPTION,
 	PROP_CATEGORY,
 	PROP_AUTHORS,
+	PROP_HELP,
 	PROP_WEBSITE,
 	PROP_DEPENDENCIES,
 	N_PROPERTIES,
@@ -238,6 +240,15 @@ gplugin_plugin_info_set_authors(GPluginPluginInfo *info,
 }
 
 static void
+gplugin_plugin_info_set_help(GPluginPluginInfo *info, const gchar *help)
+{
+	GPluginPluginInfoPrivate *priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	g_free(priv->help);
+	priv->help = (help) ? g_strdup(help) : NULL;
+}
+
+static void
 gplugin_plugin_info_set_website(GPluginPluginInfo *info,
                                 const gchar *website)
 {
@@ -323,6 +334,9 @@ gplugin_plugin_info_get_property(GObject *obj, guint param_id, GValue *value,
 		case PROP_AUTHORS:
 			g_value_set_boxed(value, gplugin_plugin_info_get_authors(info));
 			break;
+		case PROP_HELP:
+			g_value_set_string(value, gplugin_plugin_info_get_help(info));
+			break;
 		case PROP_WEBSITE:
 			g_value_set_string(value, gplugin_plugin_info_get_website(info));
 			break;
@@ -398,6 +412,9 @@ gplugin_plugin_info_set_property(GObject *obj, guint param_id,
 		case PROP_AUTHORS:
 			gplugin_plugin_info_set_authors(info, g_value_get_boxed(value));
 			break;
+		case PROP_HELP:
+			gplugin_plugin_info_set_help(info, g_value_get_string(value));
+			break;
 		case PROP_WEBSITE:
 			gplugin_plugin_info_set_website(info, g_value_get_string(value));
 			break;
@@ -425,6 +442,7 @@ gplugin_plugin_info_finalize(GObject *obj) {
 	g_free(priv->summary);
 	g_free(priv->description);
 	g_strfreev(priv->authors);
+	g_free(priv->help);
 	g_free(priv->website);
 	g_strfreev(priv->dependencies);
 
@@ -685,6 +703,18 @@ gplugin_plugin_info_class_init(GPluginPluginInfoClass *klass) {
 		                   G_TYPE_STRV,
 		                   G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
 		                   G_PARAM_CONSTRUCT_ONLY));
+
+	/**
+	 * GPluginPluginInfo:help:
+	 *
+	 * The url of the plugin that can be represented in a user interface.
+	 */
+	g_object_class_install_property(obj_class, PROP_HELP,
+		g_param_spec_string("help", "help",
+		                    "The help string for the plugin",
+		                    NULL,
+		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
+		                    G_PARAM_CONSTRUCT_ONLY));
 
 	/**
 	 * GPluginPluginInfo:website:
@@ -1003,6 +1033,23 @@ gplugin_plugin_info_get_authors(const GPluginPluginInfo *info) {
 	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
 
 	return (const gchar * const *)priv->authors;
+}
+
+/**
+ * gplugin_plugin_info_get_help:
+ * @info: #GPluginPluginInfo instance
+ *
+ * Return value: The help from @info.
+ */
+const gchar *
+gplugin_plugin_info_get_help(const GPluginPluginInfo *info) {
+	GPluginPluginInfoPrivate *priv = NULL;
+
+	g_return_val_if_fail(GPLUGIN_IS_PLUGIN_INFO(info), NULL);
+
+	priv = GPLUGIN_PLUGIN_INFO_GET_PRIVATE(info);
+
+	return priv->help;
 }
 
 /**

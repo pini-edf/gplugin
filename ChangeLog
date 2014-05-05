@@ -1,3 +1,8 @@
+0.0.16: 2014/05/05
+  * Added luajit as the first Lua library to try to use.
+  * Added moonscript support to the Lua loader.
+  * Added a help field to GPluginPluginInfo.
+
 0.0.15: 2014/03/15
   * Added support to build against lua 5.2 (Elliott Sales de Andrade)
   * Fixed issue #45 (Elliott Sales de Andrade)
