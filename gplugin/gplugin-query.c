@@ -34,21 +34,33 @@ static gboolean show_internal = FALSE;
  * Helpers
  *****************************************************************************/
 static gboolean
-verbosity_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
+verbosity_cb(GPLUGIN_UNUSED const gchar *n,
+             GPLUGIN_UNUSED const gchar *v,
+             GPLUGIN_UNUSED gpointer d,
+             GPLUGIN_UNUSED GError **e)
+{
 	verbosity++;
 
 	return TRUE;
 }
 
 static gboolean
-full_verbosity_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
+full_verbosity_cb(GPLUGIN_UNUSED const gchar *n,
+                  GPLUGIN_UNUSED const gchar *v,
+                  GPLUGIN_UNUSED gpointer d,
+                  GPLUGIN_UNUSED GError **e)
+{
 	verbosity = 1 << 11;
 
 	return TRUE;
 }
 
 static gboolean
-internal_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
+internal_cb(GPLUGIN_UNUSED const gchar *n,
+            GPLUGIN_UNUSED const gchar *v,
+            GPLUGIN_UNUSED gpointer d,
+            GPLUGIN_UNUSED GError **e)
+{
 	show_internal = TRUE;
 
 	return TRUE;
