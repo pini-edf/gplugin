@@ -139,6 +139,17 @@ add_definitions(
 	-Wextra
 )
 
+# check if we're using gcc
+if(CMAKE_COMPILER_IS_GNUCC)
+	add_definitions(
+		-DGPLUGIN_UNUSED=__attribute__\(\(unused\)\)
+	)
+else(CMAKE_COMPILER_IS_GNUCC)
+	add_definitions(
+		-DGPLUGIN_UNUSED=""
+	)
+endif(CMAKE_COMPILER_IS_GNUCC)
+
 include_directories(
 	${CMAKE_SOURCE_DIR}
 	${CMAKE_BINARY_DIR}                # for built headers/sources
