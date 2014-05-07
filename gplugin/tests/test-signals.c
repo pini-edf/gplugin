@@ -30,9 +30,9 @@ typedef struct {
  * Callbacks
  *****************************************************************************/
 static gboolean
-test_gplugin_manager_signals_normal_loading(GObject *manager,
-                                            GPluginPlugin *plugin,
-                                            GError **error,
+test_gplugin_manager_signals_normal_loading(GPLUGIN_UNUSED GObject *manager,
+                                            GPLUGIN_UNUSED GPluginPlugin *plugin,
+                                            GPLUGIN_UNUSED GError **error,
                                             gpointer d)
 {
 	TestGPluginManagerSignalsData *data = (TestGPluginManagerSignalsData *)d;
@@ -43,8 +43,8 @@ test_gplugin_manager_signals_normal_loading(GObject *manager,
 }
 
 static void
-test_gplugin_manager_signals_normal_loaded(GObject *manager,
-                                           GPluginPlugin *plugin,
+test_gplugin_manager_signals_normal_loaded(GPLUGIN_UNUSED GObject *manager,
+                                           GPLUGIN_UNUSED GPluginPlugin *plugin,
                                            gpointer d)
 {
 	TestGPluginManagerSignalsData *data = (TestGPluginManagerSignalsData *)d;
@@ -53,9 +53,9 @@ test_gplugin_manager_signals_normal_loaded(GObject *manager,
 }
 
 static gboolean
-test_gplugin_manager_signals_normal_unloading(GObject *manager,
-                                              GPluginPlugin *plugin,
-                                              GError **error,
+test_gplugin_manager_signals_normal_unloading(GPLUGIN_UNUSED GObject *manager,
+                                              GPLUGIN_UNUSED GPluginPlugin *plugin,
+                                              GPLUGIN_UNUSED GError **error,
                                               gpointer d)
 {
 	TestGPluginManagerSignalsData *data = (TestGPluginManagerSignalsData *)d;
@@ -66,8 +66,8 @@ test_gplugin_manager_signals_normal_unloading(GObject *manager,
 }
 
 static void
-test_gplugin_manager_signals_normal_unloaded(GObject *manager,
-                                             GPluginPlugin *plugin,
+test_gplugin_manager_signals_normal_unloaded(GPLUGIN_UNUSED GObject *manager,
+                                             GPLUGIN_UNUSED GPluginPlugin *plugin,
                                              gpointer d)
 {
 	TestGPluginManagerSignalsData *data = (TestGPluginManagerSignalsData *)d;
@@ -76,8 +76,8 @@ test_gplugin_manager_signals_normal_unloaded(GObject *manager,
 }
 
 static gboolean
-test_gplugin_manager_signals_stop_loading(GObject *manager,
-                                          GPluginPlugin *plugin,
+test_gplugin_manager_signals_stop_loading(GPLUGIN_UNUSED GObject *manager,
+                                          GPLUGIN_UNUSED GPluginPlugin *plugin,
                                           GError **error,
                                           gpointer d)
 {
@@ -91,8 +91,8 @@ test_gplugin_manager_signals_stop_loading(GObject *manager,
 }
 
 static gboolean
-test_gplugin_manager_signals_stop_unloading(GObject *manager,
-                                            GPluginPlugin *plugin,
+test_gplugin_manager_signals_stop_unloading(GPLUGIN_UNUSED GObject *manager,
+                                            GPLUGIN_UNUSED GPluginPlugin *plugin,
                                             GError **error,
                                             gpointer d)
 {
