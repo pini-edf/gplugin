@@ -130,6 +130,7 @@ endif(NLS)
 # Build Info
 ###############################################################################
 add_definitions(
+	-std=c99
 	-g -g3
 	-DPREFIX="${CMAKE_INSTALL_PREFIX}"
 	-DGPLUGIN_WEBSITE="http://bitbucket.org/rw_grim/gplugin/"
