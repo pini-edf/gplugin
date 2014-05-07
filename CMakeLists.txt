@@ -130,10 +130,25 @@ endif(NLS)
 # Build Info
 ###############################################################################
 add_definitions(
-	-g -g3 -Wall
+	-g -g3
 	-DPREFIX="${CMAKE_INSTALL_PREFIX}"
 	-DGPLUGIN_WEBSITE="http://bitbucket.org/rw_grim/gplugin/"
+	-Wall
+	-Werror=format-security
+	-Wformat
+	-Wextra
 )
+
+# check if we're using gcc
+if(CMAKE_COMPILER_IS_GNUCC)
+	add_definitions(
+		-DGPLUGIN_UNUSED=__attribute__\(\(unused\)\)
+	)
+else(CMAKE_COMPILER_IS_GNUCC)
+	add_definitions(
+		-DGPLUGIN_UNUSED=""
+	)
+endif(CMAKE_COMPILER_IS_GNUCC)
 
 include_directories(
 	${CMAKE_SOURCE_DIR}

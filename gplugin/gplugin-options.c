@@ -30,8 +30,10 @@ static gboolean add_default_paths = TRUE;
 static gchar **paths = NULL;
 
 static gboolean
-gplugin_options_no_default_paths_cb(const gchar *n, const gchar *v,
-                                    gpointer d, GError **e)
+gplugin_options_no_default_paths_cb(GPLUGIN_UNUSED const gchar *n,
+                                    GPLUGIN_UNUSED const gchar *v,
+                                    GPLUGIN_UNUSED gpointer d,
+                                    GPLUGIN_UNUSED GError **e)
 {
 	add_default_paths = FALSE;
 
@@ -54,8 +56,10 @@ static GOptionEntry entries[] = {
 };
 
 static gboolean
-gplugin_options_post_parse_cb(GOptionContext *ctx, GOptionGroup *group,
-                              gpointer data, GError **error)
+gplugin_options_post_parse_cb(GPLUGIN_UNUSED GOptionContext *ctx,
+                              GPLUGIN_UNUSED GOptionGroup *group,
+                              GPLUGIN_UNUSED gpointer data,
+                              GPLUGIN_UNUSED GError **error)
 {
 	gint i = 0;
 

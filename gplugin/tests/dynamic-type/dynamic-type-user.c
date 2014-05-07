@@ -22,7 +22,7 @@
 static DynamicTest *test_object = NULL;
 
 G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_query(GError **error) {
+gplugin_query(GPLUGIN_UNUSED GError **error) {
 	const gchar * const dependencies[] = {
 		"gplugin/dynamic-type-provider",
 		NULL
@@ -37,7 +37,7 @@ gplugin_query(GError **error) {
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_load(GPluginNativePlugin *plugin, GError **error) {
+gplugin_load(GPLUGIN_UNUSED GPluginNativePlugin *plugin, GError **error) {
 	test_object = g_object_new(DYNAMIC_TYPE_TEST, NULL);
 
 	if (test_object == NULL) {
@@ -50,7 +50,7 @@ gplugin_load(GPluginNativePlugin *plugin, GError **error) {
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_unload(GPluginNativePlugin *plugin, GError **error) {
+gplugin_unload(GPLUGIN_UNUSED GPluginNativePlugin *plugin, GError **error) {
 	g_object_unref(test_object);
 
 	if (DYNAMIC_IS_TEST(test_object)) {

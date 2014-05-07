@@ -341,7 +341,8 @@ test_gplugin_plugin_info_version_func(GPluginVersionCompareFunc func) {
 }
 
 static gint
-test_gplugin_version_compare(const gchar *v1, const gchar *v2) {
+test_gplugin_version_compare(GPLUGIN_UNUSED const gchar *v1,
+                             GPLUGIN_UNUSED const gchar *v2) {
 	return 0;
 }
 

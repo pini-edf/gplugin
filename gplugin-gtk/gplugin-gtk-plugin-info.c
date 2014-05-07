@@ -44,7 +44,7 @@ enum {
  *****************************************************************************/
 static void
 _gplugin_gtk_plugin_info_expander_activate_cb(GtkExpander *expander,
-                                              gpointer data)
+                                              GPLUGIN_UNUSED gpointer data)
 {
 	if(gtk_expander_get_expanded(expander))
 		gtk_expander_set_label(expander, "More");
@@ -260,7 +260,7 @@ gplugin_gtk_plugin_info_constructed(GObject *obj) {
 }
 
 static void
-gplugin_gtk_plugin_info_init(GPluginGtkPluginInfo *info) {
+gplugin_gtk_plugin_info_init(GPLUGIN_UNUSED GPluginGtkPluginInfo *info) {
 }
 
 static void
