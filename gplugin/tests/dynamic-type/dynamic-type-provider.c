@@ -52,7 +52,7 @@ dynamic_test_get_type(void) {
 }
 
 G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_query(GError **error) {
+gplugin_query(GPLUGIN_UNUSED GError **error) {
 	return gplugin_plugin_info_new(
 		"gplugin/dynamic-type-provider",
 		GPLUGIN_NATIVE_PLUGIN_ABI_VERSION,
@@ -74,7 +74,9 @@ gplugin_load(GPluginNativePlugin *plugin, GError **error) {
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_unload(GPluginNativePlugin *plugin, GError **error) {
+gplugin_unload(GPLUGIN_UNUSED GPluginNativePlugin *plugin,
+               GPLUGIN_UNUSED GError **error)
+{
 	return TRUE;
 }
 
