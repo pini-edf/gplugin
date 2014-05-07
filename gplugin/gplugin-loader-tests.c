@@ -190,7 +190,7 @@ static GPluginTestLoaderFunction test_functions[] = {
 	{ "/loaders/%s/load-exception", gplugin_test_loader_load_exception },
 	{ "/loaders/%s/unload-failed", gplugin_test_loader_unload_failed },
 	{ "/loaders/%s/dependencies", gplugin_test_loader_dependencies },
-	{ NULL },
+	{ NULL, NULL },
 };
 
 void
