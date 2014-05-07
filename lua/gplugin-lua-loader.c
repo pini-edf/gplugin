@@ -48,10 +48,9 @@ _gplugin_lua_error_to_gerror(lua_State *L, GError **error) {
 }
 
 static gboolean
-_gplugin_lua_loader_load_unload_plugin(GPluginLoader *loader,
+_gplugin_lua_loader_load_unload_plugin(GPLUGIN_UNUSED GPluginLoader *loader,
                                        GPluginPlugin *plugin,
                                        const gchar *function,
-                                       gboolean load,
                                        GError **error)
 {
 	gboolean ret = TRUE;
@@ -83,7 +82,7 @@ _gplugin_lua_loader_load_unload_plugin(GPluginLoader *loader,
  * GPluginLoaderInterface API
  *****************************************************************************/
 static GSList *
-gplugin_lua_loader_class_supported_extensions(const GPluginLoaderClass *klass) {
+gplugin_lua_loader_class_supported_extensions(GPLUGIN_UNUSED const GPluginLoaderClass *klass) {
 	GSList *exts = NULL;
 
 	exts = g_slist_append(exts, "lua");
@@ -184,7 +183,7 @@ gplugin_lua_loader_load(GPluginLoader *loader, GPluginPlugin *plugin,
                         GError **error)
 {
 	return _gplugin_lua_loader_load_unload_plugin(loader, plugin,
-	                                              "gplugin_load", TRUE, error);
+	                                              "gplugin_load", error);
 }
 
 static gboolean
@@ -192,7 +191,7 @@ gplugin_lua_loader_unload(GPluginLoader *loader, GPluginPlugin *plugin,
                           GError **error)
 {
 	return _gplugin_lua_loader_load_unload_plugin(loader, plugin,
-	                                              "gplugin_unload", FALSE,
+	                                              "gplugin_unload",
 	                                              error);
 }
 
