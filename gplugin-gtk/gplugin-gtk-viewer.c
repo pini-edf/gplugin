@@ -139,7 +139,7 @@ static GOptionEntry entries[] = {
 		&paths, "Additional paths to look for plugins",
 		"PATH",
 	}, {
-		NULL
+		NULL, 0, 0, 0, NULL, NULL, NULL,
 	},
 };
 
