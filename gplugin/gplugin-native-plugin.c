@@ -615,7 +615,7 @@ gplugin_native_plugin_register_enum(GPluginNativePlugin *plugin,
                                     const gchar *name,
                                     const GEnumValue *values)
 {
-	GTypeInfo enum_info = { 0, };
+	GTypeInfo enum_info;
 
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), G_TYPE_INVALID);
 	g_return_val_if_fail(name, G_TYPE_INVALID);
@@ -643,7 +643,7 @@ gplugin_native_plugin_register_flags(GPluginNativePlugin *plugin,
                                      const gchar *name,
                                      const GFlagsValue *values)
 {
-	GTypeInfo flags_info = { 0, };
+	GTypeInfo flags_info;
 
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), G_TYPE_INVALID);
 	g_return_val_if_fail(name, G_TYPE_INVALID);
