@@ -233,9 +233,8 @@ static GOptionEntry entries[] = {
 		"full-verbose", 'V', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
 		full_verbosity_cb, N_("Increase verbosity to eleven"),
 		NULL,
-	}, {
-		NULL
 	},
+	NULL,
 };
 
 gint
