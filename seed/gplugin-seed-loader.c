@@ -37,7 +37,7 @@ static SeedEngine *engine = NULL;
  * GPluginLoaderInterface API
  *****************************************************************************/
 static GSList *
-gplugin_seed_loader_class_supported_extensions(__attribute__((unused)) const GPluginLoaderClass *klass) {
+gplugin_seed_loader_class_supported_extensions(GPLUGIN_UNUSED const GPluginLoaderClass *klass) {
 	return g_slist_append(NULL, "js");
 }
 
@@ -188,7 +188,7 @@ gplugin_seed_loader_query(GPluginLoader *loader, const gchar *filename,
 }
 
 static gboolean
-gplugin_seed_loader_load_unload(__attribute__((unused)) GPluginLoader *loader,
+gplugin_seed_loader_load_unload(GPLUGIN_UNUSED GPluginLoader *loader,
                                 GPluginPlugin *plugin,
                                 const gchar *function,
                                 GError **error)

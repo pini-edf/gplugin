@@ -22,7 +22,7 @@
 #include "gplugin-seed-plugin.h"
 
 G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_query(__attribute__((unused)) GError **error) {
+gplugin_query(GPLUGIN_UNUSED GError **error) {
 	const gchar * const authors[] = {
 		"Gary Kramlich <grim@reaperworld.com>",
 		NULL
@@ -48,7 +48,7 @@ gplugin_query(__attribute__((unused)) GError **error) {
 
 G_MODULE_EXPORT gboolean
 gplugin_load(GPluginNativePlugin *plugin,
-             __attribute__((unused)) GError **error)
+             GPLUGIN_UNUSED GError **error)
 {
 	gplugin_seed_loader_register(plugin);
 	gplugin_seed_plugin_register(plugin);
@@ -59,8 +59,8 @@ gplugin_load(GPluginNativePlugin *plugin,
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_unload(__attribute__((unused)) GPluginNativePlugin *plugin,
-               __attribute__((unused)) GError **error)
+gplugin_unload(GPLUGIN_UNUSED GPluginNativePlugin *plugin,
+               GPLUGIN_UNUSED GError **error)
 {
 	return FALSE;
 }
