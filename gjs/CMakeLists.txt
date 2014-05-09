@@ -16,7 +16,7 @@ if(BUILD_GJS)
 		gplugin-gjs-plugin.h
 	)
 
-	pkg_check_modules(GJS REQUIRED gjs-1.0>=1.0.0)
+	pkg_check_modules(GJS REQUIRED gjs-1.0>=1.36.0)
 	add_library(gplugin-gjs MODULE
 		${GPLUGIN_GJS_SOURCES}
 		${GPLUGIN_GJS_HEADERS}
