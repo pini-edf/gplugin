@@ -30,7 +30,7 @@ set(GTESTER_SEED_JUNIT "test-gplugin-seed-junit.xml")
 add_custom_command(
 	COMMAND ${GTESTER} -k --verbose -o ${GTESTER_SEED_LOG} ${SEED_TESTS}
 	OUTPUT ${GTESTER_SEED_LOG}
-	DEPENDS gplugin gplugin-seed
+	DEPENDS gplugin ${GPLUGIN_GIR_TARGETS} gplugin-seed
 	        ${SEED_TESTS} ${CMAKE_CURRENT_SOURCE_DIR}/plugins
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )

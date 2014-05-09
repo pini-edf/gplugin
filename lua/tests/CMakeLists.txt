@@ -23,6 +23,9 @@ add_definitions(
 add_lua_gtest(test-lua-loader)
 target_link_libraries(test-lua-loader gplugin-loader-tests)
 
+add_lua_gtest(test-lua-moon-loader)
+target_link_libraries(test-lua-moon-loader gplugin-loader-tests)
+
 set(GTESTER_LUA_TESTS "${LUA_TESTS}")
 set(GTESTER_LUA_LOG "test-gplugin-lua.xml")
 set(GTESTER_LUA_JUNIT "test-gplugin-lua-junit.xml")
@@ -30,7 +33,7 @@ set(GTESTER_LUA_JUNIT "test-gplugin-lua-junit.xml")
 add_custom_command(
 	COMMAND ${GTESTER} -k --verbose -o ${GTESTER_LUA_LOG} ${LUA_TESTS}
 	OUTPUT ${GTESTER_LUA_LOG}
-	DEPENDS gplugin gplugin-lua
+	DEPENDS gplugin ${GPLUGIN_GIR_TARGETS} gplugin-lua
 	        ${LUA_TESTS} ${CMAKE_CURRENT_SOURCE_DIR}/plugins
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )

@@ -18,8 +18,8 @@ project(gplugin C)
 
 set(GPLUGIN_MAJOR_VERSION 0)
 set(GPLUGIN_MINOR_VERSION 0)
-set(GPLUGIN_MICRO_VERSION 15)
-set(GPLUGIN_EXTRA_VERSION dev)
+set(GPLUGIN_MICRO_VERSION 16)
+set(GPLUGIN_EXTRA_VERSION)
 
 set(GPLUGIN_VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.${GPLUGIN_MICRO_VERSION}${GPLUGIN_EXTRA_VERSION})
 
@@ -130,10 +130,26 @@ endif(NLS)
 # Build Info
 ###############################################################################
 add_definitions(
-	-g -g3 -Wall
+	-std=c99
+	-g -g3
 	-DPREFIX="${CMAKE_INSTALL_PREFIX}"
 	-DGPLUGIN_WEBSITE="http://bitbucket.org/rw_grim/gplugin/"
+	-Wall
+	-Werror=format-security
+	-Wformat
+	-Wextra
 )
+
+# check if we're using gcc
+if(CMAKE_COMPILER_IS_GNUCC)
+	add_definitions(
+		-DGPLUGIN_UNUSED=__attribute__\(\(unused\)\)
+	)
+else(CMAKE_COMPILER_IS_GNUCC)
+	add_definitions(
+		-DGPLUGIN_UNUSED=""
+	)
+endif(CMAKE_COMPILER_IS_GNUCC)
 
 include_directories(
 	${CMAKE_SOURCE_DIR}

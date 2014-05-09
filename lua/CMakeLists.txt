@@ -5,6 +5,10 @@ option(
 )
 
 if(BUILD_LUA)
+	if(NOT BUILD_GIR)
+		message(FATAL_ERROR "Lua plugin requires GObject Introspection.")
+	endif(NOT BUILD_GIR)
+
 	set(GPLUGIN_LUA_SOURCES
 		gplugin-lua-core.c
 		gplugin-lua-loader.c
@@ -16,12 +20,15 @@ if(BUILD_LUA)
 		gplugin-lua-plugin.h
 	)
 
-	pkg_check_modules(LUA lua>=5.2.0)
-	if(NOT LUA_FOUND)
-		pkg_check_modules(LUA lua-5.1>=5.1.0)
+	set(_LUAS "luajit>=2.0.0;lua5.2>=5.2.0;lua5.1>=5.1.0")
+	foreach(_LUA ${_LUAS})
 		if(NOT LUA_FOUND)
-			pkg_check_modules(LUA REQUIRED lua5.1>=5.1.0)
+			pkg_check_modules(LUA ${_LUA})
 		endif(NOT LUA_FOUND)
+	endforeach(_LUA)
+
+	if(NOT LUA_FOUND)
+		message(FATAL_ERROR "No usable Lua library was found")
 	endif(NOT LUA_FOUND)
 
 	include_directories(${LUA_INCLUDE_DIRS})

@@ -60,7 +60,7 @@ gplugin_file_tree_entry_free(GPluginFileTreeEntry *entry) {
  * Helpers
  *****************************************************************************/
 static gboolean
-gplugin_file_tree_free_leaves(GNode *n, gpointer d) {
+gplugin_file_tree_free_leaves(GNode *n, GPLUGIN_UNUSED gpointer d) {
 	GPluginFileTreeEntry *e = n->data;
 
 	gplugin_file_tree_entry_free(e);
@@ -69,7 +69,7 @@ gplugin_file_tree_free_leaves(GNode *n, gpointer d) {
 }
 
 static gboolean
-gplugin_file_tree_free_non_leaves(GNode *n, gpointer d) {
+gplugin_file_tree_free_non_leaves(GNode *n, GPLUGIN_UNUSED gpointer d) {
 	g_free(n->data);
 
 	return FALSE;

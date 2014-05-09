@@ -5,6 +5,10 @@ option(
 )
 
 if(BUILD_SEED)
+	if(NOT BUILD_GIR)
+		message(FATAL_ERROR "Seed JavaScript plugin requires GObject Introspection.")
+	endif(NOT BUILD_GIR)
+
 	set(GPLUGIN_SEED_SOURCES
 		gplugin-seed-core.c
 		gplugin-seed-loader.c

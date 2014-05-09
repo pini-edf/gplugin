@@ -34,7 +34,10 @@ static gchar **paths = NULL;
  * Callbacks
  *****************************************************************************/
 static gboolean
-window_closed_cb(GtkWidget *w, GdkEvent *e, gpointer d) {
+window_closed_cb(GPLUGIN_UNUSED GtkWidget *w,
+                 GPLUGIN_UNUSED GdkEvent *e,
+                 GPLUGIN_UNUSED gpointer d)
+{
 	gtk_main_quit();
 
 	return FALSE;
@@ -60,14 +63,22 @@ selection_changed_cb(GtkTreeSelection *sel, gpointer data) {
  * Helpers
  *****************************************************************************/
 static gboolean
-internal_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
+internal_cb(GPLUGIN_UNUSED const gchar *n,
+            GPLUGIN_UNUSED const gchar *v,
+            GPLUGIN_UNUSED gpointer d,
+            GPLUGIN_UNUSED GError **e)
+{
 	show_internal = TRUE;
 
 	return TRUE;
 }
 
 static gboolean
-no_default_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
+no_default_cb(GPLUGIN_UNUSED const gchar *n,
+              GPLUGIN_UNUSED const gchar *v,
+              GPLUGIN_UNUSED gpointer d,
+              GPLUGIN_UNUSED GError **e)
+{
 	add_default_paths = FALSE;
 
 	return TRUE;
@@ -128,7 +139,7 @@ static GOptionEntry entries[] = {
 		&paths, "Additional paths to look for plugins",
 		"PATH",
 	}, {
-		NULL
+		NULL, 0, 0, 0, NULL, NULL, NULL,
 	},
 };
 

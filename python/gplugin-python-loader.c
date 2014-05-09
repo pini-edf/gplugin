@@ -47,14 +47,14 @@ static GType type_real = 0;
  * GPluginLoaderInterface API
  *****************************************************************************/
 static GSList *
-gplugin_python_loader_class_supported_extensions(const GPluginLoaderClass *klass) {
+gplugin_python_loader_class_supported_extensions(GPLUGIN_UNUSED const GPluginLoaderClass *klass) {
 	return g_slist_append(NULL, "py");
 }
 
 static GPluginPlugin *
-gplugin_python_loader_query(GPluginLoader *loader,
-                                   const gchar *filename,
-                                   GError **error)
+gplugin_python_loader_query(GPLUGIN_UNUSED GPluginLoader *loader,
+                            const gchar *filename,
+                            GPLUGIN_UNUSED GError **error)
 {
 	GPluginPlugin *plugin = NULL;
 	GObject *info = NULL;
@@ -181,9 +181,9 @@ gplugin_python_loader_query(GPluginLoader *loader,
 }
 
 static gboolean
-gplugin_python_loader_load(GPluginLoader *loader,
-                                  GPluginPlugin *plugin,
-                                  GError **error)
+gplugin_python_loader_load(GPLUGIN_UNUSED GPluginLoader *loader,
+                           GPluginPlugin *plugin,
+                           GError **error)
 {
 	PyObject *load = NULL, *pyplugin = NULL, *result = NULL;
 	gboolean ret = FALSE;
@@ -215,9 +215,9 @@ gplugin_python_loader_load(GPluginLoader *loader,
 }
 
 static gboolean
-gplugin_python_loader_unload(GPluginLoader *loader,
-                                    GPluginPlugin *plugin,
-                                    GError **error)
+gplugin_python_loader_unload(GPLUGIN_UNUSED GPluginLoader *loader,
+                             GPluginPlugin *plugin,
+                             GError **error)
 {
 	PyObject *unload = NULL, *pyplugin = NULL, *result = NULL;
 	gboolean ret = FALSE;
@@ -257,8 +257,16 @@ static gboolean
 gplugin_python_loader_init_pygobject(void) {
 	pygobject_init(3, 0, 0);
 	if(PyErr_Occurred()) {
-		g_warning("Failed to initialize PyGObject");
-		PyErr_Print();
+		PyObject *type = NULL, *value = NULL, *tb = NULL, *obj = NULL;
+
+		PyErr_Fetch(&type, &value, &tb);
+		Py_DECREF(type);
+
+		obj = PyUnicode_AsUTF8String(value);
+		Py_DECREF(value);
+
+		g_warning("Failed to initialize PyGObject : %s", PyBytes_AsString(obj));
+		Py_DECREF(obj);
 
 		return FALSE;
 	}

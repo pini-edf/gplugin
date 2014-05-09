@@ -19,10 +19,10 @@
 
 /* A GSignalAccumulator that stops emission if a handler returns FALSE */
 gboolean
-gplugin_boolean_accumulator(GSignalInvocationHint *hint,
+gplugin_boolean_accumulator(GPLUGIN_UNUSED GSignalInvocationHint *hint,
                             GValue *return_accu,
                             const GValue *handler_return,
-                            gpointer data)
+                            GPLUGIN_UNUSED gpointer data)
 {
 	gboolean continue_emission;
 	gboolean handler_returned;

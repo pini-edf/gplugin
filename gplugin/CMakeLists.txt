@@ -220,6 +220,8 @@ if(BUILD_GIR)
 			BUILT_SOURCES ${GPLUGIN_PUBLIC_BUILT_SOURCES}
 			              ${GPLUGIN_PUBLIC_BUILT_HEADERS}
 		)
+		# For loader plugin tests dependencies
+		set(GPLUGIN_GIR_TARGETS ${GPLUGIN_GIR_TARGETS} PARENT_SCOPE)
 	endif(APPLE)
 endif(BUILD_GIR)
 

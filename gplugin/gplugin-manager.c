@@ -128,7 +128,10 @@ gplugin_manager_str_hash(gconstpointer v) {
 }
 
 static gboolean
-gplugin_manager_remove_list_value(gpointer k, gpointer v, gpointer d) {
+gplugin_manager_remove_list_value(GPLUGIN_UNUSED gpointer k,
+                                  gpointer v,
+                                  GPLUGIN_UNUSED gpointer d)
+{
 	GSList *l = NULL;
 
 	for(l = (GSList *)v; l; l = l->next) {
@@ -588,8 +591,7 @@ gplugin_manager_real_list_plugins(GPluginManager *manager) {
 }
 
 static gboolean
-gplugin_manager_load_dependencies(GPluginPlugin *plugin,
-                                  const GPluginPluginInfo *info,
+gplugin_manager_load_dependencies(const GPluginPluginInfo *info,
                                   GError **error)
 {
 	const gchar * const *dependencies = NULL;
@@ -730,7 +732,7 @@ gplugin_manager_real_load_plugin(GPluginManager *manager,
 		return FALSE;
 	}
 
-	if(!gplugin_manager_load_dependencies(plugin, info, error)) {
+	if(!gplugin_manager_load_dependencies(info, error)) {
 		g_object_unref(G_OBJECT(info));
 
 		return FALSE;
@@ -808,15 +810,17 @@ gplugin_manager_real_unload_plugin(GPluginManager *manager,
 }
 
 static gboolean
-gplugin_manager_loading_cb(GObject *manager, GPluginPlugin *plugin,
-                                  GError **error)
+gplugin_manager_loading_cb(GPLUGIN_UNUSED GObject *manager,
+                           GPLUGIN_UNUSED GPluginPlugin *plugin,
+                           GPLUGIN_UNUSED GError **error)
 {
 	return TRUE;
 }
 
 static gboolean
-gplugin_manager_unloading_cb(GObject *manager, GPluginPlugin *plugin,
-                                    GError **error)
+gplugin_manager_unloading_cb(GPLUGIN_UNUSED GObject *manager,
+                             GPLUGIN_UNUSED GPluginPlugin *plugin,
+                             GPLUGIN_UNUSED GError **error)
 {
 	return TRUE;
 }

@@ -79,7 +79,7 @@ gplugin_native_loader_open(const gchar *filename, GModuleFlags flags,
  * GPluginLoaderInterface API
  *****************************************************************************/
 static GSList *
-gplugin_native_loader_class_supported_extensions(const GPluginLoaderClass *klass) {
+gplugin_native_loader_class_supported_extensions(GPLUGIN_UNUSED const GPluginLoaderClass *klass) {
 	return g_slist_append(NULL, G_MODULE_SUFFIX);
 }
 
@@ -209,7 +209,7 @@ gplugin_native_loader_query(GPluginLoader *loader,
 }
 
 static gboolean
-gplugin_native_loader_load(GPluginLoader *loader,
+gplugin_native_loader_load(GPLUGIN_UNUSED GPluginLoader *loader,
                            GPluginPlugin *plugin,
                            GError **error)
 {
@@ -242,7 +242,7 @@ gplugin_native_loader_load(GPluginLoader *loader,
 }
 
 static gboolean
-gplugin_native_loader_unload(GPluginLoader *loader,
+gplugin_native_loader_unload(GPLUGIN_UNUSED GPluginLoader *loader,
                              GPluginPlugin *plugin,
                              GError **error)
 {

@@ -355,7 +355,9 @@ gplugin_native_plugin_get_type(void) {
  * Returns: FALSE if @plugin needed to be loaded and loading failed.
  */
 gboolean
-gplugin_native_plugin_use(GPluginNativePlugin *plugin, GError **error) {
+gplugin_native_plugin_use(GPluginNativePlugin *plugin,
+                          GPLUGIN_UNUSED GError **error)
+{
 	GPluginNativePluginPrivate *priv = NULL;
 
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), FALSE);
@@ -407,7 +409,9 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin, GError **error) {
  * Returns: TRUE if successful, FALSE otherwise.
  */
 gboolean
-gplugin_native_plugin_unuse(GPluginNativePlugin *plugin, GError **error) {
+gplugin_native_plugin_unuse(GPluginNativePlugin *plugin,
+                            GPLUGIN_UNUSED GError **error)
+{
 	GPluginNativePluginPrivate *priv = NULL;
 
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), FALSE);
@@ -611,7 +615,7 @@ gplugin_native_plugin_register_enum(GPluginNativePlugin *plugin,
                                     const gchar *name,
                                     const GEnumValue *values)
 {
-	GTypeInfo enum_info = { 0, };
+	GTypeInfo enum_info;
 
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), G_TYPE_INVALID);
 	g_return_val_if_fail(name, G_TYPE_INVALID);
@@ -639,7 +643,7 @@ gplugin_native_plugin_register_flags(GPluginNativePlugin *plugin,
                                      const gchar *name,
                                      const GFlagsValue *values)
 {
-	GTypeInfo flags_info = { 0, };
+	GTypeInfo flags_info;
 
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), G_TYPE_INVALID);
 	g_return_val_if_fail(name, G_TYPE_INVALID);

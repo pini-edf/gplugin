@@ -14,30 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include <glib.h>
 #include <gplugin.h>
-#include <gplugin-native.h>
 
-G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_query(GPLUGIN_UNUSED GError **error) {
-	return gplugin_plugin_info_new(
-		"gplugin/test-greater-equal",
-		0x04030201,
-		"version", "2.0",
-		NULL
-	);
-}
+#include <gplugin/gplugin-loader-tests.h>
 
-G_MODULE_EXPORT gboolean
-gplugin_load(GPLUGIN_UNUSED GPluginNativePlugin *plugin,
-             GPLUGIN_UNUSED GError **error)
-{
-	return TRUE;
-}
+gint
+main(gint argc, gchar **argv) {
+	g_test_init(&argc, &argv, NULL);
 
-G_MODULE_EXPORT gboolean
-gplugin_unload(GPLUGIN_UNUSED GPluginNativePlugin *plugin,
-               GPLUGIN_UNUSED GError **error)
-{
-	return TRUE;
+	gplugin_loader_tests_main(LUA_LOADER_DIR, LUA_PLUGIN_DIR, "moon");
+
+	return g_test_run();
 }
 
