@@ -21,6 +21,7 @@
 #include <glib/gi18n.h>
 
 #include <gjs/gjs-module.h>
+#include <gi/object.h>
 
 /******************************************************************************
  * Globals
@@ -31,6 +32,32 @@ static GType type_real = 0;
 /******************************************************************************
  * Helpers
  *****************************************************************************/
+static JSFunction *
+gplugin_gjs_loader_find_function(JSContext *jsctx, JSObject *parent,
+                                 const gchar *name, GError **error)
+{
+	jsval value;
+
+	if(!JS_GetProperty(jsctx, parent, name, &value)) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "Failed to find the function '%s'", name);
+		}
+
+		return NULL;
+	}
+
+	if(!JSVAL_IS_OBJECT(value) || JSVAL_IS_NULL(value)) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "'%s' is not a function", name);
+		}
+
+		return NULL;
+	}
+
+	return JS_ValueToFunction(jsctx, value);
+}
 
 /******************************************************************************
  * GPluginLoaderInterface API
@@ -45,18 +72,54 @@ gplugin_gjs_loader_query(GPLUGIN_UNUSED GPluginLoader *loader,
                          const gchar *filename,
                          GError **error)
 {
+	GObject *obj = NULL;
+	GPluginPluginInfo *info = NULL;
 	GjsContext *context = NULL;
 	JSContext *jsctx = NULL;
 	JSObject *global = NULL;
+	JSFunction *query = NULL, *load = NULL, *unload = NULL;
+	jsval value;
 
 	context = gjs_context_new();
 
-	if(gjs_context_eval_file(context, filename, NULL, error)) {
+	if(!gjs_context_eval_file(context, filename, NULL, error)) {
 		return NULL;
 	}
 
 	jsctx = gjs_context_get_native_context(context);
 	global = JS_GetGlobalObject(jsctx);
+
+	/* find the query function */
+	query = gplugin_gjs_loader_find_function(jsctx, global, "gplugin_query",
+	                                         error);
+	if(query == NULL)
+		return NULL;
+
+	/* find the load function */
+	load = gplugin_gjs_loader_find_function(jsctx, global, "gplugin_load",
+	                                        error);
+	if(load == NULL)
+		return NULL;
+
+	/* find the unload function */
+	unload = gplugin_gjs_loader_find_function(jsctx, global, "gplugin_unload",
+	                                          error);
+	if(unload == NULL)
+		return NULL;
+
+	/* now call the query function */
+	if(!JS_CallFunction(jsctx, global, query, 0, NULL, &value)) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "Failed to call the query function");
+		}
+
+		return NULL;
+	}
+
+	/* now grab the plugin info */
+	info = gjs_g_object_from_object(jsctx, js_ValueToObjectOrNull(value));
+	g_warning("info: %p", info);
 
 	return NULL;
 }
