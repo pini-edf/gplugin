@@ -36,13 +36,14 @@ static GType type_real = 0;
  * GPluginLoaderInterface API
  *****************************************************************************/
 static GSList *
-gplugin_gjs_loader_class_supported_extensions(const GPluginLoaderClass *klass) {
+gplugin_gjs_loader_class_supported_extensions(GPLUGIN_UNUSED const GPluginLoaderClass *klass) {
 	return g_slist_append(NULL, "js");
 }
 
 static GPluginPlugin *
-gplugin_gjs_loader_query(GPluginLoader *loader, const gchar *filename,
-                          GError **error)
+gplugin_gjs_loader_query(GPLUGIN_UNUSED GPluginLoader *loader,
+                         const gchar *filename,
+                         GError **error)
 {
 	GjsContext *context = NULL;
 	JSContext *jsctx = NULL;
@@ -61,10 +62,10 @@ gplugin_gjs_loader_query(GPluginLoader *loader, const gchar *filename,
 }
 
 static gboolean
-gplugin_gjs_loader_load_unload(GPluginLoader *loader,
-                                GPluginPlugin *plugin,
-                                const gchar *function,
-                                GError **error)
+gplugin_gjs_loader_load_unload(GPLUGIN_UNUSED GPluginLoader *loader,
+                               GPLUGIN_UNUSED GPluginPlugin *plugin,
+                               GPLUGIN_UNUSED const gchar *function,
+                               GPLUGIN_UNUSED GError **error)
 {
 	return FALSE;
 }

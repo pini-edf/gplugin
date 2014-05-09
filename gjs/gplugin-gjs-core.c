@@ -22,7 +22,7 @@
 #include "gplugin-gjs-plugin.h"
 
 G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_query(GError **error) {
+gplugin_query(GPLUGIN_UNUSED GError **error) {
 	const gchar * const authors[] = {
 		"Gary Kramlich <grim@reaperworld.com>",
 		NULL
@@ -47,7 +47,8 @@ gplugin_query(GError **error) {
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_load(GPluginNativePlugin *plugin, GError **error) {
+gplugin_load(GPluginNativePlugin *plugin,
+             GPLUGIN_UNUSED GError **error) {
 	gplugin_gjs_loader_register(plugin);
 	gplugin_gjs_plugin_register(plugin);
 
@@ -57,7 +58,8 @@ gplugin_load(GPluginNativePlugin *plugin, GError **error) {
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_unload(GPluginNativePlugin *plugin, GError **error) {
+gplugin_unload(GPLUGIN_UNUSED GPluginNativePlugin *plugin,
+               GPLUGIN_UNUSED GError **error) {
 	return FALSE;
 }
 
