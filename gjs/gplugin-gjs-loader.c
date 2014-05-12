@@ -68,7 +68,7 @@ gplugin_gjs_loader_class_supported_extensions(GPLUGIN_UNUSED const GPluginLoader
 }
 
 static GPluginPlugin *
-gplugin_gjs_loader_query(GPLUGIN_UNUSED GPluginLoader *loader,
+gplugin_gjs_loader_query(GPluginLoader *loader,
                          const gchar *filename,
                          GError **error)
 {
@@ -76,13 +76,15 @@ gplugin_gjs_loader_query(GPLUGIN_UNUSED GPluginLoader *loader,
 	GPluginPluginInfo *info = NULL;
 	GjsContext *context = NULL;
 	JSContext *jsctx = NULL;
-	JSObject *global = NULL;
-	JSFunction *query = NULL, *load = NULL, *unload = NULL;
+	JSObject *global = NULL, *jsobj = NULL;
+	JSFunction *query = NULL;
 	jsval value;
 
 	context = gjs_context_new();
 
 	if(!gjs_context_eval_file(context, filename, NULL, error)) {
+		g_object_unref(G_OBJECT(context));
+
 		return NULL;
 	}
 
@@ -92,20 +94,11 @@ gplugin_gjs_loader_query(GPLUGIN_UNUSED GPluginLoader *loader,
 	/* find the query function */
 	query = gplugin_gjs_loader_find_function(jsctx, global, "gplugin_query",
 	                                         error);
-	if(query == NULL)
-		return NULL;
+	if(query == NULL) {
+		g_object_unref(G_OBJECT(jsctx));
 
-	/* find the load function */
-	load = gplugin_gjs_loader_find_function(jsctx, global, "gplugin_load",
-	                                        error);
-	if(load == NULL)
 		return NULL;
-
-	/* find the unload function */
-	unload = gplugin_gjs_loader_find_function(jsctx, global, "gplugin_unload",
-	                                          error);
-	if(unload == NULL)
-		return NULL;
+	}
 
 	/* now call the query function */
 	if(!JS_CallFunction(jsctx, global, query, 0, NULL, &value)) {
@@ -114,16 +107,44 @@ gplugin_gjs_loader_query(GPLUGIN_UNUSED GPluginLoader *loader,
 			                     "Failed to call the query function");
 		}
 
+		g_object_unref(G_OBJECT(jsctx));
+
 		return NULL;
 	}
 
 	/* now grab the plugin info */
-	gobj = gjs_g_object_from_object(jsctx, JS_ValueToObject(jsctx, value, NULL));
-	info = GPLUGIN_PLUGIN_INFO(gobj);
-	g_message("info: %p", info);
-	g_message("id: %s", gplugin_plugin_info_get_id(info));
+	if(!JS_ValueToObject(jsctx, value, &jsobj)) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "Query function did not return a GObject");
+		}
 
-	return NULL;
+		g_object_unref(G_OBJECT(jsctx));
+
+		return NULL;
+	}
+
+	gobj = gjs_g_object_from_object(jsctx, jsobj);
+	if(!GPLUGIN_IS_PLUGIN_INFO(gobj)) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "Query function did not return a "
+			                     "GPluginPluginInfo object");
+		}
+
+		g_object_unref(G_OBJECT(jsctx));
+
+		return NULL;
+	}
+
+	info = GPLUGIN_PLUGIN_INFO(gobj);
+
+	return g_object_new(GPLUGIN_TYPE_GJS_PLUGIN,
+	                    "filename", filename,
+	                    "loader", loader,
+	                    "info", info,
+	                    "context", context,
+	                    NULL);
 }
 
 static gboolean
@@ -132,6 +153,8 @@ gplugin_gjs_loader_load_unload(GPLUGIN_UNUSED GPluginLoader *loader,
                                GPLUGIN_UNUSED const gchar *function,
                                GPLUGIN_UNUSED GError **error)
 {
+	g_warning("not implemented");
+
 	return FALSE;
 }
 

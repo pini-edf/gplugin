@@ -48,7 +48,8 @@ gplugin_query(GPLUGIN_UNUSED GError **error) {
 
 G_MODULE_EXPORT gboolean
 gplugin_load(GPluginNativePlugin *plugin,
-             GPLUGIN_UNUSED GError **error) {
+             GPLUGIN_UNUSED GError **error)
+{
 	gplugin_gjs_loader_register(plugin);
 	gplugin_gjs_plugin_register(plugin);
 
@@ -59,7 +60,8 @@ gplugin_load(GPluginNativePlugin *plugin,
 
 G_MODULE_EXPORT gboolean
 gplugin_unload(GPLUGIN_UNUSED GPluginNativePlugin *plugin,
-               GPLUGIN_UNUSED GError **error) {
+               GPLUGIN_UNUSED GError **error)
+{
 	return FALSE;
 }
 
