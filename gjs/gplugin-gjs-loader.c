@@ -72,7 +72,7 @@ gplugin_gjs_loader_query(GPLUGIN_UNUSED GPluginLoader *loader,
                          const gchar *filename,
                          GError **error)
 {
-	GObject *obj = NULL;
+	GObject *gobj = NULL;
 	GPluginPluginInfo *info = NULL;
 	GjsContext *context = NULL;
 	JSContext *jsctx = NULL;
@@ -118,8 +118,10 @@ gplugin_gjs_loader_query(GPLUGIN_UNUSED GPluginLoader *loader,
 	}
 
 	/* now grab the plugin info */
-	info = gjs_g_object_from_object(jsctx, js_ValueToObjectOrNull(value));
-	g_warning("info: %p", info);
+	gobj = gjs_g_object_from_object(jsctx, JS_ValueToObject(jsctx, value, NULL));
+	info = GPLUGIN_PLUGIN_INFO(gobj);
+	g_message("info: %p", info);
+	g_message("id: %s", gplugin_plugin_info_get_id(info));
 
 	return NULL;
 }
