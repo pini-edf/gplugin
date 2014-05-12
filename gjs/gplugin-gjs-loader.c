@@ -95,7 +95,7 @@ gplugin_gjs_loader_query(GPluginLoader *loader,
 	query = gplugin_gjs_loader_find_function(jsctx, global, "gplugin_query",
 	                                         error);
 	if(query == NULL) {
-		g_object_unref(G_OBJECT(jsctx));
+		g_object_unref(G_OBJECT(context));
 
 		return NULL;
 	}
@@ -107,7 +107,7 @@ gplugin_gjs_loader_query(GPluginLoader *loader,
 			                     "Failed to call the query function");
 		}
 
-		g_object_unref(G_OBJECT(jsctx));
+		g_object_unref(G_OBJECT(context));
 
 		return NULL;
 	}
@@ -119,7 +119,7 @@ gplugin_gjs_loader_query(GPluginLoader *loader,
 			                     "Query function did not return a GObject");
 		}
 
-		g_object_unref(G_OBJECT(jsctx));
+		g_object_unref(G_OBJECT(context));
 
 		return NULL;
 	}
@@ -132,7 +132,7 @@ gplugin_gjs_loader_query(GPluginLoader *loader,
 			                     "GPluginPluginInfo object");
 		}
 
-		g_object_unref(G_OBJECT(jsctx));
+		g_object_unref(G_OBJECT(context));
 
 		return NULL;
 	}
