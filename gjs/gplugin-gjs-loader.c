@@ -144,16 +144,20 @@ gplugin_gjs_loader_query(GPluginLoader *loader,
 	                    "loader", loader,
 	                    "info", info,
 	                    "context", context,
+	                    "js-context", jsctx,
 	                    NULL);
 }
 
 static gboolean
 gplugin_gjs_loader_load_unload(GPLUGIN_UNUSED GPluginLoader *loader,
-                               GPLUGIN_UNUSED GPluginPlugin *plugin,
-                               GPLUGIN_UNUSED const gchar *function,
+                               GPluginPlugin *plugin,
+                               const gchar *function,
                                GPLUGIN_UNUSED GError **error)
 {
-	g_warning("not implemented");
+	JSContext *jsctx = NULL;
+	JSFunction *func = NULL;
+
+	g_object_get(G_OBJECT(plugin), "js-context", &jsctx, NULL);
 
 	return FALSE;
 }
