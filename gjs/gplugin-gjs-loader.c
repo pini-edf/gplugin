@@ -145,35 +145,84 @@ gplugin_gjs_loader_query(GPluginLoader *loader,
 	                    "info", info,
 	                    "context", context,
 	                    "js-context", jsctx,
+	                    "global", global,
 	                    NULL);
 }
 
 static gboolean
 gplugin_gjs_loader_load_unload(GPLUGIN_UNUSED GPluginLoader *loader,
                                GPluginPlugin *plugin,
-                               const gchar *function,
+                               gboolean load,
                                GPLUGIN_UNUSED GError **error)
 {
 	JSContext *jsctx = NULL;
 	JSFunction *func = NULL;
+	JSObject *global = NULL, *js_plugin = NULL;
+	JSBool ret = FALSE;
+	jsval args[1];
+	jsval rval;
+	const gchar *func_name = (load) ? "gplugin_load" : "gplugin_unload";
+	gchar *filename = NULL;
 
-	g_object_get(G_OBJECT(plugin), "js-context", &jsctx, NULL);
+	g_object_get(G_OBJECT(plugin),
+	             "js-context", &jsctx,
+	             "global", &global,
+	             "filename", &filename,
+	             NULL);
 
-	return FALSE;
+	func = gplugin_gjs_loader_find_function(jsctx, global, func_name, error);
+	if(func == NULL) {
+		g_free(filename);
+
+		return FALSE;
+	}
+
+	js_plugin = gjs_object_from_g_object(jsctx, G_OBJECT(plugin));
+
+	args[0] = OBJECT_TO_JSVAL(js_plugin);
+
+	if(!JS_CallFunction(jsctx, global, func, 1, args, &rval)) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "Failed to %s %s",
+			                     (load) ? "load" : "unload", filename);
+		}
+
+		g_free(filename);
+
+		return FALSE;
+	}
+
+	ret = JSVAL_TO_BOOLEAN(rval);
+	if(!ret) {
+		if(error) {
+			*error = g_error_new(GPLUGIN_DOMAIN, 0,
+			                     "Failed to %s %s",
+			                     (load) ? "load" : "unload", filename);
+		}
+
+		g_free(filename);
+
+		return FALSE;
+	}
+
+	g_free(filename);
+
+	return TRUE;
 }
 
 static gboolean
 gplugin_gjs_loader_load(GPluginLoader *loader, GPluginPlugin *plugin,
                         GError **error)
 {
-	return gplugin_gjs_loader_load_unload(loader, plugin, "load", error);
+	return gplugin_gjs_loader_load_unload(loader, plugin, TRUE, error);
 }
 
 static gboolean
 gplugin_gjs_loader_unload(GPluginLoader *loader, GPluginPlugin *plugin,
                           GError **error)
 {
-	return gplugin_gjs_loader_load_unload(loader, plugin, "unload", error);
+	return gplugin_gjs_loader_load_unload(loader, plugin, FALSE, error);
 }
 
 /******************************************************************************

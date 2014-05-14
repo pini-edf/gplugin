@@ -25,6 +25,7 @@
  *****************************************************************************/
 typedef struct {
 	GjsContext *context;
+	JSObject *global;
 	JSContext *js_context;
 } GPluginGjsPluginPrivate;
 
@@ -34,6 +35,7 @@ typedef struct {
 enum {
 	PROP_ZERO,
 	PROP_CONTEXT,
+	PROP_GLOBAL,
 	PROP_JS_CONTEXT,
 	PROP_LAST,
 };
@@ -59,10 +61,17 @@ gplugin_gjs_plugin_set_context(GPluginGjsPlugin *plugin, GjsContext *context) {
 }
 
 static void
-gplugin_gjs_plugin_set_js_context(GPluginGjsPlugin *plugin, JSContext *ctx) {
+gplugin_gjs_plugin_set_global_scope(GPluginGjsPlugin *plugin, JSObject *global) {
 	GPluginGjsPluginPrivate *priv = GPLUGIN_GJS_PLUGIN_GET_PRIVATE(plugin);
 
-	priv->js_context = ctx;
+	priv->global = global;
+}
+
+static void
+gplugin_gjs_plugin_set_js_context(GPluginGjsPlugin *plugin, JSContext *jsctx) {
+	GPluginGjsPluginPrivate *priv = GPLUGIN_GJS_PLUGIN_GET_PRIVATE(plugin);
+
+	priv->js_context = jsctx;
 }
 
 /******************************************************************************
@@ -77,6 +86,10 @@ gplugin_gjs_plugin_get_property(GObject *obj, guint param_id, GValue *value,
 	switch(param_id) {
 		case PROP_CONTEXT:
 			g_value_set_object(value, gplugin_gjs_plugin_get_context(plugin));
+			break;
+		case PROP_GLOBAL:
+			g_value_set_pointer(value,
+			                    gplugin_gjs_plugin_get_global_scope(plugin));
 			break;
 		case PROP_JS_CONTEXT:
 			g_value_set_pointer(value,
@@ -97,6 +110,10 @@ gplugin_gjs_plugin_set_property(GObject *obj, guint param_id,
 	switch(param_id) {
 		case PROP_CONTEXT:
 			gplugin_gjs_plugin_set_context(plugin, g_value_get_object(value));
+			break;
+		case PROP_GLOBAL:
+			gplugin_gjs_plugin_set_global_scope(plugin,
+			                                    g_value_get_pointer(value));
 			break;
 		case PROP_JS_CONTEXT:
 			gplugin_gjs_plugin_set_js_context(plugin,
@@ -137,9 +154,15 @@ gplugin_gjs_plugin_class_init(GPluginGjsPluginClass *klass) {
 		                    G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
 		                    G_PARAM_STATIC_STRINGS));
 
+	g_object_class_install_property(obj_class, PROP_GLOBAL,
+		g_param_spec_pointer("global", "global",
+		                     "The global scope for this plugin",
+		                     G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
+		                     G_PARAM_STATIC_STRINGS));
+
 	g_object_class_install_property(obj_class, PROP_JS_CONTEXT,
 		g_param_spec_pointer("js-context", "js-context",
-		                     "The JS Context for this plugin",
+		                     "The JSContext function for this plugin",
 		                     G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
 		                     G_PARAM_STATIC_STRINGS));
 }
@@ -187,6 +210,17 @@ gplugin_gjs_plugin_get_context(const GPluginGjsPlugin *plugin) {
 	priv = GPLUGIN_GJS_PLUGIN_GET_PRIVATE(plugin);
 
 	return priv->context;
+}
+
+JSObject *
+gplugin_gjs_plugin_get_global_scope(const GPluginGjsPlugin *plugin) {
+	GPluginGjsPluginPrivate *priv = NULL;
+
+	g_return_val_if_fail(GPLUGIN_IS_GJS_PLUGIN(plugin), NULL);
+
+	priv = GPLUGIN_GJS_PLUGIN_GET_PRIVATE(plugin);
+
+	return priv->global;
 }
 
 JSContext *

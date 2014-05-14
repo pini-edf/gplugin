@@ -51,6 +51,7 @@ void gplugin_gjs_plugin_register(GPluginNativePlugin *plugin);
 GType gplugin_gjs_plugin_get_type(void);
 
 GjsContext *gplugin_gjs_plugin_get_context(const GPluginGjsPlugin *plugin);
+JSObject *gplugin_gjs_plugin_get_global_scope(const GPluginGjsPlugin *plugin);
 JSContext *gplugin_gjs_plugin_get_js_context(const GPluginGjsPlugin *plugin);
 
 G_END_DECLS
