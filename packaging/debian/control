@@ -1,0 +1,17 @@
+Source: gplugin
+Section: devel
+Priority: optional
+Maintainer: Gary Kramlich <grim@reaperworld.com>
+Build-Depends: debhelper (>=9), cmake
+Homepage: https://bitbucket.org/rw_grim/gplugin
+Vcs-Browser: https://bitbucket.org/rw_grim/gplugin/src
+Vcs-Hg: https://bitbucket.org/rw_grim/gplugin
+Standards-Version: 3.9.4
+
+Package: libgplugin
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: GObject based plugin library
+ GPlugin is a simple GObject based plugin library that supports plugins with
+ dependencies written in various languages.
+
