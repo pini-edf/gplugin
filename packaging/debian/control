@@ -27,11 +27,16 @@ Depends: ${misc:Depends}, ${shlibs:Depends}, libgplugin, libglib2.0-dev
 Description: Development filesfor libgplugin
  GPlugin is a GObject based plugin library that supports plugins with complex
  dependencies written in a variety of languages.
+ .
+ This package includes the files used for development against libgplugin.
 
 Package: libgplugin-gtk
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, libgtk-3-0
 Description: GTK+3 bindings for GPlugin
+ GPlugin is a GObject based plugin library that supports plugins with complex
+ dependencies written in a variety of languages.
+ .
  This library provides some default GTK+-3 widgets for GPlugin.
 
 Package: libgplugin-gtk-dev
@@ -39,6 +44,9 @@ Architecture: any
 Section: libdevel
 Depends: ${misc:Depends}, ${shlibs:Depends}, libgtk-3-dev
 Description: Development file for libgplugin-gtk
+ GPlugin is a GObject based plugin library that supports plugins with complex
+ dependencies written in a variety of languages.
+ .
  This library provides the developmental headers for the GPlugin GTK+-3
  bindings.
 
@@ -47,6 +55,9 @@ Architecture: any
 Depends: ${gir:Depends}, ${misc:Depends}, ${shlibs:Depends}
 Section: introspection
 Description: typelibe for libgplugin
+ GPlugin is a GObject based plugin library that supports plugins with complex
+ dependencies written in a variety of languages.
+ .
  This package can be used by other packages using the GIRepository format to
  generate dynamic bindings for libgplugin.
 
@@ -55,6 +66,9 @@ Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, libluajit-5.1, libgplugin,
          gir1.2-gplugin-0.0
 Description: GPlugin Lua Loader
+ GPlugin is a GObject based plugin library that supports plugins with complex
+ dependencies written in a variety of languages.
+ .
  This package allows GPlugin to load plugins written in the Lua programming
  language.
 
@@ -63,6 +77,9 @@ Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, python3, python3-gi,
          gir1.2-gplugin-0.0
 Description: GPlugin Python Loader
+ GPlugin is a GObject based plugin library that supports plugins with complex
+ dependencies written in a variety of languages.
+ .
  This package allows GPlugin to load plugin written in the Python programming
  language.
 
@@ -71,6 +88,9 @@ Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, libseed-gtk3-0,
          gir1.2-gplugin-0.0
 Description: GPlugin Seed JavaScript Loader
+ GPlugin is a GObject based plugin library that supports plugins with complex
+ dependencies written in a variety of languages.
+ .
  This package allows GPlugin to load plugin written in the Seed JavaScript
  programming language.
 
@@ -79,6 +99,9 @@ Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, libgjs0c,
          gir1.2-gplugin-0.0
 Description: GPlugin GNOME JavaScript Loader
+ GPlugin is a GObject based plugin library that supports plugins with complex
+ dependencies written in a variety of languages.
+ .
  This package allows GPlugin to load plugin written in the GNOME JavaScript
  programming language.
 
