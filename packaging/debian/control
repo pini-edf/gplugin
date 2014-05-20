@@ -70,7 +70,7 @@ Package: libgplugin-seed
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, libseed-gtk3-0,
          gir1.2-gplugin-0.0
-Description: GPlugin Python Loader
+Description: GPlugin Seed JavaScript Loader
  This package allows GPlugin to load plugin written in the Seed JavaScript
  programming language.
 
@@ -78,7 +78,7 @@ Package: libgplugin-gjs
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, libgjs0c,
          gir1.2-gplugin-0.0
-Description: GPlugin Python Loader
+Description: GPlugin GNOME JavaScript Loader
  This package allows GPlugin to load plugin written in the GNOME JavaScript
  programming language.
 
