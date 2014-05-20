@@ -3,3 +3,7 @@
 %:
 	dh $@
 
+override_dh_makeshlibs:
+	dh_makeshlibs -p libgplugin.so
+	dh_makeshlibs -p libgplugin-gtk.so
+
