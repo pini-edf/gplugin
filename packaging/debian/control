@@ -67,7 +67,7 @@ Description: GPlugin Python Loader
 
 Package: libgplugin-seed
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, libseed-gtk3-0,
+Depends: ${misc:Depends}, libseed-gtk3-0,
          gir1.2-gplugin-0.0
 Description: GPlugin Python Loader
  This package allows GPlugin to load plugin written in the Seed JavaScript
