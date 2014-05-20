@@ -15,3 +15,10 @@ Description: GObject based plugin library
  GPlugin is a simple GObject based plugin library that supports plugins with
  dependencies written in various languages.
 
+Package: libgplugin-lua
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}, libluajit-5.1
+Description: GPlugin Lua Loader
+ This package allows GPlugin to load plugins written in the Lua programming
+ language.
+
