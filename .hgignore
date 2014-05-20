@@ -5,4 +5,10 @@ syntax: glob
 
 syntax: regexp
 ^build.*\/
-^debian\/?
+^packaging\/debian\/tmp\/
+^packaging\/debian\/(.+\.)?(substvars|debhelper\.log)$
+^packaging\/debian\/libgplugin(-.+)?\/
+^packaging\/debian\/files$
+^obj-x86_64-linux-gnu\/
+^debian\/?$
+
