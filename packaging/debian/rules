@@ -9,5 +9,6 @@ LDFLAGS:=$(shell dpkg-buildflags --get LDFLAGS)
 	dh $@
 
 override_dh_makeshlibs:
-	dh_makeshlibs -plibgplugin-0 -plibgplugin-gtk-0
+	dh_makeshlibs -plibgplugin-0
+	dh_makeshlibs -plibgplugin-gtk-0
 
