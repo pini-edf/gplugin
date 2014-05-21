@@ -1,2 +1,3 @@
 usr/lib/libgplugin.so* usr/lib
+usr/bin/gplugin-query usr/bin
 
