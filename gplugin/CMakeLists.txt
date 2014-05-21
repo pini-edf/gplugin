@@ -2,7 +2,7 @@
 # Library
 ###############################################################################
 
-set(GPLUGIN_LD_CURRENT 1)
+set(GPLUGIN_LD_CURRENT 0)
 set(GPLUGIN_LD_REVISION 1)
 set(GPLUGIN_LD_AGE 0)
 set(GPLUGIN_LD_VERSION ${GPLUGIN_LD_CURRENT}.${GPLUGIN_LD_REVISION}.${GPLUGIN_LD_AGE})

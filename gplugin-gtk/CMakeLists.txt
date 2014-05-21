@@ -11,7 +11,7 @@ if(BUILD_GTK3)
 ###############################################################################
 pkg_check_modules(GTK3 REQUIRED gtk+-3.0>=3.0.0)
 
-set(GPLUGIN_GTK_LD_CURRENT 1)
+set(GPLUGIN_GTK_LD_CURRENT 0)
 set(GPLUGIN_GTK_LD_REVISION 1)
 set(GPLUGIN_GTK_LD_AGE 0)
 set(GPLUGIN_GTK_LD_VERSION ${GPLUGIN_GTK_LD_CURRENT}.${GPLUGIN_GTK_LD_REVISION}.${GPLUGIN_GTK_LD_AGE})
