@@ -1,6 +1,12 @@
 ###############################################################################
 # Library
 ###############################################################################
+
+set(GPLUGIN_LD_CURRENT 1)
+set(GPLUGIN_LD_REVISION 1)
+set(GPLUGIN_LD_AGE 0)
+set(GPLUGIN_LD_VERSION ${GPLUGIN_LD_CURRENT}.${GPLUGIN_LD_REVISION}.${GPLUGIN_LD_AGE})
+
 add_definitions(
 	-DGPLUGIN_COMPILATION
 	-DG_LOG_DOMAIN="GPlugin"
@@ -163,6 +169,11 @@ add_library(gplugin SHARED
 	${PRIVATE_HEADERS}
 	gplugin.h
 	gplugin-native.h
+)
+
+set_target_properties(gplugin PROPERTIES
+	SOVERSION ${GPLUGIN_LD_VERSION}
+	VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}
 )
 
 target_link_libraries(gplugin
