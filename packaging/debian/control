@@ -42,13 +42,22 @@ Description: GTK+3 bindings for GPlugin
 Package: libgplugin-gtk-dev
 Architecture: any
 Section: libdevel
-Depends: ${misc:Depends}, ${shlibs:Depends}, libgtk-3-dev, libgplugin-gtk
+Depends: ${misc:Depends}, ${shlibs:Depends}, libgtk-3-dev, libgplugin-gtk-0
 Description: Development file for libgplugin-gtk
  GPlugin is a GObject based plugin library that supports plugins with complex
  dependencies written in a variety of languages.
  .
  This library provides the developmental headers for the GPlugin GTK+-3
  bindings.
+
+Package: libgplugin-gtk-bin
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}, libgplugin-gtk-0
+Description: Programs for the GTK+ interface to GPlugin
+ GPlugin is a GObject based plugin library that supports plugins with complex
+ dependencies written in a variety of languages.
+ .
+ This package contains the gplugin-gtk-viewer application for viewing plugins.
 
 Package: gir1.2-gplugin-0.0
 Architecture: any
