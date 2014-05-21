@@ -5,9 +5,9 @@ Source: https://bitbucket.org/rw_grim/gplugin
 
 Files: *
 Copyright: 2011-2014 Gary Kramlich <grim@reaperworld.com>
-License: LGPLV3+
+License: LGPL-3+
 
-License:
+License: LGPL-3+
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
