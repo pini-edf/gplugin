@@ -1,2 +1,2 @@
-usr/lib/libgplugin.so usr/lib
+usr/lib/libgplugin.so* usr/lib
 
