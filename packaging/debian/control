@@ -30,7 +30,7 @@ Description: Development filesfor libgplugin
  .
  This package includes the files used for development against libgplugin.
 
-Package: libgplugin-gtk0
+Package: libgplugin-gtk-0
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, libgtk-3-0, libgplugin-0
 Description: GTK+3 bindings for GPlugin
