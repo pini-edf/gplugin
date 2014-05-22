@@ -100,7 +100,7 @@ gplugin_python_loader_query(GPLUGIN_UNUSED GPluginLoader *loader,
 
 	query = PyDict_GetItemString(module_dict, "gplugin_query");
 	if(query == NULL) {
-		g_warning(_("Failed to find the gplugin_plugin_query function in %s"),
+		g_warning(_("Failed to find the gplugin_query function in %s"),
 		          filename);
 
 		pyg_gil_state_release(state);
