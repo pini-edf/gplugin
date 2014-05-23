@@ -29,6 +29,7 @@
  *****************************************************************************/
 static gint verbosity = 0;
 static gboolean show_internal = FALSE;
+static gboolean version_only = FALSE;
 
 /******************************************************************************
  * Helpers
@@ -62,6 +63,19 @@ internal_cb(GPLUGIN_UNUSED const gchar *n,
             GPLUGIN_UNUSED GError **e)
 {
 	show_internal = TRUE;
+
+	return TRUE;
+}
+
+static gboolean
+version_cb(GPLUGIN_UNUSED const gchar *n,
+           GPLUGIN_UNUSED const gchar *v,
+           GPLUGIN_UNUSED gpointer d,
+           GPLUGIN_UNUSED GError **e)
+{
+	printf("gplugin-query %s\n", GPLUGIN_VERSION);
+
+	version_only = TRUE;
 
 	return TRUE;
 }
@@ -234,6 +248,10 @@ static GOptionEntry entries[] = {
 		full_verbosity_cb, N_("Increase verbosity to eleven"),
 		NULL,
 	}, {
+		"version", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+		version_cb, N_("display the version and exit"),
+		NULL,
+	}, {
 		NULL, 0, 0, 0, NULL, NULL, NULL,
 	}
 };
@@ -265,6 +283,10 @@ main(gint argc, gchar **argv) {
 		gplugin_uninit();
 
 		return EXIT_FAILURE;
+	}
+
+	if(version_only) {
+		return 0;
 	}
 
 	gplugin_manager_refresh();
