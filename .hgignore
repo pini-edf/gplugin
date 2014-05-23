@@ -1,8 +1,16 @@
 syntax: glob
 .*.swp
+*.debhelper
 *.orig
 *.pyc
 
 syntax: regexp
 ^build.*\/
+^packaging\/debian\/tmp\/
+^packaging\/debian\/(.+\.)?(substvars|debhelper\.log)$
+^packaging\/debian\/libgplugin0?(-.+)?\/
+^packaging\/debian\/gir1.2-gplugin-0.0\/
+^packaging\/debian\/files$
+^obj-x86_64-linux-gnu\/
+^debian\/?$
 

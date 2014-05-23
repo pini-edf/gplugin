@@ -27,7 +27,7 @@
  * Globals
  *****************************************************************************/
 static gboolean show_internal = FALSE;
-static gboolean add_default_paths = TRUE;
+static gboolean add_default_paths = TRUE, version_only = FALSE;
 static gchar **paths = NULL;
 
 /******************************************************************************
@@ -80,6 +80,19 @@ no_default_cb(GPLUGIN_UNUSED const gchar *n,
               GPLUGIN_UNUSED GError **e)
 {
 	add_default_paths = FALSE;
+
+	return TRUE;
+}
+
+static gboolean
+version_cb(GPLUGIN_UNUSED const gchar *n,
+           GPLUGIN_UNUSED const gchar *v,
+           GPLUGIN_UNUSED gpointer d,
+           GPLUGIN_UNUSED GError **e)
+{
+	version_only = TRUE;
+
+	printf("gplugin-gtk-viewer %s\n", GPLUGIN_VERSION);
 
 	return TRUE;
 }
@@ -139,6 +152,10 @@ static GOptionEntry entries[] = {
 		&paths, "Additional paths to look for plugins",
 		"PATH",
 	}, {
+		"version", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+		version_cb, "Display the version and exit",
+		NULL,
+	}, {
 		NULL, 0, 0, 0, NULL, NULL, NULL,
 	},
 };
@@ -167,6 +184,10 @@ main(gint argc, gchar **argv) {
 		gplugin_uninit();
 
 		return EXIT_FAILURE;
+	}
+
+	if(version_only) {
+		return 0;
 	}
 
 	if(add_default_paths)
