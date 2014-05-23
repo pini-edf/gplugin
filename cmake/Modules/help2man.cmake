@@ -48,7 +48,8 @@ function(help2man _FIRST_ARG)
 		COMMAND ${HELP2MAN}
 		        -s ${_HELP2MAN_SECTION}
 		        -o ${_HELP2MAN_OUTPUT}
-		        -N ${_HELP2MAN_OPTIONS}
+		        --no-info --no-discard-stderr
+		        ${_HELP2MAN_OPTIONS}
 		        ${_HELP2MAN_EXEC}
 		DEPENDS ${_HELP2MAN_TARGET}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

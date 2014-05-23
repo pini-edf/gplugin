@@ -249,7 +249,7 @@ static GOptionEntry entries[] = {
 		NULL,
 	}, {
 		"version", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
-		version_cb, N_("display the version and exit"),
+		version_cb, N_("Display the version and exit"),
 		NULL,
 	}, {
 		NULL, 0, 0, 0, NULL, NULL, NULL,

@@ -2,7 +2,8 @@ Source: gplugin
 Section: libs
 Priority: optional
 Maintainer: Gary Kramlich <grim@reaperworld.com>
-Build-Depends: debhelper (>=9), cmake, libglib2.0-dev, xsltproc, gettext,
+Build-Depends: debhelper (>=9), cmake, libglib2.0-dev,
+               xsltproc, gettext, help2man,
                gobject-introspection, libgirepository1.0-dev,
                libluajit-5.1-dev, lua-lgi,
                libseed-gtk3-dev,

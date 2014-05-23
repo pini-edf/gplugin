@@ -1,2 +1,3 @@
-usr/bin/gplugin-gtk-viewer usr/bin
+usr/bin/gplugin-gtk-viewer
+usr/share/man/man1/gplugin-gtk-viewer.1
 

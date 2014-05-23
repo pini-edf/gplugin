@@ -130,6 +130,13 @@ target_link_libraries(gplugin-gtk-viewer
 	gplugin
 )
 
+help2man(
+	TARGET gplugin-gtk-viewer
+	OUTPUT gplugin-gtk-viewer.1
+	SECTION 1
+	NAME "View installed plugins"
+)
+
 install(TARGETS gplugin-gtk-viewer RUNTIME DESTINATION bin)
 
 endif(BUILD_GTK3)
