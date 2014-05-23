@@ -196,6 +196,12 @@ gettextize_pot_file(
 add_executable(gplugin-query gplugin-query.c)
 target_link_libraries(gplugin-query ${GLIB_LIBRARIES} gplugin)
 
+help2man(
+	TARGET gplugin-query
+	OUTPUT gplugin-query.1
+	SECTION 1
+)
+
 ###############################################################################
 # loader-tests static library
 ###############################################################################

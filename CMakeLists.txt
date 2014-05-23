@@ -80,6 +80,7 @@ endif(APPLE)
 
 include(FindPkgConfig)
 include(PkgConfigVariable)
+include(help2man)
 
 set(REQ_GLIB_VER 2.20.0)
 
