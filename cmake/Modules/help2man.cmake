@@ -11,7 +11,7 @@ if(NOT HELP2MAN)
 endif(NOT HELP2MAN)
 
 function(help2man _FIRST_ARG)
-	set(oneValueArgs TARGET OUTPUT SECTION)
+	set(oneValueArgs TARGET OUTPUT SECTION NAME)
 
 	CMAKE_PARSE_ARGUMENTS(_HELP2MAN "" "${oneValueArgs}" "" ${_FIRST_ARG} ${ARGN})
 
@@ -32,7 +32,11 @@ function(help2man _FIRST_ARG)
 		set(_HELP2MAN_SECTION 1)
 	endif(NOT _HELP2MAN_SECTION)
 
-	set(OPTIONS, "${OPTIONS} -N")
+	# additional options
+	set(_HELP2MAN_OPTIONS)
+	if(_HELP2MAN_NAME)
+		set(_HELP2MAN_OPTIONS ${_HELP2MAN_OPTIONS} -n "${_HELP2MAN_NAME}")
+	endif(_HELP2MAN_NAME)
 
 	# now find the executable
 	get_target_property(_HELP2MAN_EXEC ${_HELP2MAN_TARGET} RUNTIME_OUTPUT_NAME)
@@ -41,12 +45,16 @@ function(help2man _FIRST_ARG)
 	endif(NOT _HELP2MAN_EXEC)
 
 	add_custom_target(${_HELP2MAN_OUTPUT} ALL
-		COMMAND ${HELP2MAN} -s ${_HELP2MAN_SECTION} -o ${_HELP2MAN_OUTPUT} ${_HELP2MAN_EXEC}
+		COMMAND ${HELP2MAN}
+		        -s ${_HELP2MAN_SECTION}
+		        -o ${_HELP2MAN_OUTPUT}
+		        -N ${_HELP2MAN_OPTIONS}
+		        ${_HELP2MAN_EXEC}
 		DEPENDS ${_HELP2MAN_TARGET}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	)
 
-	install(FILES ${_HELP2MAN_OUTPUT} DESTINATION share/man/man${_HELP2MAN_SECTION})
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${_HELP2MAN_OUTPUT} DESTINATION share/man/man${_HELP2MAN_SECTION})
 endfunction(help2man)
 
 
