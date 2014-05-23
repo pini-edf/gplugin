@@ -172,8 +172,8 @@ add_library(gplugin SHARED
 )
 
 set_target_properties(gplugin PROPERTIES
-	SOVERSION ${GPLUGIN_LD_VERSION}
-	VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}
+	SOVERSION ${GPLUGIN_LD_CURRENT}
+	VERSION ${GPLUGIN_LD_VERSION}
 )
 
 target_link_libraries(gplugin

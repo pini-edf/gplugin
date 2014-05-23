@@ -87,8 +87,8 @@ add_library(gplugin-gtk SHARED
 )
 
 set_target_properties(gplugin-gtk PROPERTIES
-	SOVERSION ${GPLUGIN_GTK_LD_VERSION}
-	VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}
+	SOVERSION ${GPLUGIN_GTK_LD_CURRENT}
+	VERSION ${GPLUGIN_GTK_LD_VERSION}
 )
 
 target_link_libraries(gplugin-gtk
