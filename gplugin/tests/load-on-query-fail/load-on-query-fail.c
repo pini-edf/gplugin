@@ -15,6 +15,7 @@
  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <gplugin.h>
 #include <gplugin-native.h>
 
 G_MODULE_EXPORT GPluginPluginInfo *
