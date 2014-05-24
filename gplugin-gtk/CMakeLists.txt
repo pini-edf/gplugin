@@ -135,6 +135,7 @@ help2man(
 	OUTPUT gplugin-gtk-viewer.1
 	SECTION 1
 	NAME "View installed plugins"
+	HELP_OPTION --help-all
 )
 
 install(TARGETS gplugin-gtk-viewer RUNTIME DESTINATION bin)

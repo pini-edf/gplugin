@@ -201,6 +201,7 @@ help2man(
 	OUTPUT gplugin-query.1
 	SECTION 1
 	NAME "Query installed plugins"
+	HELP_OPTION --help-all
 )
 
 ###############################################################################
