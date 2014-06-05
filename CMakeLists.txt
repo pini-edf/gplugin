@@ -41,6 +41,12 @@ option(
 	"On"
 )
 
+option(
+	TESTING_ENABLED
+	"Whether or not to run unit tests while compiling"
+	"On"
+)
+
 ###############################################################################
 # Dependencies
 ###############################################################################
@@ -104,17 +110,19 @@ else(${GLIB_gobject-2.0_VERSION} LESS 2.32.0)
 	pkg_config_variable(glib-2.0 glib_mkenums GLIB_MKENUMS)
 endif(${GLIB_gobject-2.0_VERSION} LESS 2.32.0)
 
-find_program(GTESTER
-	NAMES gtester
-	DOC "gtester executable"
-)
-mark_as_advanced(GTESTER)
+if(TESTING_ENABLED)
+	find_program(GTESTER
+		NAMES gtester
+		DOC	"gtester executable"
+	)
+	mark_as_advanced(GTESTER)
 
-find_program(XSLTPROC
-	NAMES xsltproc
-	DOC "xsltproc executable"
-)
-mark_as_advanced(XSLTPROC)
+	find_program(XSLTPROC
+		NAMES xsltproc
+		DOC "xsltproc executable"
+	)
+	mark_as_advanced(XSLTPROC)
+endif(TESTING_ENABLED)
 
 ###############################################################################
 # NLS
