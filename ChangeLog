@@ -2,6 +2,7 @@
   * Finished the gjs loader.
   * Relicensed to LGPL2.
   * Created the Debian packaging.
+  * Add an option to disable unit testing
 
 0.0.16: 2014/05/05
   * Added luajit as the first Lua library to try to use.
