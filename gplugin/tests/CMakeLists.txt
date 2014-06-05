@@ -143,4 +143,3 @@ add_custom_target(tests ALL
 	DEPENDS ${GTESTER_LOG} ${GTESTER_JUNIT}
 )
 
-

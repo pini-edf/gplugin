@@ -282,5 +282,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gplugin.pc DESTINATION lib/pkgconfig)
 ###############################################################################
 # subdirectories
 ###############################################################################
-add_subdirectory(tests)
+if(TESTING_ENABLED)
+	add_subdirectory(tests)
+endif(TESTING_ENABLED)
 
