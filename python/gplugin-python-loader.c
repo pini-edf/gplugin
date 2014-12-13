@@ -1,19 +1,21 @@
 /*
- * Copyright (C) 2011-2013 Gary Kramlich <grim@reaperworld.com>
+ * Copyright (C) 2011-2014 Gary Kramlich <grim@reaperworld.com>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
+
+#include <stdlib.h>
 
 #include <Python.h>
 
@@ -47,14 +49,14 @@ static GType type_real = 0;
  * GPluginLoaderInterface API
  *****************************************************************************/
 static GSList *
-gplugin_python_loader_class_supported_extensions(const GPluginLoaderClass *klass) {
+gplugin_python_loader_class_supported_extensions(GPLUGIN_UNUSED const GPluginLoaderClass *klass) {
 	return g_slist_append(NULL, "py");
 }
 
 static GPluginPlugin *
-gplugin_python_loader_query(GPluginLoader *loader,
-                                   const gchar *filename,
-                                   GError **error)
+gplugin_python_loader_query(GPLUGIN_UNUSED GPluginLoader *loader,
+                            const gchar *filename,
+                            GPLUGIN_UNUSED GError **error)
 {
 	GPluginPlugin *plugin = NULL;
 	GObject *info = NULL;
@@ -100,7 +102,7 @@ gplugin_python_loader_query(GPluginLoader *loader,
 
 	query = PyDict_GetItemString(module_dict, "gplugin_query");
 	if(query == NULL) {
-		g_warning(_("Failed to find the gplugin_plugin_query function in %s"),
+		g_warning(_("Failed to find the gplugin_query function in %s"),
 		          filename);
 
 		pyg_gil_state_release(state);
@@ -181,9 +183,9 @@ gplugin_python_loader_query(GPluginLoader *loader,
 }
 
 static gboolean
-gplugin_python_loader_load(GPluginLoader *loader,
-                                  GPluginPlugin *plugin,
-                                  GError **error)
+gplugin_python_loader_load(GPLUGIN_UNUSED GPluginLoader *loader,
+                           GPluginPlugin *plugin,
+                           GError **error)
 {
 	PyObject *load = NULL, *pyplugin = NULL, *result = NULL;
 	gboolean ret = FALSE;
@@ -215,9 +217,9 @@ gplugin_python_loader_load(GPluginLoader *loader,
 }
 
 static gboolean
-gplugin_python_loader_unload(GPluginLoader *loader,
-                                    GPluginPlugin *plugin,
-                                    GError **error)
+gplugin_python_loader_unload(GPLUGIN_UNUSED GPluginLoader *loader,
+                             GPluginPlugin *plugin,
+                             GError **error)
 {
 	PyObject *unload = NULL, *pyplugin = NULL, *result = NULL;
 	gboolean ret = FALSE;
@@ -313,14 +315,14 @@ gplugin_python_loader_init_python(void) {
 
 	program = g_get_prgname();
 	program = program ? program : "";
-	len = mbstowcs(NULL, program, 0);
+	len = __mbstowcs_chk(NULL, program, 0, 0);
 	if(len == (size_t)-1) {
 		g_warning("Could not convert program name to wchar_t string.");
 		return FALSE;
 	}
 
 	argv[0] = g_new(wchar_t, len + 1);
-	len = mbstowcs(argv[0], program, len + 1);
+	len = __mbstowcs_chk(argv[0], program, len + 1, len + 1);
 	if(len == (size_t)-1) {
 		g_warning("Could not convert program name to wchar_t string.");
 		return FALSE;

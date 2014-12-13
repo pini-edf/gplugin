@@ -18,7 +18,7 @@ project(gplugin C)
 
 set(GPLUGIN_MAJOR_VERSION 0)
 set(GPLUGIN_MINOR_VERSION 0)
-set(GPLUGIN_MICRO_VERSION 16)
+set(GPLUGIN_MICRO_VERSION 17)
 set(GPLUGIN_EXTRA_VERSION)
 
 set(GPLUGIN_VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.${GPLUGIN_MICRO_VERSION}${GPLUGIN_EXTRA_VERSION})
@@ -38,6 +38,12 @@ option(
 option(
 	NLS
 	"Install translation files"
+	"On"
+)
+
+option(
+	TESTING_ENABLED
+	"Whether or not to run unit tests while compiling"
 	"On"
 )
 
@@ -80,6 +86,7 @@ endif(APPLE)
 
 include(FindPkgConfig)
 include(PkgConfigVariable)
+include(help2man)
 
 set(REQ_GLIB_VER 2.20.0)
 
@@ -103,17 +110,19 @@ else(${GLIB_gobject-2.0_VERSION} LESS 2.32.0)
 	pkg_config_variable(glib-2.0 glib_mkenums GLIB_MKENUMS)
 endif(${GLIB_gobject-2.0_VERSION} LESS 2.32.0)
 
-find_program(GTESTER
-	NAMES gtester
-	DOC "gtester executable"
-)
-mark_as_advanced(GTESTER)
+if(TESTING_ENABLED)
+	find_program(GTESTER
+		NAMES gtester
+		DOC	"gtester executable"
+	)
+	mark_as_advanced(GTESTER)
 
-find_program(XSLTPROC
-	NAMES xsltproc
-	DOC "xsltproc executable"
-)
-mark_as_advanced(XSLTPROC)
+	find_program(XSLTPROC
+		NAMES xsltproc
+		DOC "xsltproc executable"
+	)
+	mark_as_advanced(XSLTPROC)
+endif(TESTING_ENABLED)
 
 ###############################################################################
 # NLS
@@ -130,10 +139,26 @@ endif(NLS)
 # Build Info
 ###############################################################################
 add_definitions(
-	-g -g3 -Wall
+	-std=c99
+	-g -g3
 	-DPREFIX="${CMAKE_INSTALL_PREFIX}"
 	-DGPLUGIN_WEBSITE="http://bitbucket.org/rw_grim/gplugin/"
+	-Wall
+	-Werror=format-security
+	-Wformat
+	-Wextra
 )
+
+# check if we're using gcc
+if(CMAKE_COMPILER_IS_GNUCC)
+	add_definitions(
+		-DGPLUGIN_UNUSED=__attribute__\(\(unused\)\)
+	)
+else(CMAKE_COMPILER_IS_GNUCC)
+	add_definitions(
+		-DGPLUGIN_UNUSED=""
+	)
+endif(CMAKE_COMPILER_IS_GNUCC)
 
 include_directories(
 	${CMAKE_SOURCE_DIR}
@@ -156,6 +181,7 @@ add_subdirectory(gplugin-gtk)
 add_subdirectory(plugins)
 add_subdirectory(po)
 
+add_subdirectory(gjs)
 add_subdirectory(lua)
 add_subdirectory(perl)
 add_subdirectory(python)

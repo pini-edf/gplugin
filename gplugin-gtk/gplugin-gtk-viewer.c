@@ -1,18 +1,18 @@
 /*
- * Copyright (C) 2011-2013 Gary Kramlich <grim@reaperworld.com>
+ * Copyright (C) 2011-2014 Gary Kramlich <grim@reaperworld.com>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <stdio.h>
@@ -27,14 +27,17 @@
  * Globals
  *****************************************************************************/
 static gboolean show_internal = FALSE;
-static gboolean add_default_paths = TRUE;
+static gboolean add_default_paths = TRUE, version_only = FALSE;
 static gchar **paths = NULL;
 
 /******************************************************************************
  * Callbacks
  *****************************************************************************/
 static gboolean
-window_closed_cb(GtkWidget *w, GdkEvent *e, gpointer d) {
+window_closed_cb(GPLUGIN_UNUSED GtkWidget *w,
+                 GPLUGIN_UNUSED GdkEvent *e,
+                 GPLUGIN_UNUSED gpointer d)
+{
 	gtk_main_quit();
 
 	return FALSE;
@@ -60,15 +63,36 @@ selection_changed_cb(GtkTreeSelection *sel, gpointer data) {
  * Helpers
  *****************************************************************************/
 static gboolean
-internal_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
+internal_cb(GPLUGIN_UNUSED const gchar *n,
+            GPLUGIN_UNUSED const gchar *v,
+            GPLUGIN_UNUSED gpointer d,
+            GPLUGIN_UNUSED GError **e)
+{
 	show_internal = TRUE;
 
 	return TRUE;
 }
 
 static gboolean
-no_default_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
+no_default_cb(GPLUGIN_UNUSED const gchar *n,
+              GPLUGIN_UNUSED const gchar *v,
+              GPLUGIN_UNUSED gpointer d,
+              GPLUGIN_UNUSED GError **e)
+{
 	add_default_paths = FALSE;
+
+	return TRUE;
+}
+
+static gboolean
+version_cb(GPLUGIN_UNUSED const gchar *n,
+           GPLUGIN_UNUSED const gchar *v,
+           GPLUGIN_UNUSED gpointer d,
+           GPLUGIN_UNUSED GError **e)
+{
+	version_only = TRUE;
+
+	printf("gplugin-gtk-viewer %s\n", GPLUGIN_VERSION);
 
 	return TRUE;
 }
@@ -128,7 +152,11 @@ static GOptionEntry entries[] = {
 		&paths, "Additional paths to look for plugins",
 		"PATH",
 	}, {
-		NULL
+		"version", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+		version_cb, "Display the version and exit",
+		NULL,
+	}, {
+		NULL, 0, 0, 0, NULL, NULL, NULL,
 	},
 };
 
@@ -156,6 +184,10 @@ main(gint argc, gchar **argv) {
 		gplugin_uninit();
 
 		return EXIT_FAILURE;
+	}
+
+	if(version_only) {
+		return 0;
 	}
 
 	if(add_default_paths)

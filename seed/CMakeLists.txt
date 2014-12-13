@@ -36,5 +36,7 @@ if(BUILD_SEED)
 	install(TARGETS gplugin-seed DESTINATION lib/gplugin)
 endif(BUILD_SEED)
 
-add_subdirectory(tests)
+if(TESTING_ENABLED)
+	add_subdirectory(tests)
+endif(TESTING_ENABLED)
 

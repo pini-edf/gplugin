@@ -1,19 +1,20 @@
 /*
- * Copyright (C) 2011-2013 Gary Kramlich <grim@reaperworld.com>
+ * Copyright (C) 2011-2014 Gary Kramlich <grim@reaperworld.com>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
+
 #include <gplugin/gplugin-native-plugin.h>
 
 #include <gplugin/gplugin-native-private.h>
@@ -355,7 +356,9 @@ gplugin_native_plugin_get_type(void) {
  * Returns: FALSE if @plugin needed to be loaded and loading failed.
  */
 gboolean
-gplugin_native_plugin_use(GPluginNativePlugin *plugin, GError **error) {
+gplugin_native_plugin_use(GPluginNativePlugin *plugin,
+                          GPLUGIN_UNUSED GError **error)
+{
 	GPluginNativePluginPrivate *priv = NULL;
 
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), FALSE);
@@ -407,7 +410,9 @@ gplugin_native_plugin_use(GPluginNativePlugin *plugin, GError **error) {
  * Returns: TRUE if successful, FALSE otherwise.
  */
 gboolean
-gplugin_native_plugin_unuse(GPluginNativePlugin *plugin, GError **error) {
+gplugin_native_plugin_unuse(GPluginNativePlugin *plugin,
+                            GPLUGIN_UNUSED GError **error)
+{
 	GPluginNativePluginPrivate *priv = NULL;
 
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), FALSE);
@@ -611,7 +616,7 @@ gplugin_native_plugin_register_enum(GPluginNativePlugin *plugin,
                                     const gchar *name,
                                     const GEnumValue *values)
 {
-	GTypeInfo enum_info = { 0, };
+	GTypeInfo enum_info;
 
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), G_TYPE_INVALID);
 	g_return_val_if_fail(name, G_TYPE_INVALID);
@@ -639,7 +644,7 @@ gplugin_native_plugin_register_flags(GPluginNativePlugin *plugin,
                                      const gchar *name,
                                      const GFlagsValue *values)
 {
-	GTypeInfo flags_info = { 0, };
+	GTypeInfo flags_info;
 
 	g_return_val_if_fail(GPLUGIN_IS_NATIVE_PLUGIN(plugin), G_TYPE_INVALID);
 	g_return_val_if_fail(name, G_TYPE_INVALID);

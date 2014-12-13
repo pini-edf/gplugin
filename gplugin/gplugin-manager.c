@@ -1,18 +1,18 @@
 /*
- * Copyright (C) 2011-2013 Gary Kramlich <grim@reaperworld.com>
+ * Copyright (C) 2011-2014 Gary Kramlich <grim@reaperworld.com>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <stdio.h>
@@ -128,7 +128,10 @@ gplugin_manager_str_hash(gconstpointer v) {
 }
 
 static gboolean
-gplugin_manager_remove_list_value(gpointer k, gpointer v, gpointer d) {
+gplugin_manager_remove_list_value(GPLUGIN_UNUSED gpointer k,
+                                  gpointer v,
+                                  GPLUGIN_UNUSED gpointer d)
+{
 	GSList *l = NULL;
 
 	for(l = (GSList *)v; l; l = l->next) {
@@ -588,8 +591,7 @@ gplugin_manager_real_list_plugins(GPluginManager *manager) {
 }
 
 static gboolean
-gplugin_manager_load_dependencies(GPluginPlugin *plugin,
-                                  const GPluginPluginInfo *info,
+gplugin_manager_load_dependencies(const GPluginPluginInfo *info,
                                   GError **error)
 {
 	const gchar * const *dependencies = NULL;
@@ -730,7 +732,7 @@ gplugin_manager_real_load_plugin(GPluginManager *manager,
 		return FALSE;
 	}
 
-	if(!gplugin_manager_load_dependencies(plugin, info, error)) {
+	if(!gplugin_manager_load_dependencies(info, error)) {
 		g_object_unref(G_OBJECT(info));
 
 		return FALSE;
@@ -808,15 +810,17 @@ gplugin_manager_real_unload_plugin(GPluginManager *manager,
 }
 
 static gboolean
-gplugin_manager_loading_cb(GObject *manager, GPluginPlugin *plugin,
-                                  GError **error)
+gplugin_manager_loading_cb(GPLUGIN_UNUSED GObject *manager,
+                           GPLUGIN_UNUSED GPluginPlugin *plugin,
+                           GPLUGIN_UNUSED GError **error)
 {
 	return TRUE;
 }
 
 static gboolean
-gplugin_manager_unloading_cb(GObject *manager, GPluginPlugin *plugin,
-                                    GError **error)
+gplugin_manager_unloading_cb(GPLUGIN_UNUSED GObject *manager,
+                             GPLUGIN_UNUSED GPluginPlugin *plugin,
+                             GPLUGIN_UNUSED GError **error)
 {
 	return TRUE;
 }

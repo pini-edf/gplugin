@@ -1,18 +1,18 @@
 /*
- * Copyright (C) 2011-2013 Gary Kramlich <grim@reaperworld.com>
+ * Copyright (C) 2011-2014 Gary Kramlich <grim@reaperworld.com>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <gplugin/gplugin-core.h>
@@ -79,7 +79,7 @@ gplugin_native_loader_open(const gchar *filename, GModuleFlags flags,
  * GPluginLoaderInterface API
  *****************************************************************************/
 static GSList *
-gplugin_native_loader_class_supported_extensions(const GPluginLoaderClass *klass) {
+gplugin_native_loader_class_supported_extensions(GPLUGIN_UNUSED const GPluginLoaderClass *klass) {
 	return g_slist_append(NULL, G_MODULE_SUFFIX);
 }
 
@@ -209,7 +209,7 @@ gplugin_native_loader_query(GPluginLoader *loader,
 }
 
 static gboolean
-gplugin_native_loader_load(GPluginLoader *loader,
+gplugin_native_loader_load(GPLUGIN_UNUSED GPluginLoader *loader,
                            GPluginPlugin *plugin,
                            GError **error)
 {
@@ -242,7 +242,7 @@ gplugin_native_loader_load(GPluginLoader *loader,
 }
 
 static gboolean
-gplugin_native_loader_unload(GPluginLoader *loader,
+gplugin_native_loader_unload(GPLUGIN_UNUSED GPluginLoader *loader,
                              GPluginPlugin *plugin,
                              GError **error)
 {

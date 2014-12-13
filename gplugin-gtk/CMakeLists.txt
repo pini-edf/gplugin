@@ -11,6 +11,11 @@ if(BUILD_GTK3)
 ###############################################################################
 pkg_check_modules(GTK3 REQUIRED gtk+-3.0>=3.0.0)
 
+set(GPLUGIN_GTK_LD_CURRENT 0)
+set(GPLUGIN_GTK_LD_REVISION 1)
+set(GPLUGIN_GTK_LD_AGE 0)
+set(GPLUGIN_GTK_LD_VERSION ${GPLUGIN_GTK_LD_CURRENT}.${GPLUGIN_GTK_LD_REVISION}.${GPLUGIN_GTK_LD_AGE})
+
 add_definitions(
 	-DGPLUGIN_GTK_COMPILATION
 	-DG_LOG_DOMAIN="GPluginGtk"
@@ -81,6 +86,11 @@ add_library(gplugin-gtk SHARED
 	${GPLUGIN_GTK_BUILT_HEADERS}
 )
 
+set_target_properties(gplugin-gtk PROPERTIES
+	SOVERSION ${GPLUGIN_GTK_LD_CURRENT}
+	VERSION ${GPLUGIN_GTK_LD_VERSION}
+)
+
 target_link_libraries(gplugin-gtk
 	${GTK3_LIBRARIES}
 	gplugin
@@ -118,6 +128,14 @@ add_executable(gplugin-gtk-viewer
 target_link_libraries(gplugin-gtk-viewer
 	gplugin-gtk
 	gplugin
+)
+
+help2man(
+	TARGET gplugin-gtk-viewer
+	OUTPUT gplugin-gtk-viewer.1
+	SECTION 1
+	NAME "View installed plugins"
+	HELP_OPTION --help-all
 )
 
 install(TARGETS gplugin-gtk-viewer RUNTIME DESTINATION bin)

@@ -1,18 +1,18 @@
 /*
- * Copyright (C) 2011-2013 Gary Kramlich <grim@reaperworld.com>
+ * Copyright (C) 2011-2014 Gary Kramlich <grim@reaperworld.com>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <glib.h>
@@ -29,27 +29,53 @@
  *****************************************************************************/
 static gint verbosity = 0;
 static gboolean show_internal = FALSE;
+static gboolean version_only = FALSE;
 
 /******************************************************************************
  * Helpers
  *****************************************************************************/
 static gboolean
-verbosity_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
+verbosity_cb(GPLUGIN_UNUSED const gchar *n,
+             GPLUGIN_UNUSED const gchar *v,
+             GPLUGIN_UNUSED gpointer d,
+             GPLUGIN_UNUSED GError **e)
+{
 	verbosity++;
 
 	return TRUE;
 }
 
 static gboolean
-full_verbosity_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
+full_verbosity_cb(GPLUGIN_UNUSED const gchar *n,
+                  GPLUGIN_UNUSED const gchar *v,
+                  GPLUGIN_UNUSED gpointer d,
+                  GPLUGIN_UNUSED GError **e)
+{
 	verbosity = 1 << 11;
 
 	return TRUE;
 }
 
 static gboolean
-internal_cb(const gchar *n, const gchar *v, gpointer d, GError **e) {
+internal_cb(GPLUGIN_UNUSED const gchar *n,
+            GPLUGIN_UNUSED const gchar *v,
+            GPLUGIN_UNUSED gpointer d,
+            GPLUGIN_UNUSED GError **e)
+{
 	show_internal = TRUE;
+
+	return TRUE;
+}
+
+static gboolean
+version_cb(GPLUGIN_UNUSED const gchar *n,
+           GPLUGIN_UNUSED const gchar *v,
+           GPLUGIN_UNUSED gpointer d,
+           GPLUGIN_UNUSED GError **e)
+{
+	printf("gplugin-query %s\n", GPLUGIN_VERSION);
+
+	version_only = TRUE;
 
 	return TRUE;
 }
@@ -222,8 +248,12 @@ static GOptionEntry entries[] = {
 		full_verbosity_cb, N_("Increase verbosity to eleven"),
 		NULL,
 	}, {
-		NULL
-	},
+		"version", 0, G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+		version_cb, N_("Display the version and exit"),
+		NULL,
+	}, {
+		NULL, 0, 0, 0, NULL, NULL, NULL,
+	}
 };
 
 gint
@@ -236,6 +266,7 @@ main(gint argc, gchar **argv) {
 	gplugin_init();
 
 	ctx = g_option_context_new("PLUGIN-ID...");
+	g_option_context_set_summary(ctx, _("Query installed plugins"));
 	g_option_context_set_translation_domain(ctx, GETTEXT_PACKAGE);
 	g_option_context_add_main_entries(ctx, entries, NULL);
 
@@ -253,6 +284,10 @@ main(gint argc, gchar **argv) {
 		gplugin_uninit();
 
 		return EXIT_FAILURE;
+	}
+
+	if(version_only) {
+		return 0;
 	}
 
 	gplugin_manager_refresh();

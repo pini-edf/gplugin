@@ -1,19 +1,20 @@
 /*
  * Copyright (C) 2013 Ankit Vani <a@nevitus.org>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
+
 #include <gplugin.h>
 #include <gplugin-native.h>
 
@@ -22,7 +23,7 @@
 static DynamicTest *test_object = NULL;
 
 G_MODULE_EXPORT GPluginPluginInfo *
-gplugin_query(GError **error) {
+gplugin_query(GPLUGIN_UNUSED GError **error) {
 	const gchar * const dependencies[] = {
 		"gplugin/dynamic-type-provider",
 		NULL
@@ -37,7 +38,7 @@ gplugin_query(GError **error) {
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_load(GPluginNativePlugin *plugin, GError **error) {
+gplugin_load(GPLUGIN_UNUSED GPluginNativePlugin *plugin, GError **error) {
 	test_object = g_object_new(DYNAMIC_TYPE_TEST, NULL);
 
 	if (test_object == NULL) {
@@ -50,7 +51,7 @@ gplugin_load(GPluginNativePlugin *plugin, GError **error) {
 }
 
 G_MODULE_EXPORT gboolean
-gplugin_unload(GPluginNativePlugin *plugin, GError **error) {
+gplugin_unload(GPLUGIN_UNUSED GPluginNativePlugin *plugin, GError **error) {
 	g_object_unref(test_object);
 
 	if (DYNAMIC_IS_TEST(test_object)) {

@@ -104,5 +104,7 @@ if(BUILD_PYTHON)
 	install(TARGETS gplugin-python DESTINATION lib/gplugin)
 endif(BUILD_PYTHON)
 
-add_subdirectory(tests)
+if(TESTING_ENABLED)
+	add_subdirectory(tests)
+endif(TESTING_ENABLED)
 

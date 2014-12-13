@@ -1,6 +1,12 @@
 ###############################################################################
 # Library
 ###############################################################################
+
+set(GPLUGIN_LD_CURRENT 0)
+set(GPLUGIN_LD_REVISION 1)
+set(GPLUGIN_LD_AGE 0)
+set(GPLUGIN_LD_VERSION ${GPLUGIN_LD_CURRENT}.${GPLUGIN_LD_REVISION}.${GPLUGIN_LD_AGE})
+
 add_definitions(
 	-DGPLUGIN_COMPILATION
 	-DG_LOG_DOMAIN="GPlugin"
@@ -165,6 +171,11 @@ add_library(gplugin SHARED
 	gplugin-native.h
 )
 
+set_target_properties(gplugin PROPERTIES
+	SOVERSION ${GPLUGIN_LD_CURRENT}
+	VERSION ${GPLUGIN_LD_VERSION}
+)
+
 target_link_libraries(gplugin
 	${GLIB_LIBRARIES}
 	${GMODULE_LIBRARIES}
@@ -184,6 +195,14 @@ gettextize_pot_file(
 ###############################################################################
 add_executable(gplugin-query gplugin-query.c)
 target_link_libraries(gplugin-query ${GLIB_LIBRARIES} gplugin)
+
+help2man(
+	TARGET gplugin-query
+	OUTPUT gplugin-query.1
+	SECTION 1
+	NAME "Query installed plugins"
+	HELP_OPTION --help-all
+)
 
 ###############################################################################
 # loader-tests static library
@@ -263,5 +282,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gplugin.pc DESTINATION lib/pkgconfig)
 ###############################################################################
 # subdirectories
 ###############################################################################
-add_subdirectory(tests)
+if(TESTING_ENABLED)
+	add_subdirectory(tests)
+endif(TESTING_ENABLED)
 

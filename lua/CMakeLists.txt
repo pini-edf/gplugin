@@ -79,5 +79,7 @@ if(BUILD_LUA)
 	install(TARGETS gplugin-lua DESTINATION lib/gplugin)
 endif(BUILD_LUA)
 
-add_subdirectory(tests)
+if(TESTING_ENABLED)
+	add_subdirectory(tests)
+endif(TESTING_ENABLED)
 
