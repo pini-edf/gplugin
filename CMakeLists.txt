@@ -193,3 +193,34 @@ add_subdirectory(seed)
 # documentation
 install(FILES ChangeLog INSTALL README HACKING DESTINATION share/doc/gplugin)
 
+###############################################################################
+# make dist
+###############################################################################
+set(ARCHIVES
+	gplugin-${GPLUGIN_VERSION}.tar.bz2
+	gplugin-${GPLUGIN_VERSION}.tar.gz
+	gplugin-${GPLUGIN_VERSION}.zip
+)
+
+set(SIGNATURES)
+
+foreach(ARCHIVE ${ARCHIVES})
+	add_custom_command(
+		COMMAND hg archive ${ARCHIVE}
+		OUTPUT ${ARCHIVE}
+		DEPENDS .
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+	)
+
+	add_custom_command(
+		COMMAND gpg --yes -abs ${ARCHIVE}
+		OUTPUT ${ARCHIVE}.asc
+		DEPENDS . ${ARCHIVE}
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+	)
+
+	list(APPEND SIGNATURES ${ARCHIVE}.asc)
+endforeach(ARCHIVE)
+
+add_custom_target(dist DEPENDS ${ARCHIVES} ${SIGNATURES})
+
