@@ -194,7 +194,7 @@ add_subdirectory(seed)
 install(FILES ChangeLog INSTALL README HACKING DESTINATION share/doc/gplugin)
 
 ###############################################################################
-# "make dist"
+# make dist
 ###############################################################################
 set(ARCHIVES
 	gplugin-${GPLUGIN_VERSION}.tar.bz2
@@ -213,7 +213,7 @@ foreach(ARCHIVE ${ARCHIVES})
 	)
 
 	add_custom_command(
-		COMMAND gpg -abs ${ARCHIVE}
+		COMMAND gpg --yes -abs ${ARCHIVE}
 		OUTPUT ${ARCHIVE}.asc
 		DEPENDS . ${ARCHIVE}
 		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
