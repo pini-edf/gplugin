@@ -1,3 +1,6 @@
+0.0.18: 2015/02/22
+  * Add a dist target to build and sign source archives
+
 0.0.17: 2014/12/12
   * Finished the gjs loader.
   * Relicensed to LGPL2.
