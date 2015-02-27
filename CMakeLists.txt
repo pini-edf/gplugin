@@ -142,7 +142,7 @@ add_definitions(
 	-std=c99
 	-g -g3
 	-DPREFIX="${CMAKE_INSTALL_PREFIX}"
-	-DGPLUGIN_WEBSITE="http://bitbucket.org/rw_grim/gplugin/"
+	-DGPLUGIN_WEBSITE="http://bitbucket.org/gplugin/main"
 	-Wall
 	-Werror=format-security
 	-Wformat
