@@ -24,11 +24,23 @@ Description: GObject based plugin library
  .
  This package contains the main library.
 
+Package: libgplugin0-dbg
+Architecture: any
+Section: debug
+Priority: extra
+Depends: ${misc:Depends}, libgplugin0 (= ${binary:Version})
+Description: debugging symbols for libgplugin0
+ GPlugin is a GObject based library that implements a reusable plugin system
+ which supports loading plugins in other languages via loaders. It relies
+ heavily on GObjectIntrospection to expose its API to the other languages.
+ .
+ This package contains the debugging symbols for libgplugin0.
+
 Package: libgplugin-dev
 Architecture: any
 Section: libdevel
 Depends: ${misc:Depends}, libgplugin0 (= ${binary:Version}), libglib2.0-dev
-Description: Development filesfor libgplugin
+Description: Development files for libgplugin
  GPlugin is a GObject based library that implements a reusable plugin system
  which supports loading plugins in other languages via loaders. It relies
  heavily on GObjectIntrospection to expose its API to the other languages.
@@ -44,6 +56,18 @@ Description: GTK+3 bindings for GPlugin
  heavily on GObjectIntrospection to expose its API to the other languages.
  .
  This library provides some default GTK+-3 widgets for GPlugin.
+
+Package: libgplugin-gtk0-dbg
+Architecture: any
+Section: debug
+Priority: extra
+Depends: ${misc:Depends}, libgplugin-gtk0 (= ${binary:Version})
+Description: debugging symbols for libgplugin-gtk0
+ GPlugin is a GObject based library that implements a reusable plugin system
+ which supports loading plugins in other languages via loaders. It relies
+ heavily on GObjectIntrospection to expose its API to the other languages.
+ .
+ This library provides the debugging symbols for libgplugin-gtk0
 
 Package: libgplugin-gtk-dev
 Architecture: any
