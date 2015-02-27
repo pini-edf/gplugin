@@ -10,4 +10,4 @@ override_dh_makeshlibs:
 override_dh_strip:
 	dh_strip -plibgplugin0 --dbg-package=libgplugin0-dbg
 	dh_strip -plibgplugin-gtk0 --dbg-package=libgplugin-gtk0-dbg
-
+	dh_strip
