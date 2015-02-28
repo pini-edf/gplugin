@@ -47,6 +47,20 @@ Description: Development files for libgplugin
  .
  This package includes the files used for development against libgplugin.
 
+Package: libgplugin-loaders
+Architecture: all
+Depends: ${misc:Depends}, ${shlibs:Depends},
+         libgplugin-gjs,
+         libgplugin-lua,
+         libgplugin-python,
+         libgplugin-seed
+Description: metapackage for all gplugin loaders
+ GPlugin is a GObject based library that implements a reusable plugin system
+ which supports loading plugins in other languages via loaders. It relies
+ heavily on GObjectIntrospection to expose its API to the other languages.
+ .
+ This package will install all of the gplugin loaders.
+
 Package: libgplugin-gtk0
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, libgtk-3-0, libgplugin0
