@@ -12,7 +12,7 @@ Build-Depends: debhelper (>=9), cmake, libglib2.0-dev,
 Homepage: https://bitbucket.org/gplugin/main
 Vcs-Browser: https://bitbucket.org/gplugin/main/src
 Vcs-Hg: https://bitbucket.org/gplugin/main
-Standards-Version: 3.9.5
+Standards-Version: 3.9.6
 
 Package: libgplugin0
 Architecture: any
