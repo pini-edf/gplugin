@@ -17,6 +17,7 @@ Standards-Version: 3.9.5
 Package: libgplugin0
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, libglib-2.0
+Recommends: libgplugin-loaders
 Description: GObject based plugin library
  GPlugin is a GObject based library that implements a reusable plugin system
  which supports loading plugins in other languages via loaders. It relies
