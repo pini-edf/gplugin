@@ -139,7 +139,8 @@ _gplugin_gtk_plugin_info_refresh(GPluginGtkPluginInfoPrivate *priv,
 
 		for(i = 0; authors[i]; i++) {
 			widget = gtk_label_new(authors[i]);
-			gtk_misc_set_alignment(GTK_MISC(widget), 0.0f, 0.0f);
+			gtk_widget_set_halign(widget, GTK_ALIGN_START);
+			gtk_widget_set_valign(widget, GTK_ALIGN_START);
 			gtk_grid_attach(GTK_GRID(authors_grid), widget, 0, i, 1, 1);
 			gtk_widget_show(widget);
 		}
