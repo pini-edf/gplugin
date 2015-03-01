@@ -181,7 +181,6 @@ add_subdirectory(gplugin-gtk)
 add_subdirectory(plugins)
 add_subdirectory(po)
 
-add_subdirectory(gjs)
 add_subdirectory(lua)
 add_subdirectory(perl)
 add_subdirectory(python)
