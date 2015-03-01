@@ -185,7 +185,6 @@ add_subdirectory(gjs)
 add_subdirectory(lua)
 add_subdirectory(perl)
 add_subdirectory(python)
-add_subdirectory(seed)
 
 ###############################################################################
 # Install stuff
