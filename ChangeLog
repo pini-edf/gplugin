@@ -1,6 +1,7 @@
 0.0.19:
   * Add debug packages to the Debian packaging
   * Add libgplugin-loaders package to the Debian packaging
+  * Removed the Seed JavaScript loader
 
 0.0.18: 2015/02/22
   * Add a dist target to build and sign source archives
