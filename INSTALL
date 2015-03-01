@@ -18,7 +18,7 @@ prior to building GPlugin.
 
 Building
 ========
-GPlugin uses CMake (http://www.cmake.org) as it's build system.  As such
+GPlugin uses CMake (http://www.cmake.org) as its build system.  As such
 compiling is a little bit different than your typical ./configure, make,
 sudo make install.  But luckily for you, not too much different.
 
