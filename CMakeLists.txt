@@ -11,11 +11,13 @@ if(${CMAKE_VERSION} VERSION_LESS "2.8.3")
 	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Compatibility)
 endif(${CMAKE_VERSION} VERSION_LESS "2.8.3")
 
-# allow reading of the LOCATION property
-cmake_policy(SET CMP0026 OLD)
+if(${CMAKE_VERSION} VERSION_GREATER "2.8.12")
+	# allow reading of the LOCATION property
+	cmake_policy(SET CMP0026 OLD)
 
-# don't force target names to match a pattern
-cmake_policy(SET CMP0037 OLD)
+	# don't force target names to match a pattern
+	cmake_policy(SET CMP0037 OLD)
+endif(${CMAKE_VERSION} VERSION_GREATER "2.8.12")
 
 ###############################################################################
 # Project Info
