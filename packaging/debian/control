@@ -6,8 +6,7 @@ Build-Depends: debhelper (>=9), cmake, libglib2.0-dev,
                xsltproc, gettext, help2man,
                gobject-introspection, libgirepository1.0-dev,
                libluajit-5.1-dev, lua-lgi,
-               python3-dev, python-gi-dev, python3-gi,
-               libgjs-dev
+               python3-dev, python-gi-dev, python3-gi
 Homepage: https://bitbucket.org/gplugin/main
 Vcs-Browser: https://bitbucket.org/gplugin/main/src
 Vcs-Hg: https://bitbucket.org/gplugin/main
@@ -50,7 +49,6 @@ Description: Development files for libgplugin
 Package: libgplugin-loaders
 Architecture: all
 Depends: ${misc:Depends}, ${shlibs:Depends},
-         libgplugin-gjs,
          libgplugin-lua,
          libgplugin-python
 Description: metapackage for all gplugin loaders
@@ -139,16 +137,4 @@ Description: GPlugin Python Loader
  .
  This package allows GPlugin to load plugin written in the Python programming
  language.
-
-Package: libgplugin-gjs
-Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, libgjs0c,
-         libgplugin0, gir1.2-gplugin-0.0
-Description: GPlugin GNOME JavaScript Loader
- GPlugin is a GObject based library that implements a reusable plugin system
- which supports loading plugins in other languages via loaders. It relies
- heavily on GObjectIntrospection to expose its API to the other languages.
- .
- This package allows GPlugin to load plugin written in the GNOME JavaScript
- programming language.
 
