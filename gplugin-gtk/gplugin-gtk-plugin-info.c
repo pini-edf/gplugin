@@ -84,13 +84,13 @@ _gplugin_gtk_plugin_info_refresh(GPluginGtkPluginInfoPrivate *priv,
 		GPluginPluginInfo *plugin_info = gplugin_plugin_get_info(plugin);
 		GPluginLoader *plugin_loader = gplugin_plugin_get_loader(plugin);
 
-		if(GPLUGIN_IS_LOADER(plugin_loader)) {
+		filename = gplugin_plugin_get_filename(plugin);
+
+		if(plugin_loader && GPLUGIN_IS_LOADER(plugin_loader)) {
 			const char *loader_name = G_OBJECT_TYPE_NAME(plugin_loader);
 			loader = g_strdup(loader_name);
 			g_object_unref(G_OBJECT(plugin_loader));
 		}
-
-		filename = gplugin_plugin_get_filename(plugin);
 
 		g_object_get(G_OBJECT(plugin_info),
 		             "abi_version", &abi_version_uint,
@@ -310,7 +310,7 @@ gplugin_gtk_plugin_info_set_plugin(GPluginGtkPluginInfo *info,
 
 	priv = GPLUGIN_GTK_PLUGIN_INFO_GET_PRIVATE(info);
 
-	if(priv->plugin)
+	if(GPLUGIN_IS_PLUGIN(priv->plugin))
 		g_object_unref(G_OBJECT(priv->plugin));
 
 	if(GPLUGIN_IS_PLUGIN(plugin))

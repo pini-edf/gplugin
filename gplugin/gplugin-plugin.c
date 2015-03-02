@@ -130,10 +130,10 @@ gplugin_plugin_get_property(GObject *obj, guint param_id, GValue *value,
 			g_value_set_string(value, gplugin_plugin_get_filename(plugin));
 			break;
 		case PROP_LOADER:
-			g_value_set_object(value, gplugin_plugin_get_loader(plugin));
+			g_value_take_object(value, gplugin_plugin_get_loader(plugin));
 			break;
 		case PROP_INFO:
-			g_value_set_object(value, gplugin_plugin_get_info(plugin));
+			g_value_take_object(value, gplugin_plugin_get_info(plugin));
 			break;
 		case PROP_STATE:
 			g_value_set_enum(value, gplugin_plugin_get_state(plugin));
@@ -306,7 +306,7 @@ gplugin_plugin_get_filename(const GPluginPlugin *plugin) {
  * gplugin_plugin_get_loader:
  * @plugin: #GPluginPlugin instance
  *
- * Return Value: (transfer none): The #GPluginLoader that loaded @plugin
+ * Return Value: (transfer full): The #GPluginLoader that loaded @plugin
  */
 GPluginLoader *
 gplugin_plugin_get_loader(const GPluginPlugin *plugin) {
@@ -316,7 +316,7 @@ gplugin_plugin_get_loader(const GPluginPlugin *plugin) {
 
 	priv = GPLUGIN_PLUGIN_GET_PRIVATE(plugin);
 
-	return priv->loader;
+	return (priv->info) ? g_object_ref(G_OBJECT(priv->loader)) : NULL;
 }
 
 /**
