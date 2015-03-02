@@ -3,6 +3,7 @@
   * Add libgplugin-loaders package to the Debian packaging
   * Removed the Seed JavaScript loader (issue #63)
   * Removed the GNOME JavaScript loader (issue #64)
+  * Fixed crash in gplugin-gtk-viewer (issue #25)
 
 0.0.18: 2015/02/22
   * Add a dist target to build and sign source archives
