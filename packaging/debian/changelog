@@ -1,5 +1,11 @@
-gplugin (0.0.18) UNRELEASED; urgency=medium
+gplugin (0.0.19) UNRELEASED; urgency=medium
+
+  * New release, see official changelog
+
+ -- Gary Kramlich <grim@reaperworld.com>  Wed, 06 May 2015 10:43:53 -0500
+
+gplugin (0.0.18) unstable; urgency=medium
 
   * Initial release.
 
- -- Gary Kramlich <grim@reaperworld.com>  Wed, 14 May 2014 01:31:15 -0500
+ -- Gary Kramlich <grim@reaperworld.com>  Wed, 06 May 2015 10:43:35 -0500
