@@ -11,7 +11,6 @@ A full build (enabled by default) depends on the following:
 	gtk-3
 	python3-dev, python-gi-dev, python3-gi
 	liblua5.1-0-dev, lua-lgi
-	libseed-gtk3-dev
 	xsltproc
 
 All of these packages and their development headers need to be installed
@@ -19,7 +18,7 @@ prior to building GPlugin.
 
 Building
 ========
-GPlugin uses CMake (http://www.cmake.org) as it's build system.  As such
+GPlugin uses CMake (http://www.cmake.org) as its build system.  As such
 compiling is a little bit different than your typical ./configure, make,
 sudo make install.  But luckily for you, not too much different.
 

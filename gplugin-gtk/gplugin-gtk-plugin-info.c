@@ -84,13 +84,13 @@ _gplugin_gtk_plugin_info_refresh(GPluginGtkPluginInfoPrivate *priv,
 		GPluginPluginInfo *plugin_info = gplugin_plugin_get_info(plugin);
 		GPluginLoader *plugin_loader = gplugin_plugin_get_loader(plugin);
 
-		if(GPLUGIN_IS_LOADER(plugin_loader)) {
+		filename = gplugin_plugin_get_filename(plugin);
+
+		if(plugin_loader && GPLUGIN_IS_LOADER(plugin_loader)) {
 			const char *loader_name = G_OBJECT_TYPE_NAME(plugin_loader);
 			loader = g_strdup(loader_name);
 			g_object_unref(G_OBJECT(plugin_loader));
 		}
-
-		filename = gplugin_plugin_get_filename(plugin);
 
 		g_object_get(G_OBJECT(plugin_info),
 		             "abi_version", &abi_version_uint,
@@ -139,7 +139,8 @@ _gplugin_gtk_plugin_info_refresh(GPluginGtkPluginInfoPrivate *priv,
 
 		for(i = 0; authors[i]; i++) {
 			widget = gtk_label_new(authors[i]);
-			gtk_misc_set_alignment(GTK_MISC(widget), 0.0f, 0.0f);
+			gtk_widget_set_halign(widget, GTK_ALIGN_START);
+			gtk_widget_set_valign(widget, GTK_ALIGN_START);
 			gtk_grid_attach(GTK_GRID(authors_grid), widget, 0, i, 1, 1);
 			gtk_widget_show(widget);
 		}
@@ -309,7 +310,7 @@ gplugin_gtk_plugin_info_set_plugin(GPluginGtkPluginInfo *info,
 
 	priv = GPLUGIN_GTK_PLUGIN_INFO_GET_PRIVATE(info);
 
-	if(priv->plugin)
+	if(GPLUGIN_IS_PLUGIN(priv->plugin))
 		g_object_unref(G_OBJECT(priv->plugin));
 
 	if(GPLUGIN_IS_PLUGIN(plugin))

@@ -315,14 +315,14 @@ gplugin_python_loader_init_python(void) {
 
 	program = g_get_prgname();
 	program = program ? program : "";
-	len = __mbstowcs_chk(NULL, program, 0, 0);
+	len = mbstowcs(NULL, program, 0);
 	if(len == (size_t)-1) {
 		g_warning("Could not convert program name to wchar_t string.");
 		return FALSE;
 	}
 
 	argv[0] = g_new(wchar_t, len + 1);
-	len = __mbstowcs_chk(argv[0], program, len + 1, len + 1);
+	len = mbstowcs(argv[0], program, len + 1);
 	if(len == (size_t)-1) {
 		g_warning("Could not convert program name to wchar_t string.");
 		return FALSE;

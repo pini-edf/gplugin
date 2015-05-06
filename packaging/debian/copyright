@@ -1,7 +1,7 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: gplugin
 Upstream-Contact: grim@reaperworld.com
-Source: https://bitbucket.org/rw_grim/gplugin
+Source: https://bitbucket.org/gplugin/main
 
 Files: *
 Copyright: 2011-2014 Gary Kramlich <grim@reaperworld.com>
