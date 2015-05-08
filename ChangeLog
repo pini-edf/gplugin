@@ -1,3 +1,6 @@
+0.0.21:
+  *
+
 0.0.20: 2015/05/07
   * Fixed the lua dependency checks for Fedora 20
   * Fixed the build on cmake<3.0.0
