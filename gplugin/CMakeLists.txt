@@ -248,23 +248,23 @@ endif(BUILD_GIR)
 # Install Stuff
 ###############################################################################
 # install the main library
-install(TARGETS gplugin DESTINATION lib)
+install(TARGETS gplugin DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 # install gplugin-query
-install(TARGETS gplugin-query RUNTIME DESTINATION bin)
+install(TARGETS gplugin-query RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # install the single includes into the main directory
 install(
 	FILES ${CMAKE_CURRENT_BINARY_DIR}/gplugin.h
 	      ${CMAKE_CURRENT_BINARY_DIR}/gplugin-native.h
-	DESTINATION include/gplugin-1.0
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/gplugin-1.0
 )
 
 # install the normal includes into the gplugin subdirectory
 foreach(HEADER ${GPLUGIN_HEADERS} ${GPLUGIN_NATIVE_HEADERS})
 	install(
 		FILES ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}
-		DESTINATION include/gplugin-1.0/gplugin
+		DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/gplugin-1.0/gplugin
 	)
 endforeach(HEADER)
 
@@ -272,12 +272,12 @@ endforeach(HEADER)
 foreach(HEADER ${GPLUGIN_PUBLIC_BUILT_HEADERS})
 	install(
 		FILES ${CMAKE_CURRENT_BINARY_DIR}/${HEADER}
-		DESTINATION include/gplugin-1.0/gplugin
+		DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/gplugin-1.0/gplugin
 	)
 endforeach(HEADER)
 
 # pkg-config files
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gplugin.pc DESTINATION lib/pkgconfig)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gplugin.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 ###############################################################################
 # subdirectories

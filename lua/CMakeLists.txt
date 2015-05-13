@@ -76,7 +76,7 @@ if(BUILD_LUA)
 		gplugin
 	)
 
-	install(TARGETS gplugin-lua DESTINATION lib/gplugin)
+	install(TARGETS gplugin-lua DESTINATION ${CMAKE_INSTALL_LIBDIR}/gplugin)
 endif(BUILD_LUA)
 
 if(TESTING_ENABLED)
