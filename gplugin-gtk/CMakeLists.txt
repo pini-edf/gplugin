@@ -71,7 +71,7 @@ configure_file(gplugin-gtk.h.in gplugin-gtk.h @ONLY)
 configure_file(gplugin-gtk.pc.in gplugin-gtk.pc @ONLY)
 install(
 	FILES ${CMAKE_CURRENT_BINARY_DIR}/gplugin-gtk.pc
-	DESTINATION lib/pkgconfig
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
 
 ###############################################################################
@@ -96,26 +96,26 @@ target_link_libraries(gplugin-gtk
 	gplugin
 )
 
-install(TARGETS gplugin-gtk DESTINATION lib)
+install(TARGETS gplugin-gtk DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 # install the single include into the main directory
 install(
 	FILES ${CMAKE_CURRENT_BINARY_DIR}/gplugin-gtk.h
-	DESTINATION include/gplugin-1.0
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/gplugin-1.0
 )
 
 # install the normal includes into the gplugin-gtk subdirectory
 foreach(HEADER ${GPLUGIN_GTK_HEADERS})
 	install(
 		FILES ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}
-		DESTINATION include/gplugin-1.0/gplugin-gtk
+		DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/gplugin-1.0/gplugin-gtk
 	)
 endforeach(HEADER)
 
 # install the GtkBuilder files
 install(
 	FILES gplugin-gtk-plugin-info.ui
-	DESTINATION share/gplugin/gplugin-gtk/
+	DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/gplugin/gplugin-gtk/
 )
 
 ###############################################################################
@@ -138,6 +138,6 @@ help2man(
 	HELP_OPTION --help-all
 )
 
-install(TARGETS gplugin-gtk-viewer RUNTIME DESTINATION bin)
+install(TARGETS gplugin-gtk-viewer RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 endif(BUILD_GTK3)

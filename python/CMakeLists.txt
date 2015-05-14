@@ -101,7 +101,7 @@ if(BUILD_PYTHON)
 		gplugin
 	)
 
-	install(TARGETS gplugin-python DESTINATION lib/gplugin)
+	install(TARGETS gplugin-python DESTINATION ${CMAKE_INSTALL_LIBDIR}/gplugin)
 endif(BUILD_PYTHON)
 
 if(TESTING_ENABLED)

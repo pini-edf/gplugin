@@ -92,6 +92,7 @@ if(APPLE)
 	set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:/sw/lib/pkgconfig:/opt/local/lib/pkgconfig")
 endif(APPLE)
 
+include(GNUInstallDirs)
 include(FindPkgConfig)
 include(PkgConfigVariable)
 include(help2man)
@@ -197,7 +198,7 @@ add_subdirectory(python)
 # Install stuff
 ###############################################################################
 # documentation
-install(FILES ChangeLog INSTALL README HACKING DESTINATION share/doc/gplugin)
+install(FILES ChangeLog INSTALL README HACKING DESTINATION ${CMAKE_INSTALL_DOCDIR})
 
 ###############################################################################
 # make dist
