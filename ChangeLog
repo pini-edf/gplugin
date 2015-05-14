@@ -1,5 +1,6 @@
 0.0.21:
-  *
+  * Use the GNUInstallDirs cmake module to install everything to the correct
+    locations. - Elliott Sales de Andrade
 
 0.0.20: 2015/05/07
   * Fixed the lua dependency checks for Fedora 20
