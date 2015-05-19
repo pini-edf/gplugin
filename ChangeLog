@@ -1,6 +1,8 @@
 0.0.21:
   * Use the GNUInstallDirs cmake module to install everything to the correct
     locations. - Elliott Sales de Andrade
+  * Added -L, --list option to gplugin-query to show the search paths it is
+    using.
 
 0.0.20: 2015/05/07
   * Fixed the lua dependency checks for Fedora 20
