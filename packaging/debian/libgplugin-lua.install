@@ -1,2 +1,2 @@
-usr/lib/gplugin/gplugin-lua.so usr/lib/gplugin
+usr/lib/*/gplugin/gplugin-lua.so usr/lib/*/gplugin
 

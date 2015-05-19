@@ -1,2 +1,2 @@
-usr/lib/libgplugin-gtk.so.* usr/lib
+usr/lib/*/libgplugin-gtk.so.*
 
