@@ -1119,7 +1119,7 @@ void
 gplugin_manager_add_default_paths(void) {
 	gchar *path;
 
-	path = g_build_filename(PREFIX, "lib", "gplugin", NULL);
+	path = g_build_filename(PREFIX, LIBDIR, "gplugin", NULL);
 	gplugin_manager_prepend_path(path);
 	g_free(path);
 
@@ -1140,13 +1140,13 @@ gplugin_manager_add_default_paths(void) {
  */
 void
 gplugin_manager_add_app_paths(const gchar *prefix,
-                                     const gchar *appname)
+                              const gchar *appname)
 {
 	gchar *path;
 
 	g_return_if_fail(appname != NULL);
 
-	path = g_build_filename(prefix, "lib", appname, NULL);
+	path = g_build_filename(prefix, LIBDIR, appname, NULL);
 	gplugin_manager_prepend_path(path);
 	g_free(path);
 
