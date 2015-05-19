@@ -71,7 +71,7 @@ test_gplugin_manager_default_paths(void) {
 	GList *paths = NULL;
 	gchar *path = NULL;
 
-	path = g_build_filename(PREFIX, "lib", "gplugin", NULL);
+	path = g_build_filename(PREFIX, LIBDIR, "gplugin", NULL);
 	paths = g_list_prepend(paths, path);
 
 	path = g_build_filename(g_get_user_config_dir(), "gplugin", NULL);
