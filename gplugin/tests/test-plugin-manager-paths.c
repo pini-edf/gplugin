@@ -92,7 +92,7 @@ test_gplugin_manager_add_default_paths(void) {
 	req = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 
 	/* create and add the paths we are expecting to the table */
-	path = g_build_filename(PREFIX, "lib", "gplugin", NULL);
+	path = g_build_filename(PREFIX, LIBDIR, "gplugin", NULL);
 	g_hash_table_insert(req, path, GINT_TO_POINTER(FALSE));
 
 	path = g_build_filename(g_get_user_config_dir(), "gplugin", NULL);
@@ -127,7 +127,7 @@ test_gplugin_manager_add_app_paths(void) {
 	/* build our table of required paths */
 	req = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 
-	path = g_build_filename(prefix, "lib", appname, NULL);
+	path = g_build_filename(prefix, LIBDIR, appname, NULL);
 	g_hash_table_insert(req, path, GINT_TO_POINTER(FALSE));
 
 	path = g_build_filename(g_get_user_config_dir(), appname, "plugins", NULL);
