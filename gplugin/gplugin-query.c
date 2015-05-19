@@ -29,7 +29,8 @@
  *****************************************************************************/
 static gint verbosity = 0;
 static gboolean show_internal = FALSE;
-static gboolean version_only = FALSE;
+static gboolean output_paths = FALSE;
+static gboolean exit_early = FALSE;
 
 /******************************************************************************
  * Helpers
@@ -75,7 +76,18 @@ version_cb(GPLUGIN_UNUSED const gchar *n,
 {
 	printf("gplugin-query %s\n", GPLUGIN_VERSION);
 
-	version_only = TRUE;
+	exit_early = TRUE;
+
+	return TRUE;
+}
+
+static gboolean
+list_cb(GPLUGIN_UNUSED const gchar *n,
+        GPLUGIN_UNUSED const gchar *v,
+        GPLUGIN_UNUSED gpointer d,
+        GPLUGIN_UNUSED GError **e)
+{
+	output_paths = TRUE;
 
 	return TRUE;
 }
@@ -252,6 +264,10 @@ static GOptionEntry entries[] = {
 		version_cb, N_("Display the version and exit"),
 		NULL,
 	}, {
+		"list", 'L', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK,
+		list_cb, N_("Display all search paths and exit"),
+		NULL,
+	}, {
 		NULL, 0, 0, 0, NULL, NULL, NULL,
 	}
 };
@@ -286,7 +302,19 @@ main(gint argc, gchar **argv) {
 		return EXIT_FAILURE;
 	}
 
-	if(version_only) {
+	if(output_paths) {
+		GList *path = NULL;
+
+		for(path = gplugin_manager_get_paths(); path; path = path->next) {
+			printf("%s\n", (gchar *)path->data);
+		}
+
+		exit_early = TRUE;
+	}
+
+	if(exit_early) {
+		gplugin_uninit();
+
 		return 0;
 	}
 
