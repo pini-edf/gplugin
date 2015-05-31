@@ -62,6 +62,11 @@ if(BUILD_LUA)
 		message(FATAL_ERROR "  failed to find the 'lgi' lua module")
 	endif(${LUA_LGI_FOUND} EQUAL 0)
 
+	option(
+		MOONSCRIPT_TESTS
+		"Whether or not to run the moonscript tests"
+		"Off"
+	)
 
 	# now add the library
 	add_library(gplugin-lua MODULE
