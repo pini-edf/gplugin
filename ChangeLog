@@ -3,6 +3,8 @@
     locations. - Elliott Sales de Andrade
   * Added -L, --list option to gplugin-query to show the search paths it is
     using.
+  * Added an option to toggle whether or not the moonscript tests are run.
+    Defaults to no.
 
 0.0.20: 2015/05/07
   * Fixed the lua dependency checks for Fedora 20
