@@ -1,4 +1,4 @@
-0.0.21:
+0.0.21: 2015/06/29
   * Use the GNUInstallDirs cmake module to install everything to the correct
     locations. - Elliott Sales de Andrade
   * Added -L, --list option to gplugin-query to show the search paths it is
