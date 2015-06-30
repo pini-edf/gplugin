@@ -18,6 +18,7 @@ endmacro(add_lua_gtest)
 add_definitions(
 	-DLUA_LOADER_DIR="${CMAKE_BINARY_DIR}/lua"
 	-DLUA_PLUGIN_DIR="${CMAKE_CURRENT_SOURCE_DIR}/lua-plugins"
+	-DMOONSCRIPT_PLUGIN_DIR="${CMAKE_CURRENT_SOURCE_DIR}/moonscript-plugins"
 )
 
 add_lua_gtest(test-lua-loader)
