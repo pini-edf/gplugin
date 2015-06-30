@@ -1,4 +1,6 @@
 0.0.22:
+  * Made the moonscripts tests not interfer with the lua tests unless they're
+    explicitly turned on
 
 0.0.21: 2015/06/29
   * Use the GNUInstallDirs cmake module to install everything to the correct
