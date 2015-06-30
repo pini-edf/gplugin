@@ -47,8 +47,8 @@ if(_INSTALL_PREFIX)
 	_pkg_config_variable(girdir GIR_GIRDIR)
 	_pkg_config_variable(typelibdir GIR_TYPELIBDIR)
 else(_INSTALL_PREFIX)
-	set(GIR_GIRDIR "${CMAKE_INSTALL_PREFIX}/share/gir-1.0")
-	set(GIR_TYPELIBDIR "${CMAKE_INSTALL_PREFIX}/lib/girepository-1.0")
+	set(GIR_GIRDIR "${CMAKE_INSTALL_FULL_DATAROOTDIR}/gir-1.0")
+	set(GIR_TYPELIBDIR "${CMAKE_INSTALL_FULL_LIBDIR}/girepository-1.0")
 endif(_INSTALL_PREFIX)
 
 ###############################################################################

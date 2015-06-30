@@ -5,6 +5,7 @@ GPlugin depends on the following at a bare minimum:
 	gobject-introspection, libgirepository1.0-dev
 	cmake >= 2.8
 	gettext
+	help2man
 	a C compiler
 
 A full build (enabled by default) depends on the following:

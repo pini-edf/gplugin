@@ -46,7 +46,7 @@ if(BUILD_PERL)
 		include_directories(${PERL_INCLUDE_PATH})
 		target_link_libraries(gplugin-perl ${PERL_LIBRARY})
 
-		install(TARGETS gplugin-perl DESTINATION lib/gplugin)
+		install(TARGETS gplugin-perl DESTINATION ${CMAKE_INSTALL_LIBDIR}/gplugin)
 	else(PERLLIBS_FOUND)
 		message(FATAL_ERROR "Failed to find the Perl libraries")
 	endif(PERLLIBS_FOUND)

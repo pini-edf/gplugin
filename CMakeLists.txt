@@ -26,7 +26,7 @@ project(gplugin C)
 
 set(GPLUGIN_MAJOR_VERSION 0)
 set(GPLUGIN_MINOR_VERSION 0)
-set(GPLUGIN_MICRO_VERSION 20)
+set(GPLUGIN_MICRO_VERSION 21)
 set(GPLUGIN_EXTRA_VERSION)
 
 set(GPLUGIN_VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.${GPLUGIN_MICRO_VERSION}${GPLUGIN_EXTRA_VERSION})
@@ -92,6 +92,7 @@ if(APPLE)
 	set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:/sw/lib/pkgconfig:/opt/local/lib/pkgconfig")
 endif(APPLE)
 
+include(GNUInstallDirs)
 include(FindPkgConfig)
 include(PkgConfigVariable)
 include(help2man)
@@ -150,6 +151,7 @@ add_definitions(
 	-std=c99
 	-g -g3
 	-DPREFIX="${CMAKE_INSTALL_PREFIX}"
+	-DLIBDIR="${CMAKE_INSTALL_LIBDIR}"
 	-DGPLUGIN_WEBSITE="http://bitbucket.org/gplugin/main"
 	-Wall
 	-Werror=format-security
@@ -197,7 +199,7 @@ add_subdirectory(python)
 # Install stuff
 ###############################################################################
 # documentation
-install(FILES ChangeLog INSTALL README HACKING DESTINATION share/doc/gplugin)
+install(FILES ChangeLog INSTALL README HACKING DESTINATION ${CMAKE_INSTALL_DOCDIR})
 
 ###############################################################################
 # make dist

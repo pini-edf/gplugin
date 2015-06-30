@@ -1,2 +1,2 @@
-usr/lib/gplugin/gplugin-python.so usr/lib/gplugin
+usr/lib/*/gplugin/gplugin-python.so usr/lib/*/gplugin
 
