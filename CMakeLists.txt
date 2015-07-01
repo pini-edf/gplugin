@@ -163,6 +163,7 @@ add_definitions(
 if(CMAKE_COMPILER_IS_GNUCC)
 	add_definitions(
 		-DGPLUGIN_UNUSED=__attribute__\(\(unused\)\)
+		-ggdb
 	)
 else(CMAKE_COMPILER_IS_GNUCC)
 	add_definitions(
