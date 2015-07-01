@@ -24,7 +24,7 @@ gint
 main(gint argc, gchar **argv) {
 	g_test_init(&argc, &argv, NULL);
 
-	gplugin_loader_tests_main(LUA_LOADER_DIR, LUA_PLUGIN_DIR, "moon");
+	gplugin_loader_tests_main(LUA_LOADER_DIR, MOONSCRIPT_PLUGIN_DIR, "moon");
 
 	return g_test_run();
 }
