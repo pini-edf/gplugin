@@ -1,4 +1,4 @@
-0.0.22:
+0.0.22: 2015/06/30
   * Made the moonscripts tests not interfer with the lua tests unless they're
     explicitly turned on
   * Set the -ggdb cflag if we're being compiled by gcc
