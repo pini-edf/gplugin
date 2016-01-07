@@ -20,7 +20,7 @@ if(BUILD_LUA)
 		gplugin-lua-plugin.h
 	)
 
-	set(_LUAS "luajit>=2.0.0;lua>=5.1.0;lua5.2>=5.2.0;lua5.1>=5.1.0")
+	set(_LUAS "lua>=5.1.0;lua5.1>=5.1.0;luajit>=2.0.0;lua5.2>=5.2.0")
 	foreach(_LUA ${_LUAS})
 		if(NOT LUA_FOUND)
 			pkg_check_modules(LUA ${_LUA})
