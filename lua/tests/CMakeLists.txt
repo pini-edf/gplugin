@@ -24,10 +24,10 @@ add_definitions(
 add_lua_gtest(test-lua-loader)
 target_link_libraries(test-lua-loader gplugin-loader-tests)
 
-if(${MOONSCRIPT_TESTS})
+if(MOONSCRIPT_TESTS)
 	add_lua_gtest(test-lua-moon-loader)
 	target_link_libraries(test-lua-moon-loader gplugin-loader-tests)
-endif(${MOONSCRIPT_TESTS})
+endif(MOONSCRIPT_TESTS)
 
 set(GTESTER_LUA_TESTS "${LUA_TESTS}")
 set(GTESTER_LUA_LOG "test-gplugin-lua.xml")
