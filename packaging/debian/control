@@ -116,7 +116,7 @@ Description: typelibe for libgplugin
 
 Package: libgplugin-lua
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, liblua-5.1-0,
+Depends: ${misc:Depends}, ${shlibs:Depends}, liblua5.1-0,
          libgplugin0, gir1.2-gplugin-0.0
 Description: GPlugin Lua Loader
  GPlugin is a GObject based library that implements a reusable plugin system
