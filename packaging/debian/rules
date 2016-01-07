@@ -1,5 +1,8 @@
 #!/usr/bin/make -f
 
+debian/%.install: debian/%.install.in
+	sed 's/@DEB_HOST_MULTIARCH@/$(DEB_HOST_MULTIARCH)/g' $< > $@
+
 %:
 	dh $@
 
@@ -11,4 +14,3 @@ override_dh_strip:
 	dh_strip -plibgplugin0 --dbg-package=libgplugin0-dbg
 	dh_strip -plibgplugin-gtk0 --dbg-package=libgplugin-gtk0-dbg
 	dh_strip
-

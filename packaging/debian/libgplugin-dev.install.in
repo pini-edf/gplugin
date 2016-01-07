@@ -3,4 +3,3 @@ usr/include/gplugin-1.0/gplugin.h
 usr/include/gplugin-1.0/gplugin-native.h
 usr/lib/*/libgplugin.so
 usr/lib/*/pkgconfig/gplugin.pc
-
