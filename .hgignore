@@ -14,4 +14,4 @@ syntax: regexp
 ^packaging\/debian\/files$
 ^obj-x86_64-linux-gnu\/
 ^debian\/?$
-
+.+\.sublime-workspace
