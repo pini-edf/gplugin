@@ -1,2 +1,2 @@
-usr/lib/*/gplugin/gplugin-python.so usr/lib/*/gplugin
-
+#!/usr/bin/dh-exec
+usr/lib/${DEB_HOST_MULTIARCH}/gplugin/gplugin-python.so
