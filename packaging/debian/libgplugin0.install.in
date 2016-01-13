@@ -1,3 +1,0 @@
-usr/lib/@DEB_HOST_MULTIARCH@/libgplugin.so.*
-usr/bin/gplugin-query
-usr/share/man/man1/gplugin-query.1
