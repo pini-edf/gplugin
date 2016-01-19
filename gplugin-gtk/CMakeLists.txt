@@ -130,13 +130,15 @@ target_link_libraries(gplugin-gtk-viewer
 	gplugin
 )
 
-help2man(
-	TARGET gplugin-gtk-viewer
-	OUTPUT gplugin-gtk-viewer.1
-	SECTION 1
-	NAME "View installed plugins"
-	HELP_OPTION --help-all
-)
+if(BUILD_HELP2MAN)
+	help2man(
+		TARGET gplugin-gtk-viewer
+		OUTPUT gplugin-gtk-viewer.1
+		SECTION 1
+		NAME "View installed plugins"
+		HELP_OPTION --help-all
+	)
+endif(BUILD_HELP2MAN)
 
 install(TARGETS gplugin-gtk-viewer RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 

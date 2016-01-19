@@ -55,6 +55,12 @@ option(
 	"On"
 )
 
+option(
+	BUILD_HELP2MAN
+	"Whether or not to build man pages from --help output"
+	"on"
+)
+
 ###############################################################################
 # Dependencies
 ###############################################################################
@@ -95,7 +101,10 @@ endif(APPLE)
 include(GNUInstallDirs)
 include(FindPkgConfig)
 include(PkgConfigVariable)
-include(help2man)
+
+if(BUILD_HELP2MAN)
+	include(help2man)
+endif(BUILD_HELP2MAN)
 
 set(REQ_GLIB_VER 2.20.0)
 
