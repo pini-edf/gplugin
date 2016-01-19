@@ -182,13 +182,15 @@ target_link_libraries(gplugin
 )
 
 # nls
-gettextize_pot_file(
-	SORT
-	LANGUAGES C
-	SOURCES ${GPLUGIN_SOURCES} ${GPLUGIN_NATIVE_SOURCES} gplugin-query.c
-	BUILT_SOURCES ${GPLUGIN_PUBLIC_BUILT_SOURCES}
-	FILENAME gplugin.pot
-)
+if(NLS)
+	gettextize_pot_file(
+		SORT
+		LANGUAGES C
+		SOURCES ${GPLUGIN_SOURCES} ${GPLUGIN_NATIVE_SOURCES} gplugin-query.c
+		BUILT_SOURCES ${GPLUGIN_PUBLIC_BUILT_SOURCES}
+		FILENAME gplugin.pot
+	)
+endif(NLS)
 
 ###############################################################################
 # gplugin-query executable
