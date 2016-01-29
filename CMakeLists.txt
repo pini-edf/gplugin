@@ -26,8 +26,8 @@ project(gplugin C)
 
 set(GPLUGIN_MAJOR_VERSION 0)
 set(GPLUGIN_MINOR_VERSION 0)
-set(GPLUGIN_MICRO_VERSION 23)
-set(GPLUGIN_EXTRA_VERSION)
+set(GPLUGIN_MICRO_VERSION 24)
+set(GPLUGIN_EXTRA_VERSION dev)
 
 set(GPLUGIN_VERSION ${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.${GPLUGIN_MICRO_VERSION}${GPLUGIN_EXTRA_VERSION})
 
@@ -53,6 +53,12 @@ option(
 	TESTING_ENABLED
 	"Whether or not to run unit tests while compiling"
 	"On"
+)
+
+option(
+	BUILD_HELP2MAN
+	"Whether or not to build man pages from --help output"
+	"on"
 )
 
 ###############################################################################
@@ -95,7 +101,10 @@ endif(APPLE)
 include(GNUInstallDirs)
 include(FindPkgConfig)
 include(PkgConfigVariable)
-include(help2man)
+
+if(BUILD_HELP2MAN)
+	include(help2man)
+endif(BUILD_HELP2MAN)
 
 set(REQ_GLIB_VER 2.20.0)
 
@@ -167,7 +176,7 @@ if(CMAKE_COMPILER_IS_GNUCC)
 	)
 else(CMAKE_COMPILER_IS_GNUCC)
 	add_definitions(
-		-DGPLUGIN_UNUSED=""
+		-DGPLUGIN_UNUSED=
 	)
 endif(CMAKE_COMPILER_IS_GNUCC)
 

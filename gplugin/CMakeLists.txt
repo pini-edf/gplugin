@@ -182,13 +182,15 @@ target_link_libraries(gplugin
 )
 
 # nls
-gettextize_pot_file(
-	SORT
-	LANGUAGES C
-	SOURCES ${GPLUGIN_SOURCES} ${GPLUGIN_NATIVE_SOURCES} gplugin-query.c
-	BUILT_SOURCES ${GPLUGIN_PUBLIC_BUILT_SOURCES}
-	FILENAME gplugin.pot
-)
+if(NLS)
+	gettextize_pot_file(
+		SORT
+		LANGUAGES C
+		SOURCES ${GPLUGIN_SOURCES} ${GPLUGIN_NATIVE_SOURCES} gplugin-query.c
+		BUILT_SOURCES ${GPLUGIN_PUBLIC_BUILT_SOURCES}
+		FILENAME gplugin.pot
+	)
+endif(NLS)
 
 ###############################################################################
 # gplugin-query executable
@@ -196,13 +198,15 @@ gettextize_pot_file(
 add_executable(gplugin-query gplugin-query.c)
 target_link_libraries(gplugin-query ${GLIB_LIBRARIES} gplugin)
 
-help2man(
-	TARGET gplugin-query
-	OUTPUT gplugin-query.1
-	SECTION 1
-	NAME "Query installed plugins"
-	HELP_OPTION --help-all
-)
+if(BUILD_HELP2MAN)
+	help2man(
+		TARGET gplugin-query
+		OUTPUT gplugin-query.1
+		SECTION 1
+		NAME "Query installed plugins"
+		HELP_OPTION --help-all
+	)
+endif(BUILD_HELP2MAN)
 
 ###############################################################################
 # loader-tests static library
