@@ -1,4 +1,5 @@
 0.0.24:
+  * Really fixed the debian package this time
 
 0.0.23: 2016/01/06
   * Made the moonscript tests option work
