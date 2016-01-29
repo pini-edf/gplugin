@@ -1,3 +1,7 @@
+0.24.1: 2016/01/28
+  * Fixed the version numbering finally
+  * Updated the version in CMakeLists.txt
+
 0.0.24: 2016/01/28
   * Really fixed the debian package this time
   * Made help2man optional
