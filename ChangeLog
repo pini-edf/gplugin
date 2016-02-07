@@ -1,4 +1,4 @@
-0.25.0:
+0.25.0: 2016/02/06
   * Fix a regression where the GIR file did not have a predictable name.
   * Fix the glib requirement.  It was set at 2.20, but we require 2.32.
 
