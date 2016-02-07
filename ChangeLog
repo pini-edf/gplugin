@@ -1,3 +1,7 @@
+0.25.0: 2016/02/06
+  * Fix a regression where the GIR file did not have a predictable name.
+  * Fix the glib requirement.  It was set at 2.20, but we require 2.32.
+
 0.24.1: 2016/01/28
   * Fixed the version numbering finally
   * Updated the version in CMakeLists.txt

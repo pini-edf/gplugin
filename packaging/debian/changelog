@@ -1,8 +1,14 @@
+gplugin (0.25) unstable; urgency=medium
+
+  * New upstream release, see official changelog
+
+ -- Gary Kramlich <grim@reaperworld.com>  Sat, 06 Feb 2016 20:28:53 -0600
+
 gplugin (0.24.1) unstable; urgency=medium
 
   * New upstream release, see official changelog
 
- -- Gary Kramlich <grim@reaperworld.com>  Thu, 28 Jan 2016 22:49:30 -0600
+ -- Gary Kramlich <grim@reaperworld.com>  Sat, 06 Feb 2016 20:28:47 -0600
 
 gplugin (0.0.24) unstable; urgency=medium
 

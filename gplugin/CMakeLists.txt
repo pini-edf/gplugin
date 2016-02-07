@@ -231,7 +231,7 @@ if(BUILD_GIR)
 		set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${CMAKE_BINARY_DIR}")
 
 		gobject_introspection(
-			FILENAME GPlugin-${GPLUGIN_MAJOR_VERSION}.${GPLUGIN_MINOR_VERSION}.gir
+			FILENAME GPlugin-${GPLUGIN_MAJOR_VERSION}.0.gir
 			PACKAGES glib-2.0 gmodule-2.0 gobject-2.0
 			LIBRARY gplugin
 			QUIET
