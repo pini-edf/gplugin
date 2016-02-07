@@ -106,27 +106,13 @@ if(BUILD_HELP2MAN)
 	include(help2man)
 endif(BUILD_HELP2MAN)
 
-set(REQ_GLIB_VER 2.20.0)
-
-pkg_check_modules(GLIB REQUIRED
-	glib-2.0>=${REQ_GLIB_VER}
-	gobject-2.0>=${REQ_GLIB_VER}
-)
+pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.0 gobject-2.0)
 
 # we separate gmodule out so our test aren't linked to it
-pkg_check_modules(GMODULE REQUIRED
-	gmodule-2.0>=${REQ_GLIB_VER}
-)
+pkg_check_modules(GMODULE REQUIRED gmodule-2.0)
 
 pkg_config_variable(glib-2.0 glib_genmarshal GLIB_GENMARSHAL)
-
-if(${GLIB_gobject-2.0_VERSION} LESS 2.32.0)
-	set(GLIB_MKENUMS ${CMAKE_SOURCE_DIR}/tools/glib-mkenums
-		CACHE FILEPATH "glib-mkenums executable"
-	)
-else(${GLIB_gobject-2.0_VERSION} LESS 2.32.0)
-	pkg_config_variable(glib-2.0 glib_mkenums GLIB_MKENUMS)
-endif(${GLIB_gobject-2.0_VERSION} LESS 2.32.0)
+pkg_config_variable(glib-2.0 glib_mkenums GLIB_MKENUMS)
 
 if(TESTING_ENABLED)
 	find_program(GTESTER
