@@ -151,7 +151,7 @@ gplugin_manager_remove_list_value(GPLUGIN_UNUSED gpointer k,
  *****************************************************************************/
 static void
 gplugin_manager_real_append_path(GPluginManager *manager,
-                                        const gchar *path)
+                                 const gchar *path)
 {
 	GList *l = NULL;
 
@@ -167,7 +167,7 @@ gplugin_manager_real_append_path(GPluginManager *manager,
 
 static void
 gplugin_manager_real_prepend_path(GPluginManager *manager,
-                                         const gchar *path)
+                                  const gchar *path)
 {
 	GList *l = NULL;
 
@@ -183,7 +183,7 @@ gplugin_manager_real_prepend_path(GPluginManager *manager,
 
 static void
 gplugin_manager_real_remove_path(GPluginManager *manager,
-                                        const gchar *path)
+                                 const gchar *path)
 {
 	GList *l = NULL, *link = NULL;
 
@@ -211,7 +211,7 @@ gplugin_manager_real_get_paths(GPluginManager *manager) {
 
 static void
 gplugin_manager_real_register_loader(GPluginManager *manager,
-                                            GType type)
+                                     GType type)
 {
 	GPluginLoader *loader = NULL;
 	GPluginLoaderClass *lo_class = NULL;
@@ -275,7 +275,7 @@ gplugin_manager_real_register_loader(GPluginManager *manager,
 
 static void
 gplugin_manager_real_unregister_loader(GPluginManager *manager,
-                                              GType type)
+                                       GType type)
 {
 	GPluginLoaderClass *klass = NULL;
 	GSList *exts = NULL;
@@ -552,7 +552,7 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 
 static GSList *
 gplugin_manager_real_find_plugins(GPluginManager *manager,
-                                         const gchar *id)
+                                  const gchar *id)
 {
 	GSList *plugins_list = NULL, *l;
 
@@ -779,8 +779,8 @@ gplugin_manager_real_load_plugin(GPluginManager *manager,
 
 static gboolean
 gplugin_manager_real_unload_plugin(GPluginManager *manager,
-                                          GPluginPlugin *plugin,
-                                          GError **error)
+                                   GPluginPlugin *plugin,
+                                   GError **error)
 {
 	GPluginLoader *loader = NULL;
 	gboolean ret = TRUE;
@@ -962,9 +962,8 @@ gplugin_manager_class_init(GPluginManagerClass *klass) {
 
 	/**
 	 * GPluginManager::unloading-plugin:
-	 * @manager: the #gpluginpluginmanager instance.  treat as a #gobject.
-	 * @plugin: the #gpluginplugin that's about to be loaded.
-	 * @error: return address for a #gerror.
+	 * @manager: the #GPluginPluginManager instance.  treat as a #GObject.
+	 * @plugin: the #GPluginPlugin that's about to be loaded.
 	 *
 	 * emitted before a plugin is unloaded.
 	 *
