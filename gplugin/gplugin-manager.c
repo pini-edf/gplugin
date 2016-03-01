@@ -37,6 +37,7 @@
 enum {
 	SIG_LOADING,
 	SIG_LOADED,
+	SIG_LOAD_FAILED,
 	SIG_UNLOADING,
 	SIG_UNLOADED,
 	N_SIGNALS,
@@ -89,6 +90,7 @@ typedef struct {
 	                           GError **error);
 	void (*loaded_plugin)(GObject *manager,
 	                      GPluginPlugin *plugin);
+	void (*load_failed)(GObject *manager, GPluginPlugin *plugin);
 	gboolean (*unloading_plugin)(GObject *manager,
 	                             GPluginPlugin *plugin,
 	                             GError **error);
@@ -767,7 +769,10 @@ gplugin_manager_real_load_plugin(GPluginManager *manager,
 	gplugin_plugin_set_state(plugin, (ret) ? GPLUGIN_PLUGIN_STATE_LOADED :
 	                                         GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
 
-	g_signal_emit(manager, signals[SIG_LOADED], 0, plugin);
+	if(ret)
+		g_signal_emit(manager, signals[SIG_LOADED], 0, plugin);
+	else
+		g_signal_emit(manager, signals[SIG_LOAD_FAILED], 0, plugin);
 
 	return ret;
 }
@@ -931,6 +936,25 @@ gplugin_manager_class_init(GPluginManagerClass *klass) {
 		             G_STRUCT_OFFSET(GPluginManagerClass,
 		                             loaded_plugin),
 		             NULL, NULL,
+		             gplugin_marshal_VOID__OBJECT,
+		             G_TYPE_NONE,
+		             1,
+		             GPLUGIN_TYPE_PLUGIN);
+
+	/**
+	 * GPluginManager::load-failed:
+	 * @manager: The #GPluginPluginManager instance.
+	 * @plugin: The #GPluginPlugin that failed to load.
+	 *
+	 * emitted after a plugin fails to load.
+	 */
+	signals[SIG_LOAD_FAILED] =
+		g_signal_new("load-failed",
+		             G_OBJECT_CLASS_TYPE(manager_class),
+		             G_SIGNAL_RUN_LAST,
+		             G_STRUCT_OFFSET(GPluginManagerClass, load_failed),
+		             NULL,
+		             NULL,
 		             gplugin_marshal_VOID__OBJECT,
 		             G_TYPE_NONE,
 		             1,
