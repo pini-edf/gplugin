@@ -24,6 +24,7 @@ typedef struct {
 	gboolean loaded;
 	gboolean unloading;
 	gboolean unloaded;
+	gboolean load_failed;
 } TestGPluginManagerSignalsData;
 
 /******************************************************************************
@@ -105,6 +106,16 @@ test_gplugin_manager_signals_stop_unloading(GPLUGIN_UNUSED GObject *manager,
 	return FALSE;
 }
 
+static void
+test_gplugin_manager_signals_load_failed(GPLUGIN_UNUSED GObject *manager,
+                                         GPLUGIN_UNUSED GPluginPlugin *plugin,
+                                         gpointer d)
+{
+	TestGPluginManagerSignalsData *data = (TestGPluginManagerSignalsData *)d;
+
+	data->load_failed = TRUE;
+}
+
 /******************************************************************************
  * Tests
  *****************************************************************************/
@@ -113,7 +124,7 @@ test_gplugin_manager_signals_normal(void) {
 	GPluginPlugin *plugin = NULL;
 	GObject *manager = gplugin_manager_get_instance();
 	GError *error = NULL;
-	TestGPluginManagerSignalsData data = { FALSE, FALSE, FALSE, FALSE };
+	TestGPluginManagerSignalsData data = { FALSE, FALSE, FALSE, FALSE, FALSE };
 	gulong signals[] = { 0, 0, 0, 0};
 
 	signals[0] =
@@ -158,7 +169,7 @@ test_gplugin_manager_signals_loading_stopped(void) {
 	GPluginPlugin *plugin = NULL;
 	GObject *manager = gplugin_manager_get_instance();
 	GError *error = NULL;
-	TestGPluginManagerSignalsData data = { FALSE, FALSE, FALSE, FALSE };
+	TestGPluginManagerSignalsData data = { FALSE, FALSE, FALSE, FALSE, FALSE };
 	gulong signals[] = { 0, 0, 0, 0};
 
 	signals[0] =
@@ -200,7 +211,7 @@ test_gplugin_manager_signals_unloading_stopped(void) {
 	GPluginPlugin *plugin = NULL;
 	GObject *manager = gplugin_manager_get_instance();
 	GError *error = NULL;
-	TestGPluginManagerSignalsData data = { FALSE, FALSE, FALSE, FALSE };
+	TestGPluginManagerSignalsData data = { FALSE, FALSE, FALSE, FALSE, FALSE };
 	gulong signals[] = { 0, 0, 0, 0};
 
 	signals[0] =
@@ -240,6 +251,36 @@ test_gplugin_manager_signals_unloading_stopped(void) {
 	g_signal_handler_disconnect(manager, signals[3]);
 }
 
+static void
+test_gplugin_manager_signals_load_failure(void) {
+	GPluginPlugin *plugin = NULL;
+	GObject *manager = gplugin_manager_get_instance();
+	GError *error = NULL;
+	TestGPluginManagerSignalsData data = { FALSE, FALSE, FALSE, FALSE, FALSE };
+	gulong signals[] = { 0, 0, 0, 0, 0};
+
+	signals[0] =
+		g_signal_connect(manager, "loading-plugin",
+		                 G_CALLBACK(test_gplugin_manager_signals_normal_loading),
+		                 &data);
+	signals[1] =
+		g_signal_connect(manager, "load-failed",
+		                 G_CALLBACK(test_gplugin_manager_signals_load_failed),
+		                 &data);
+
+	gplugin_manager_append_path(TEST_DIR);
+	gplugin_manager_refresh();
+
+	plugin = gplugin_manager_find_plugin("gplugin/native-load-failed");
+	gplugin_manager_load_plugin(plugin, &error);
+	g_assert_error(error, GPLUGIN_DOMAIN, 0);
+	g_assert(data.loading);
+	g_assert(data.load_failed);
+
+	g_signal_handler_disconnect(manager, signals[0]);
+	g_signal_handler_disconnect(manager, signals[1]);
+}
+
 /******************************************************************************
  * Main
  *****************************************************************************/
@@ -256,6 +297,8 @@ main(gint argc, gchar **argv) {
 	                test_gplugin_manager_signals_loading_stopped);
 	g_test_add_func("/manager/signals/unloading-stopped",
 	                test_gplugin_manager_signals_unloading_stopped);
+	g_test_add_func("/manager/signals/load-failed",
+	                test_gplugin_manager_signals_load_failure);
 
 	return g_test_run();
 }
