@@ -837,16 +837,7 @@ static void
 gplugin_manager_finalize(GObject *obj) {
 	GPluginManager *manager = GPLUGIN_MANAGER(obj);
 
-#if GLIB_CHECK_VERSION(2,32,0)
 	g_queue_free_full(manager->paths, g_free);
-#else
-	GList *iter = NULL;
-	GSList *l = NULL;
-
-	for(iter = manager->paths->head; iter; iter = iter->next)
-		g_free(iter->data);
-	g_queue_free(manager->paths);
-#endif /* GLIB_CHECK_VERSION(2,32,0) */
 
 	/* free all the data in the plugins hash table and destroy it */
 	g_hash_table_foreach_remove(manager->plugins,
