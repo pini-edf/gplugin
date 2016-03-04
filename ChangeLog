@@ -1,5 +1,6 @@
 0.25.0:
   * Added a load-failed signal which is emitted when a plugin fails to load
+  * Removed pre glib 2.32.0 code
 
 0.25.0: 2016/02/06
   * Fix a regression where the GIR file did not have a predictable name.
