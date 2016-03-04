@@ -37,6 +37,7 @@
 enum {
 	SIG_LOADING,
 	SIG_LOADED,
+	SIG_LOAD_FAILED,
 	SIG_UNLOADING,
 	SIG_UNLOADED,
 	N_SIGNALS,
@@ -89,6 +90,7 @@ typedef struct {
 	                           GError **error);
 	void (*loaded_plugin)(GObject *manager,
 	                      GPluginPlugin *plugin);
+	void (*load_failed)(GObject *manager, GPluginPlugin *plugin);
 	gboolean (*unloading_plugin)(GObject *manager,
 	                             GPluginPlugin *plugin,
 	                             GError **error);
@@ -149,7 +151,7 @@ gplugin_manager_remove_list_value(GPLUGIN_UNUSED gpointer k,
  *****************************************************************************/
 static void
 gplugin_manager_real_append_path(GPluginManager *manager,
-                                        const gchar *path)
+                                 const gchar *path)
 {
 	GList *l = NULL;
 
@@ -165,7 +167,7 @@ gplugin_manager_real_append_path(GPluginManager *manager,
 
 static void
 gplugin_manager_real_prepend_path(GPluginManager *manager,
-                                         const gchar *path)
+                                  const gchar *path)
 {
 	GList *l = NULL;
 
@@ -181,7 +183,7 @@ gplugin_manager_real_prepend_path(GPluginManager *manager,
 
 static void
 gplugin_manager_real_remove_path(GPluginManager *manager,
-                                        const gchar *path)
+                                 const gchar *path)
 {
 	GList *l = NULL, *link = NULL;
 
@@ -209,7 +211,7 @@ gplugin_manager_real_get_paths(GPluginManager *manager) {
 
 static void
 gplugin_manager_real_register_loader(GPluginManager *manager,
-                                            GType type)
+                                     GType type)
 {
 	GPluginLoader *loader = NULL;
 	GPluginLoaderClass *lo_class = NULL;
@@ -273,7 +275,7 @@ gplugin_manager_real_register_loader(GPluginManager *manager,
 
 static void
 gplugin_manager_real_unregister_loader(GPluginManager *manager,
-                                              GType type)
+                                       GType type)
 {
 	GPluginLoaderClass *klass = NULL;
 	GSList *exts = NULL;
@@ -550,7 +552,7 @@ gplugin_manager_real_refresh(GPluginManager *manager) {
 
 static GSList *
 gplugin_manager_real_find_plugins(GPluginManager *manager,
-                                         const gchar *id)
+                                  const gchar *id)
 {
 	GSList *plugins_list = NULL, *l;
 
@@ -767,15 +769,18 @@ gplugin_manager_real_load_plugin(GPluginManager *manager,
 	gplugin_plugin_set_state(plugin, (ret) ? GPLUGIN_PLUGIN_STATE_LOADED :
 	                                         GPLUGIN_PLUGIN_STATE_LOAD_FAILED);
 
-	g_signal_emit(manager, signals[SIG_LOADED], 0, plugin);
+	if(ret)
+		g_signal_emit(manager, signals[SIG_LOADED], 0, plugin);
+	else
+		g_signal_emit(manager, signals[SIG_LOAD_FAILED], 0, plugin);
 
 	return ret;
 }
 
 static gboolean
 gplugin_manager_real_unload_plugin(GPluginManager *manager,
-                                          GPluginPlugin *plugin,
-                                          GError **error)
+                                   GPluginPlugin *plugin,
+                                   GError **error)
 {
 	GPluginLoader *loader = NULL;
 	gboolean ret = TRUE;
@@ -832,16 +837,7 @@ static void
 gplugin_manager_finalize(GObject *obj) {
 	GPluginManager *manager = GPLUGIN_MANAGER(obj);
 
-#if GLIB_CHECK_VERSION(2,32,0)
 	g_queue_free_full(manager->paths, g_free);
-#else
-	GList *iter = NULL;
-	GSList *l = NULL;
-
-	for(iter = manager->paths->head; iter; iter = iter->next)
-		g_free(iter->data);
-	g_queue_free(manager->paths);
-#endif /* GLIB_CHECK_VERSION(2,32,0) */
 
 	/* free all the data in the plugins hash table and destroy it */
 	g_hash_table_foreach_remove(manager->plugins,
@@ -937,10 +933,28 @@ gplugin_manager_class_init(GPluginManagerClass *klass) {
 		             GPLUGIN_TYPE_PLUGIN);
 
 	/**
+	 * GPluginManager::load-failed:
+	 * @manager: The #GPluginPluginManager instance.
+	 * @plugin: The #GPluginPlugin that failed to load.
+	 *
+	 * emitted after a plugin fails to load.
+	 */
+	signals[SIG_LOAD_FAILED] =
+		g_signal_new("load-failed",
+		             G_OBJECT_CLASS_TYPE(manager_class),
+		             G_SIGNAL_RUN_LAST,
+		             G_STRUCT_OFFSET(GPluginManagerClass, load_failed),
+		             NULL,
+		             NULL,
+		             gplugin_marshal_VOID__OBJECT,
+		             G_TYPE_NONE,
+		             1,
+		             GPLUGIN_TYPE_PLUGIN);
+
+	/**
 	 * GPluginManager::unloading-plugin:
-	 * @manager: the #gpluginpluginmanager instance.  treat as a #gobject.
-	 * @plugin: the #gpluginplugin that's about to be loaded.
-	 * @error: return address for a #gerror.
+	 * @manager: the #GPluginPluginManager instance.  treat as a #GObject.
+	 * @plugin: the #GPluginPlugin that's about to be loaded.
 	 *
 	 * emitted before a plugin is unloaded.
 	 *
