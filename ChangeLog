@@ -1,4 +1,4 @@
-0.26.0:
+0.26.0: 2016/03/03
   * Added a load-failed signal which is emitted when a plugin fails to load
   * Removed pre glib 2.32.0 code
 
