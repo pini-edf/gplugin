@@ -1,4 +1,4 @@
-0.25.0:
+0.26.0:
   * Added a load-failed signal which is emitted when a plugin fails to load
   * Removed pre glib 2.32.0 code
 
