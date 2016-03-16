@@ -106,7 +106,7 @@ if(BUILD_HELP2MAN)
 	include(help2man)
 endif(BUILD_HELP2MAN)
 
-pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.0 gobject-2.0)
+pkg_check_modules(GLIB REQUIRED glib-2.0>=2.34.0 gobject-2.0)
 
 # we separate gmodule out so our test aren't linked to it
 pkg_check_modules(GMODULE REQUIRED gmodule-2.0)
