@@ -132,7 +132,7 @@ gplugin_native_loader_query(GPluginLoader *loader,
 		if(module)
 			g_module_close(module);
 
-		if(error) {
+		if(error && !*error) {
 			*error = g_error_new(GPLUGIN_DOMAIN, 0,
 			                     _("the query function did not return a "
 			                       "GPluginPluginInfo instance"));
@@ -151,7 +151,7 @@ gplugin_native_loader_query(GPluginLoader *loader,
 		if(!GPLUGIN_IS_PLUGIN_INFO(info)) {
 			g_module_close(module);
 
-			if(error) {
+			if(error && !*error) {
 				*error = g_error_new(GPLUGIN_DOMAIN, 0,
 				                     _("the query function did not return a "
 				                       "GPluginPluginInfo instance"));

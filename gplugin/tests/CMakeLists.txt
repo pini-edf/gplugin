@@ -31,6 +31,7 @@ add_subdirectory(load-on-query-pass)
 add_subdirectory(load-on-query-fail)
 add_subdirectory(versioned-dependencies)
 add_subdirectory(bind-local)
+add_subdirectory(unresolved-symbol)
 
 ###############################################################################
 # Tests
@@ -115,6 +116,15 @@ add_definitions(-DTEST_ID_DIR="${CMAKE_CURRENT_BINARY_DIR}/id-collision/")
 add_gtest(test-bind-local)
 add_dependencies(test-bind-local bind-local)
 add_definitions(-DTEST_BIND_LOCAL_DIR="${CMAKE_CURRENT_BINARY_DIR}/bind-local/")
+
+#######################################
+# Unresolved Symbol
+#######################################
+add_gtest(test-unresolved-symbol)
+add_dependencies(test-unresolved-symbol unresolved-symbol)
+add_definitions(
+	-DPLUGIN_DIR="${CMAKE_CURRENT_BINARY_DIR}/unresolved-symbol"
+)
 
 ###############################################################################
 # GTester Stuff
