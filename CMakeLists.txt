@@ -145,6 +145,7 @@ endif(NLS)
 add_definitions(
 	-std=c99
 	-g -g3
+	-O2
 	-DPREFIX="${CMAKE_INSTALL_PREFIX}"
 	-DLIBDIR="${CMAKE_INSTALL_LIBDIR}"
 	-DGPLUGIN_WEBSITE="http://bitbucket.org/gplugin/main"
