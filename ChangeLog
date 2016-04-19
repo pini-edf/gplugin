@@ -1,4 +1,4 @@
-0.27.0:
+0.27.0: 2016/04/18
   * Bumped the glib requirement to 2.34.0
   * Fix some error reporting with the native loader
 
