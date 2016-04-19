@@ -25,7 +25,7 @@ endif(${CMAKE_VERSION} VERSION_GREATER "3.0.0")
 project(gplugin C)
 
 set(GPLUGIN_MAJOR_VERSION 0)
-set(GPLUGIN_MINOR_VERSION 26)
+set(GPLUGIN_MINOR_VERSION 27)
 set(GPLUGIN_MICRO_VERSION 0)
 set(GPLUGIN_EXTRA_VERSION)
 
@@ -106,7 +106,7 @@ if(BUILD_HELP2MAN)
 	include(help2man)
 endif(BUILD_HELP2MAN)
 
-pkg_check_modules(GLIB REQUIRED glib-2.0>=2.32.0 gobject-2.0)
+pkg_check_modules(GLIB REQUIRED glib-2.0>=2.34.0 gobject-2.0)
 
 # we separate gmodule out so our test aren't linked to it
 pkg_check_modules(GMODULE REQUIRED gmodule-2.0)
@@ -145,6 +145,7 @@ endif(NLS)
 add_definitions(
 	-std=c99
 	-g -g3
+	-O2
 	-DPREFIX="${CMAKE_INSTALL_PREFIX}"
 	-DLIBDIR="${CMAKE_INSTALL_LIBDIR}"
 	-DGPLUGIN_WEBSITE="http://bitbucket.org/gplugin/main"
