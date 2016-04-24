@@ -31,7 +31,7 @@ test_unresolved_symbol(void) {
 	g_test_expect_message(
 		G_LOG_DOMAIN,
 		G_LOG_LEVEL_WARNING,
-		"*undefined symbol: some_unresolved_symbol"
+		"*some_unresolved_symbol*"
 	);
 
 	gplugin_manager_remove_paths();
